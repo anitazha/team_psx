@@ -1,0 +1,23 @@
+# vdk10.syx	1.1 - 3/15/94
+# @(#)Copyright (C) 1987-1993 Verity, Inc.
+#
+# Synonym-list Database Descriptor
+#
+$control: 1
+descriptor:
+{
+  data-table: syu
+  {
+    worm:	THDSTAMP		date
+    worm:	QPARSER			text
+	/_hexdata = yes
+    varwidth:	WORD		syv
+    fixwidth:	EXPLEN			2 unsigned-integer
+    varwidth:	EXPLIST		syx
+	/_hexdata = yes
+  }
+  data-table: syw
+  {
+    varwidth:	SYNONYMS	syz
+  }
+}

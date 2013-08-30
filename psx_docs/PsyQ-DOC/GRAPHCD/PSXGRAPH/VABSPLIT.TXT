@@ -1,0 +1,40 @@
+
+<VABSPLIT v1.7>
+
+   This version has been changed so that it can output VAG data offset tables for the basic sound library(libspu).  VAG data offset tables are output as
+a series of C unsigned longs, for inclusion directly in source code.
+
+   Use the -v option when outputting a VAG data offset table (.h) and the -h
+   option when a VAB header file (.vh) must be output.
+   
+   EXAMPLE:
+   
+   > vabsplit -v -h wavedat1.vab wavedata2.vab
+   
+
+<VABSPLIT>
+
+   VABSPLIT is a program which splits PlayStation sound source data into a
+VAB file attributes table header (VABheader, .vh) and a waveform data body
+(VABbody, .vb).
+   
+   The VABheader needs to be resident in main memory while that bank is being 
+   used,but VAB body can be deleted from main memory if transfer completion
+   is confirmed.  
+   
+   Splitting the header and body makes it possible to use libsnd's 
+   SsVabOpenHead(), SsVabTransBody(), and SsVabTransCompleted() functions to
+   recognize VAB, and check on transfer start and transfer completion.
+
+   Usage:
+
+        VABSPLIT <vab1> <vab2> ....
+
+
+
+
+                                (C) 1995 Sony Computer Entertainment Inc.
+
+
+
+

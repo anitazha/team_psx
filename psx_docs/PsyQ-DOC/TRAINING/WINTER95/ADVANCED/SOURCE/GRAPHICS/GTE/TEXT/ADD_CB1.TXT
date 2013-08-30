@@ -1,0 +1,58 @@
+add_cube(ot, s, vp, np, c)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *c;
+{
+	int	i;
+	CVECTOR c0,c1,c2;	
+	for (i=0; i<12; i++, vp+=3,np+=3,c++) {
+		NormalColorCol3( np[0], np[1], np[2], c, &c0, &c1, &c2);
+		/*　グーロー三角形の分割　*/
+ 		s = tridiv(ot, s, vp[0],vp[1],vp[2], &c0,&c1,&c2, 3);
+
+	}
+}
+
+POLY_G3	*tridiv(ot, s, v0, v1, v2, c0, c1, c2, n)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	*v0,*v1,*v2;
+CVECTOR *c0,*c1,*c2;
+long n;
+{
+	long	p, otz, flg, clip;
+	if(n==0){ 	/* n==0 ならばグーロー三角形の描画 */ 			
+		gte_RotAverageNclip3( 	v0, v1, v2,
+					(long *)&s->x0,(long *)&s->x1,(long *)&s->x2,
+					&p, &otz, &flg, &clip);
+		if (clip <=0)  return(s); 
+		if((flg & 0x80000000)==0){ 	
+			*(CVECTOR *)&s->r0= *c0; *(CVECTOR *)&s->r1= *c1; *(CVECTOR *)&s->r2= *c2;
+			otz >>= (14-OTLENGTH);
+			addPrim( ot + OTSIZE - otz, s);
+			s++;
+		}
+	}
+	else{　
+		SVECTOR v01,v12,v20;
+		CVECTOR c01,c12,c20;
+		/* 中点を計算 */
+		v01.vx = (v0->vx+v1->vx)/2; v01.vy = (v0->vy+v1->vy)/2; v01.vz = (v0->vz+v1->vz)/2;
+		v12.vx = (v1->vx+v2->vx)/2; v12.vy = (v1->vy+v2->vy)/2; v12.vz = (v1->vz+v2->vz)/2;
+		v20.vx = (v2->vx+v0->vx)/2; v20.vy = (v2->vy+v0->vy)/2; v20.vz = (v2->vz+v0->vz)/2;
+		/* 中点の色を計算 */
+		c01.r = (c0->r+c1->r)/2; c01.g = (c0->g+c1->g)/2; c01.b = (c0->b+c1->b)/2; 
+		c12.r = (c1->r+c2->r)/2; c12.g = (c1->g+c2->g)/2; c12.b = (c1->b+c2->b)/2; 
+		c20.r = (c2->r+c0->r)/2; c20.g = (c2->g+c0->g)/2; c20.b = (c2->b+c0->b)/2; 
+		c01.cd = c0->cd; c12.cd = c0->cd; c20.cd = c0->cd;
+		/* 再帰呼びだし */
+		s=tridiv(ot, s, v0, &v01, &v20, c0, &c01, &c20, n-1);
+		s=tridiv(ot, s, &v01, v1, &v12, &c01, c1, &c12, n-1);
+		s=tridiv(ot, s, &v20, &v12, v2, &c20, &c12, c2, n-1);
+		s=tridiv(ot, s, &v01, &v12, &v20, &c01, &c12, &c20, n-1); 
+	}			
+	return(s);
+}
+

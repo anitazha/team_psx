@@ -1,0 +1,89 @@
+%PDX 2.0
+
+ObjBegin 
+<< 
+/Type /Globals
+/DirList [  ]
+/WatchedDirs [ [()(.)]  ]
+/SkipedDirs [  ]
+/TimeBuilt 851136627
+/DBFields [[/Title
+/tstr
+[]
+]
+[/Subject
+/str
+[]
+]
+[/Author
+/str
+[]
+]
+[/Keywords
+/str
+[]
+]
+[/Creator
+/str
+[]
+]
+[/Producer
+/str
+[]
+]
+[/CreationDate
+/date
+[]
+]
+[/ModificationDate
+/date
+[]
+]
+]
+/nWordsLessThanChars 0
+/nWordsGreaterThanChars 0
+/nIndexAvailableAfterFiles 4000
+/nGoalDocs 4096
+/bNumbers 1
+/bModifyPDFs 0
+/bCDROM 1
+/bSoundsLike 1
+/bAssistsAtEnd 1
+/bWordAssists 1
+/bWordStemming 1
+/bCaseSensitive 1
+/bChangedOptions 0
+/nMaxWords (400000)
+/nDocumentWordSectionsSmall (200000)
+/nDocumentWordSectionsMedium (400000)
+/nDocumentWordSectionsLarge (800000)
+/nMaxLogFileSize (1000000)
+/nDocumentWordSectionsSelection 1
+/Properties [[/IndexName
+/str
+[(Training Index)
+]
+]
+[/IndexDescription
+/str
+[(This is an index of SCEI and SCEA's Developer Support Training Co\
+urses from Winter of 95 and Fall of 96 respectively)
+]
+]
+]
+/StopWrds [(a)
+(A)
+(an)
+(An)
+(but)
+(But)
+(in)
+(In)
+(or)
+(Or)
+(the)
+(The)
+]
+>> 
+ObjEnd 
+

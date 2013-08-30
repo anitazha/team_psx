@@ -1,0 +1,56 @@
+Disc CDROMXA CD.EMU
+
+	CatalogNumber 0000000000000
+
+	LeadIn XA
+	  Empty       1000
+	  PostGap     150
+	EndTrack
+
+	Track XA
+	  Pause      150
+	  Volume          ISO9660         cd.ISO
+
+	    PrimaryVolume
+	      SystemIdentifier                    "PLAYSTATION"
+	      VolumeIdentifier                    "SLPS_00999"
+	      VolumeSetIdentifier                 "PSXGAME"
+	      PublisherIdentifier                 "SCE"
+	      DataPreparerIdentifier              "SCE"
+	      ApplicationIdentifier               "PLAYSTATION"
+	      Lpath
+	      Mpath
+
+	      Hierarchy
+
+		File              PSX.EXE
+	          XAFileAttributes Form1 Data
+        	  Source          PSX.EXE
+        	EndFile
+
+
+		Directory	DATA
+			File		RCUBE.TIM
+			  XAFileAttributes Form1 Data
+			  Source	RCUBE.TIM
+			EndFile
+
+			File		RCUBE.TMD
+			  XAFileAttributes Form1 Data
+			  Source	RCUBE.TMD
+			EndFile
+		EndDirectory
+
+	      EndHierarchy
+	    EndPrimaryVolume
+	  EndVolume
+	  Empty       300
+	  PostGap     150
+	EndTrack
+
+	LeadOut XA
+	  Empty 500
+	EndTrack
+
+EndDisc
+

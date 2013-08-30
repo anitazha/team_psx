@@ -1,0 +1,77 @@
+typedef struct {		
+		SVECTOR *v0,*v1,*v2;
+		CVECTOR *c0,*c1,*c2;
+		SVECTOR v01,v12,v20;
+		CVECTOR c01,c12,c20;
+} RLEV;
+
+typedef struct {		
+	u_long	*ot;
+	POLY_G3	*s;
+	long n,lev;
+	long	p, otz, flg, clip;
+
+	RLEV lv[5];
+} RWORK;
+
+void tridivr()
+{
+register RWORK *r;
+register RLEV *l;
+
+	r = (RWORK *)getScratchAddr(0);
+	l = &(r->lv[r->lev]);
+	if(r->lev == r->n){ 	/* lev ==  n ならばグーロー三角形の描画 */
+		gte_RotAverageNclip3( l->v0,l->v1,l->v2,
+			(long *)&r->s->x0,(long *)&r->s->x1,(long *)&r->s->x2,
+			&r->p, &r->otz, &r->flg, &r->clip);
+
+		if (r->clip <=0)  return; 
+		if((r->flg & 0x80000000)==0){ 	
+			*(CVECTOR *)&r->s->r0= *l->c0; 
+			*(CVECTOR *)&r->s->r1= *l->c1; 
+			*(CVECTOR *)&r->s->r2= *l->c2;
+			r->otz >>= (14-OTLENGTH);
+			addPrim( r->ot + OTSIZE - r->otz, r->s);
+			(r->s)++;
+		}
+	}
+	else{
+		/* 中点を計算 */
+		l->v01.vx = (l->v0->vx+l->v1->vx)/2; 
+		l->v01.vy = (l->v0->vy+l->v1->vy)/2; 
+		l->v01.vz = (l->v0->vz+l->v1->vz)/2;
+		l->v12.vx = (l->v1->vx+l->v2->vx)/2; 
+		l->v12.vy = (l->v1->vy+l->v2->vy)/2; 
+		l->v12.vz = (l->v1->vz+l->v2->vz)/2;
+		l->v20.vx = (l->v2->vx+l->v0->vx)/2; 
+		l->v20.vy = (l->v2->vy+l->v0->vy)/2; 
+		l->v20.vz = (l->v2->vz+l->v0->vz)/2;
+		/* 中点の色を計算 */
+		l->c01.r = (l->c0->r+l->c1->r)/2; 
+		l->c01.g = (l->c0->g+l->c1->g)/2; 
+		l->c01.b = (l->c0->b+l->c1->b)/2; 
+		l->c12.r = (l->c1->r+l->c2->r)/2; 
+		l->c12.g = (l->c1->g+l->c2->g)/2; 
+		l->c12.b = (l->c1->b+l->c2->b)/2; 
+		l->c20.r = (l->c2->r+l->c0->r)/2; 
+		l->c20.g = (l->c2->g+l->c0->g)/2; 
+		l->c20.b = (l->c2->b+l->c0->b)/2; 
+		l->c01.cd = l->c0->cd; l->c12.cd = l->c0->cd; l->c20.cd = l->c0->cd;
+		/* 再帰呼びだし */
+		r->lev++; 
+		(l+1)->v0 = l->v0; (l+1)->v1 = &l->v01; (l+1)->v2 = &l->v20;
+		(l+1)->c0 = l->c0; (l+1)->c1 = &l->c01; (l+1)->c2 = &l->c20;
+		tridivr();
+		(l+1)->v0 = &l->v01; (l+1)->v1 = l->v1; (l+1)->v2 = &l->v12;
+		(l+1)->c0 = &l->c01; (l+1)->c1 = l->c1; (l+1)->c2 = &l->c12;
+		tridivr();
+		(l+1)->v0 = &l->v20; (l+1)->v1 = &l->v12; (l+1)->v2 = l->v2;
+		(l+1)->c0 = &l->c20; (l+1)->c1 = &l->c12; (l+1)->c2 = l->c2;
+		tridivr();
+		(l+1)->v0 = &l->v01; (l+1)->v1 = &l->v12; (l+1)->v2 = &l->v20;
+		(l+1)->c0 = &l->c01; (l+1)->c1 = &l->c12; (l+1)->c2 = &l->c20;
+		tridivr();
+		r->lev--; 
+	}			
+}

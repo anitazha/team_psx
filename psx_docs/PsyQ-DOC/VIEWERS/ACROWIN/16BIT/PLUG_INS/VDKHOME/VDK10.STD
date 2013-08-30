@@ -1,0 +1,88 @@
+# vdk10.std	1.2 - 3/15/94
+# @(#)
+#
+# System/User Topic Set Descriptor
+#
+$control: 1
+descriptor:
+  /packed = yes
+{
+  data-table:	nod
+    /offset = 0
+    /num-records = 1
+    /max-records = 1
+  {
+    fixwidth:	TOPSTAMP_MAJ 4 date
+    fixwidth:	TOPSTAMP_MIN 4 date
+    fixwidth:	TOPTYPE      2 signed-integer
+    fixwidth:	MAXIID       2 signed-integer
+    fixwidth:	SYSNAME	    10 text
+    fixwidth:	SPARE	    42 text
+  }
+
+  data-table:	nod
+    /priority = HIGH
+    /offset   = 64
+  {
+    fixwidth:	OP	2    signed-integer
+    fixwidth:	CLINK	2  unsigned-integer
+    fixwidth:	PLINK	2  unsigned-integer
+    
+    fixwidth:	IID	2    signed-integer
+    fixwidth:	STAMP	2    signed-integer
+    fixwidth:	STASH	2    signed-integer
+    fixwidth:	FLAGS	2  unsigned-integer
+    
+    fixwidth:	OPARG	4    signed-integer
+
+    varwidth:	VALUE	   xvk
+    fixwidth:	VALUE_OF   3 unsigned-integer
+    fixwidth:	VALUE_SZ   2 unsigned-integer
+
+    varwidth:	NAME	   xtn
+    fixwidth:	NAME_OF    3 unsigned-integer
+    fixwidth:	NAME_SZ    1 unsigned-integer
+
+    varwidth:	ANNOT      xta
+    fixwidth:	ANNOT_OF   3 unsigned-integer
+    fixwidth:	ANNOT_SZ   2 unsigned-integer
+
+    varwidth:	AUTHOR	   xta
+    fixwidth:	AUTHOR_OF  3 unsigned-integer
+    fixwidth:	AUTHOR_SZ  1 unsigned-integer
+
+    varwidth:	DATE	   xta
+    fixwidth:	DATE_OF    3 unsigned-integer
+    fixwidth:	DATE_SZ    1 unsigned-integer
+
+  }
+
+  data-table: 	lnk
+    /priority = HIGH
+  {
+    fixwidth:	CNODE	2  unsigned-integer
+    fixwidth:	CNEXT	2  unsigned-integer
+
+    fixwidth:	PNODE	2  unsigned-integer
+    fixwidth:	PNEXT	2  unsigned-integer
+
+    fixwidth:	WEIGHT	1  unsigned-integer
+    fixwidth:	THRESH	1  unsigned-integer
+  }
+
+  data-table:	del
+  {
+    varwidth:	DELNAMES     xta
+    fixwidth:	DELNAMES_OF  3 unsigned-integer
+    fixwidth:	DELNAMES_SZ  1 unsigned-integer
+  }
+  data-table:	nam
+  {
+    fixwidth:	NAMEIDX	  2    signed-integer
+  }
+  data-table:	val
+  {
+    fixwidth:	VALUEIDX  2    signed-integer
+  }
+}
+$$

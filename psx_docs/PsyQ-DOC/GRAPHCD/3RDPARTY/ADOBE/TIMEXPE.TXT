@@ -1,0 +1,119 @@
+DTL-H201 output plug-in module                                    version 1.2E
+
+
+[ Operating environment ]
+
+Adobe Photoshop 2.5, Windows 3.1, DTL-H201
+
+
+[ Contents ]
+
+TIMEXPE.8BE: Export module for the DTL-H201.  This allows you to create or edit
+files in Photoshop, and output the image directly to the DTL-H201 (Artist Board)
+for viewing on the screen.  Indexed color and RGB color files may be output.
+
+TIMEXPE.TXT: This file.
+
+
+
+[ Installation ]
+
+Copy TIMEXPE.8BE into the "PLUGINS" sub-directory, found in the directory that
+PHOTOSHP.EXE is located in.
+
+
+
+[ Usage ]
+
+Sending image data to the DTL-H201
+
+1 Use ABORD.EXE to set the address of the DTL-H201.  
+You can confirm the address in the About Box by choosing 
+"Help / About plug-ins / TIM export..." from the menu bar.
+(The default address is 0x1340)
+
+2 Choose "File / Output plug-ins / TIM export" from the menu bar. 
+
+3 The TIM Export Options dialog box is displayed.  The check boxes are set 
+according to the results of the last time the module was used.  
+
+<<<<< Insert File: DLGEXPE.EPS here >>>>>
+
+* Image data modes
+Sets the pixel format to be used with the DTL-H201.
+Choose one of the following settings according to the screen type: 
+	Indexed color: 4 bit or 8 bit CLUT
+	RGB color: 16 bit or 24 bit Direct
+
+* Screen resolution
+Sets the vertical (V) and horizontal (H) resolution of the DTL-H201.  
+By changing the coordinate offset, you can display from any given address of VRAM.
+
+* Display area
+Sets the address in VRAM (from the upper left corner) and the width and height 
+of the rectangle to be texture mapped.  This is ignored when in Load Only mode.
+
+* Texture page
+Sets the address in VRAM (from the upper left corner) and the width and height
+of the texture data.  This is automatically set to (0, 0) when in Load Only mode.
+
+* CLUT section
+Sets the address in VRAM (from the upper left corner) of the CLUT.  
+This is ignored when the image mode is set to 16 or 24 bit.
+
+* Except black -> Translucent
+In Photoshop format, sets the transparency control bit for pixels or CLUT 
+entries other than those where the (R, G, B) values of the upper 5 bits are set 
+to (0, 0, 0), and draws the polygons in the display area in translucent mode.  
+As a result, all colors other than black become translucent.
+
+* Black -> Transparent
+In Photoshop format, clears the transparency control bit for pixels or CLUT 
+entries where the (R, G, B) values of the upper 5 bits are set to (0, 0, 0).  
+As a result, black becomes transparent, regardless of translucency mode.
+
+* Load only
+Sets the Load Only mode.  In this mode, texture data is only sent to VRAM, and 
+mapping of the display area is not performed.  Transparency control bits are 
+therefore ignored.  This mode is automatically selected when the color mode is 
+set to 24 bits.
+
+* Clear screen
+All of VRAM is first cleared.
+
+* Cancel
+Cancels drawing.
+
+* OK
+Sends picture data to the DTL-H201.
+
+
+******************************** IMPORTANT ************************************
+
+* RGB components in Photoshop are used at a resolution of 8 bits each, but the 
+DTL-H201 only uses 5 bits for each (except in 24 bit mode).  
+Therefore, on output the lower 3 bits will be truncated.
+
+* Transparency control bits are only valid in the display area where the texture 
+mapping is drawn.
+
+* The "Transparent" and "Translucent black/Opaque black" attributes in the TIM 
+format are the same as those in the Photoshop format.  This is manipulated 
+through the two check boxes found in this plug-in module which set the 
+transparency control bit.  However, you cannot perform mapping in a single 
+display area using both "Transparent" and "Translucent black/Opaque black" 
+attributes at the same time.  For situations such as this, set all "black" 
+pixels to an alternate value such as (R, G, B) = (0, 0, 1) in the TIM format.
+
+* This software may not be transferred or resold to any third party.
+
+* Reverse engineering of this software is forbidden.
+
+* Adobe Photoshop is an international trademark or registered trademark of Adobe 
+Systems Incorporated.
+
+* Windows is a registered trademark of Microsoft Corporation.
+
+							Copyright (C) 1994 Sony Computer Entertainment Inc.
+							All rights reserved.
+

@@ -1,0 +1,7 @@
+@RSD940102
+PLY=sample.ply
+MAT=sample.mat
+GRP=sample.grp
+NTEX=2
+TEX[0]=sample1.tim
+TEX[1]=sample2.tim

@@ -1,0 +1,61 @@
+add_cube(ot, s, vp, np, c)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *c;
+{
+	int	i;
+	CVECTOR c0,c1,c2;	
+	for (i=0; i<12; i++, vp+=3,np+=3,c++) {
+		NormalColorCol3( np[0], np[1], np[2], c, &c0, &c1, &c2);
+
+		/*　グーロー三角形の分割　*/
+		/* s = tridiv(ot, s, vp[0],vp[1],vp[2], &c0,&c1,&c2, 3); */				{
+ 			RWORK *r;
+ 			RLEV *l;
+
+			r = (RWORK *)getScratchAddr(0);			
+			r->lev = 0; l = &(r->lv[0]);
+			/* 引数のセット */
+			r->ot = ot; r->s = s;   
+			l->v0= vp[0]; l->v1= vp[1]; l->v2= vp[2];
+			l->c0= &c0; l->c1= &c1; l->c2= &c2;
+			r->n = 3;
+			tridivr();
+			s = r->s;	
+		}
+	}
+}
+
+add_cube(ot, s, vp, np, c)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *c;
+{
+	int	i;
+	CVECTOR c0,c1,c2;	
+	for (i=0; i<12; i++, vp+=3,np+=3,c++) {
+		NormalColorCol3( np[0], np[1], np[2], c, &c0, &c1, &c2);
+	
+		/*　グーロー三角形の分割　*/
+		/* s = tridiv(ot, s, vp[0],vp[1],vp[2], &c0,&c1,&c2, 3); */				{
+ 			RWORK *r;
+ 			RLEV *l;
+
+			r = (RWORK *)getScratchAddr(0);			
+			r->lev = 0; l = &(r->lv[0]);
+			/* 引数のセット */
+			r->ot = ot; r->s = s;   
+			l->v0= vp[0]; l->v1= vp[1]; l->v2= vp[2];
+			l->c0= &c0; l->c1= &c1; l->c2= &c2;
+			r->n = 3;
+			SetSpadStack(0x1f8003fc); 	/* Stack on ScratchPad */
+			tridivr();
+			ResetSpadStack();		/* Stack on Main Memory */
+			s = r->s;	
+		}
+	}
+}

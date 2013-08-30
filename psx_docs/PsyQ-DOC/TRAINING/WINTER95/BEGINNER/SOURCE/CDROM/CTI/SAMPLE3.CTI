@@ -1,0 +1,48 @@
+Disc CDROMXA CD.EMU
+
+	CatalogNumber 0000000000000
+
+	LeadIn XA
+	  Empty       1000
+	  PostGap     150
+	EndTrack
+
+	Track XA
+	  Pause      150
+	  Volume          ISO9660         cd.ISO
+
+	    PrimaryVolume
+	      SystemIdentifier                    "PLAYSTATION"
+	      VolumeIdentifier                    "SLPS_00999"
+	      VolumeSetIdentifier                 "PSXGAME"
+	      PublisherIdentifier                 "SCE"
+	      DataPreparerIdentifier              "SCE"
+	      ApplicationIdentifier               "PLAYSTATION"
+	      Lpath
+	      Mpath
+
+	      Hierarchy
+
+		File              PSX.EXE
+		  XAFileAttributes Form1 Data
+		  Source          PSX.EXE
+		EndFile
+
+	      EndHierarchy
+	    EndPrimaryVolume
+	  EndVolume
+	  Empty       300
+	  PostGap     150
+	EndTrack
+
+	Track Audio
+		Pause	150
+		Source	F:\TITLE\EDITA.DA
+	EndTrack
+
+	LeadOut Audio
+	  Empty 500
+	EndTrack
+
+EndDisc
+

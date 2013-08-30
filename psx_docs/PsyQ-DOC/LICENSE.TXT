@@ -1,0 +1,23 @@
+PlayStation(tm) Development Tools License Agreement
+
+IMPORTANT -- READ BEFORE CONTINUING
+
+	Carefully read the following terms before continuing.  Clicking the "Yes" button below indicates your acceptance of these terms.  If you do not agree with these terms, promptly return this software and documentation.
+
+Terms of License
+
+	1.	[For developers in PAL territories] The enclosed software and documentation are subject to the terms and conditions of the Non-Disclosure Agreement ("NDA") and Licensed Developer Agreement ("LDA") issued by Sony Computer Entertainment Europe or Sony Electronic Publishing Limited (collectively "Sony").  You are licensed to use the enclosed software and documentation only if there is in existence a valid NDA and LDA between you and Sony.  If there is no such valid NDA and LDA between you and Sony, then you are not licensed to use the enclosed software and documentation and you must return it immediately to Sony.
+
+	1.	[For developers and/or publishers in NTSC territories]  You are licensed to use the enclosed software and documentation if, and only if, you and Sony Computer Entertainment America ("Sony") have either (a) previously executed a license agreement entitled Development Tool Agreement which, in part, granted to you a limited right to use certain hardware, software and documentation to develop software products for the PlayStation format (the "Development Tool Agreement") or (b) previously executed a license agreement entitled Developer Agreement which, in part, granted to you a limited right to use certain hardware, software and documentation to develop software products for the PlayStation format (the "Developer Agreement").  If you and Sony have not executed either a Development Tool Agreement or a Developer Agreement, you are not licensed to use the enclosed software and documentation and you must return it to Sony.
+
+	2.	With the exception of the GNU-C Compiler , the software and documentation herein (collectively, the "Tools") are "Sony Materials," "Development Tools" and "Software Tools" -- as such terms are defined in the Development Tool Agreement and/or the Developer Agreement -- and therefore, except as is expressly set forth herein, the use of the Tools gives rise to all remedies set forth in and is subject to all applicable terms, provisions and restrictions contained in the Development Tool Agreement and/or the Developer Agreement (including, but not limited to, (a) the restrictions against reverse engineering and (b) all intellectual property provisions contained therein).
+
+	3.	Subject to the terms of the Development Tool Agreement and/or the Developer Agreement, you are hereby granted a nonexclusive license to use the Tools on one computer.  Sony retains title to and ownership of the Tools.  The Tools may not be modified without the written consent of Sony.  Duplication of the Tools for any purpose, other than for backup protection, is a violation of the copyright laws of the United States of America and the laws of other countries.
+
+	4.	THE TOOLS ARE PROVIDED "AS IS."  SONY MAKES NO REPRESENTATIONS OR WARRANTIES WITH RESPECT TO THE TOOLS, EITHER EXPRESS, IMPLIED OR STATUTORY. WITHOUT LIMITING THE GENERALITY OF THE FOREGOING, SONY AND ITS AFFILIATES AND SUPPLIERS EXPRESSLY DISCLAIM THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE AND THEIR EQUIVALENTS UNDER THE LAWS OF ANY JURISDICTION, REGARDING THE TOOLS.  ANY WARRANTY AGAINST INFRINGEMENT THAT MAY BE PROVIDED IN SECTION 2-312(3) OF THE UNIFORM COMMERCIAL CODE AND/OR IN ANY OTHER COMPARABLE STATUTE IS EXPRESSLY DISCLAIMED.
+
+	5.	You have the sole responsibility for adequate protection and backup of your data used in connection with the Tools, and waive any claim against Sony resulting from the use of the  Tools (including, but not limited to, claim(s) for lost data, re-run time, inaccurate input, work delays or lost profits).
+
+	6.	The fact that certain provisions contained in the Development Tool Agreement and/or the Developer Agreement (such as, for instance, the disclaimer set forth in section 4 above) are set forth verbatim herein shall not be construed as a waiver of or a failure to incorporate any other provisions contained in the Development Tool Agreement and/or the Developer Agreement.
+
+	

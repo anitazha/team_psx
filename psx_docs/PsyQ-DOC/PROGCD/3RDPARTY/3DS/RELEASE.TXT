@@ -1,0 +1,54 @@
+3D Studio TOD plug-in version 4.0f  release note
+
+				December 26, 1995
+				Sony Computer Entertainment Inc.
+				R&D division
+
+
+[Package ID]
+DTL-S220
+
+[Package name]
+3D Graphics Tool 
+
+[Program name]
+tod_i.kxp (3D Studio TOD plug-in)
+
+[Version]
+4.0f (Japansed & English version)
+
+[Environment]
+DOS/V,  3D Studio R4, DTL-H2000 (used for previewing animation only)
+
+[Installation]
+Released by BBS.
+Installation method is written in a document contained in the package.
+
+
+[Document]
+3dstod_e.txt (English)
+3dstod_j.txt (Japanese)
+
+
+[Document Version]
+4.0f
+
+
+[New features]
+Following bug fixes.
+
+1) Texture UV was incorrect.
+
+[Next version release schedule]
+Not fixed yet.
+
+[Installation and behavior check]
+Installation method is written in the document.
+In order to check the "Previewer" feature of the tool, load sample data
+containing animation data into 3D Studio, and invoke the plug-in. Then click
+the Preview button. If the tool is running correctly, you will see the
+animation running on DTL-H2000.
+
+In order to check the "Save RSD" and "Save TOD" features, click "Save RSD"
+button, and "Save TOD" button. Check the data by giving those data to the
+TOD previewer on DTL-H2000.

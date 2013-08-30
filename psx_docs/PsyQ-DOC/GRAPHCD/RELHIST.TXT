@@ -1,0 +1,154 @@
+===========================================================================
+SONY COMPUTER ENTERTAINMENT OF AMERICA
+919 East Hillsdale Blvd, 2nd Floor
+Foster City CA 94404
+415-655-8000    
+Developer Support Hotline: 415-655-8181    
+
+Copyright (C) 1995-96 Sony Computer Entertainment Inc.
+			       All Rights Reserved.
+
+ ~~~~ GRAPHIC ARTIST TOOLS CD : DTL-S220 ~~~~
+
+      Release History
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      -----------------------------------------------------------
+      11/19/96 - Release 1.8
+      -----------------------------------------------------------
+	o  Updates to bmp2tim, dxf2rsd, mimefilt, mimesort,
+	    mktod, movcon, movpack, pict2tim, pfg2tim,
+	   rsdcat, rsdform, rsdlink, tmdinfo, tmdsort
+	o  Release of timposw 1.01 (new tool)
+	o  Release of wingpu library (new library)
+	o Addition of  sound tools (aiff2vag 2.0, seq2sep, smf2seq 2.0, vabsplit 2.0, mkvab 2.0)
+	o Addition of 3rd Party Tools directory (Alias\Wavefront, Lightwave)
+
+    -----------------------------------------------------------
+      01/19/96 - Release 1.6
+      -----------------------------------------------------------
+	
+      -----------------------------------------------------------
+      01/19/96 - Release 1.5.8
+      -----------------------------------------------------------
+      o   Release of version 1.4e of movpack.exe
+
+          ENHANCEMENT
+
+          Termination data can be specified for each channel.
+	  
+      o   Release of the missing sprite tutorial samples.
+
+      -----------------------------------------------------------
+      01/19/96 - Release 1.5.7
+      -----------------------------------------------------------
+      o   Release of version 2.2 of bmp2tim.
+
+          ENHANCEMENT
+
+	  This version allows to create a no-CLUT TIM from a Windows 
+          BMP file.  
+          
+          To do this, use the "-plt x y" option with a negative x or y: 
+          for example,
+
+		bmp2tim -plt -1 -1 a.bmp
+
+      -----------------------------------------------------------
+      01/05/96 - Release 1.5.6
+      -----------------------------------------------------------
+      o   Release of new 4.0f of the 3D Studio Plug-in
+
+          1) Texture map UV value had been incorrect.
+
+	  For additional details please refer to the files 
+          release.txt and 3dstod_e.txt under the directory
+	  c:\psxgraph\doc\3ds (doc156.zip). 
+
+      -----------------------------------------------------------
+      12/14/95 - Release 1.5.5
+      -----------------------------------------------------------
+      o   Release of new 4.0e of the 3D Studio Plug-in
+
+          Following bug fixes.
+
+          1) Dummy object's parent was not correctly saved into 
+             TOD file.
+
+          2) Texture UV was incorrect in some cases.
+
+             For instance, if a texture pixel size is w * h,
+	     the correct UV range is,      (0,0) to (h-1, w-1),
+	     but, it the UV range had been (0,0) to (h,w).
+
+          3) TOD preview is now compiled with latest (version 3.*) 
+             library.  You have to re-install the previewer. 
+             Please read the installation section.
+
+	  For additional details please refer to the files 
+          release.txt and 3dstod_e.txt under the directory
+	  c:\psxgraph\doc\3ds (doc155.zip).  
+
+      o	  Release of new 1.98e of the Movie Converter
+
+          1)  Capability to change quantization matrices is added.
+              Users can change them from MDEC params dialog box.
+
+          2)  Capability to output warning to a log file while script
+              execution is added.
+ 
+          3)  MovConv has been enhanced to run under Windows95.
+
+          4)  MovConv has been enhanced to recognize '_' as a part of 
+              file name in the script capability.
+
+      -----------------------------------------------------------
+      12/07/95 - Release 1.5.4
+      -----------------------------------------------------------
+      o   Release of new 4.0d of the 3D Studio Plug-in
+
+          1) You can save hierarchy data into TOD file.
+
+          2) You can select RST (Rotation, Scale, Translation) 
+             packet type.
+
+          3) Load object from TOD plug-in dialog.
+
+          4) Save (and load) plug TOD plug-in parameters into 
+             TOD.INI file.
+
+	  For additional details please refer to the files 
+          release.txt and 3dstod_e.txt under the directory
+	  c:\psxgraph\doc\3ds (doc154.zip).  
+
+      -----------------------------------------------------------
+      11/10/95 - Release 1.5.3
+      -----------------------------------------------------------
+      o   Release of new 1.36e of the TIMUTIL utility
+
+          A bug has been fixed with a BMP file using fewer colors
+          than calculated by the bit depth could not be read in.
+
+	  For additional details please refer to the files 
+          release.txt and timutil.txt under the directory
+	  c:\psxgraph\doc\timutil (doc153.zip). 
+ 
+      -----------------------------------------------------------
+      10/12/95 - Release 1.5.2
+      -----------------------------------------------------------
+      o   New tool MIMewave. MIMewave is a tool used to create 
+          waveform data for MIMe animation.
+
+          Please refer to the programs Windows Help file for 
+          additional information.
+
+      o   Version 1.5 of the program mimefilt.exe
+      
+          Changes:
+          - A new feature was added so that all the arguments can be
+            stored in a file.
+ 
+          - Despite the difference of primitive types a difference 
+            can be calculated. Prior versions did not support this
+            feature.
+
+          - The return code is now 0.

@@ -1,0 +1,97 @@
+PlayStation libgpu for Windows		(Version 1.0)    July 19, 1996
+
+1.  	Outline
+This is a dynamic link library used to access the PlayStation artist board
+from Windows applications.
+
+This version corresponds to Microsoft Visual C++ 1.5.
+
+2.  	ligpu
+Although most functions are common with ligpu version 3.5 programmer tools,
+there are several differences:
+* 	Kanji fonts cannot be used.
+* 	The structure size is different.
+* 	Use structure OT with the ordering table.
+* 	The VSync return value has no meaning.
+* 	An artist board port address setting function (SetPortId) and
+        connection detection function (AssertAboard) have been added.
+
+3.  	libetc
+The function by which the PlayStation controller emulates on the PC
+keyboard is provided in libetc.lib. This libetc differs from libetc in
+the programmer tools on the following points.
+
+* 	The allocation and call-back related functions cannot be used.
+* 	The meaning of the PadInit arguments is different.
+ When an argument has been specified as 1, it will initialize at the default key assign.
+ (The default contents are entered at the end of libetc.h)
+ Any values other than this will not be allocated a key.
+* 	To use PadRead messages must be processed by means of PadReadProc.
+* 	An artist board port address get function (GetPortId) has been added.
+
+Furthermore, this library is not always essential in order to
+access the artist board.
+
+4.  	Essential files
+ libgpu.dll:	DLL
+ libgpu.lib	libgpu.dll import library
+ libetc.lib		Static library (large model) of Pad-related function 
+ definitions
+ libgte.h		Essential for structure definition.
+                        This must be included
+ before libgpu.h.
+ libgpu.h		libgpu header file
+ libetc.h		libetc header file
+
+5.  	Installation method
+
+	libgpu.dll
+		Copy to Windows system directory.
+	libgpu.h
+	libgte.h
+	libetc.h
+		Include in the compiler include path.
+	libgpu.lib
+	libetc.lib
+		Place in the appropriate directory and link with the
+                main program.
+
+When using DLL, specify the artist board port address beforehand
+using the artist tool aboard.exe.  It will then be possible to
+obtain the port address with the GetPortId( ) function of libetc.lib.
+
+6.  	Sample Program
+The PlayStation sample program has been ported to a Windows program
+for the artist board.
+
+Compile each Visual C++ 1.51 as a large model or a huge model and
+link with libgpu.lib or libetc.lib.
+
+* 	winballs
+winballs.c
+balltex.h
+winballs,def
+winballs.exe
+
+The number of balls can be increased or decreased with the 'E', 'C',
+'up arrow' or 'down arrow' keys.
+
+The 'G' or 'Esc' keys are used to terminate.
+
+* 	wintuto0
+wintuto0.c
+mat0tex.c
+mat1tex.c
+mat2tex.c
+mat3tex.c
+wintuto0.exe
+
+The character to the left is moved up, down, right or left using
+the 'E', 'S', 'C', 'F', 'up arrow', 'left arrow', 'down arrow',
+and 'right arrow' keys, and the character to the right is moved up,
+down, right or left with the 'I', 'J', 'M', or 'L' keys.
+The 'R' and 'U' keys enlarge or reduce both characters.
+The 'G' or 'Esc' key is used to terminate.
+
+ 
+

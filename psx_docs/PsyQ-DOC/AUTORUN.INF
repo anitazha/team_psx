@@ -1,0 +1,4 @@
+[autorun]
+OPEN=docsys\32bit\acrord32.exe Catalog.pdf
+ICON=psxicon.ico
+

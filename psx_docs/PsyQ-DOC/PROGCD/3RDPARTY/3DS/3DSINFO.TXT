@@ -1,0 +1,18 @@
+Information about 3D Studio
+
+							August 24, 1995
+							Sony Computer Entertainment
+							R&D Division
+
+
+
+Dear Sirs,
+
+We have released 3 tools for 3D Studio (3ds2rsd, RSD plug-in, and TOD plug-in).
+The latest "TOD plug-in" (version 2.1 and later) supports RSD files export.
+So, it can be used as saving object data as well as saving animation data.
+Please use "TOD plug-in" instead of 3ds2rsd or RSD plug-in.
+
+We will not support 3ds2rsd nor "RSD plug-in" hereafter.
+
+Thank you.

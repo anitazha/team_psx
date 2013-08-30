@@ -1,0 +1,195 @@
+Name 
+====
+mimesort - Sorts vertex information in the TMD file.  This enables the
+application of a smaller-sized difference file for MIMe after mimefilt,
+contributing to the high-speed movement of MIMe animations. 
+
+Date 
+====
+July 19, 1995, Version 1.3e
+
+Syntax 
+======
+mimesort [options] [base-model.tmd model1.tmd [model2.tmd [model3.tmd ...]]] 
+
+Explanation 
+===========
+Vertex information in the TMD file is sorted to enable the application of a
+smaller-sized difference file for MIMe created by mimefilt.  The run time
+needed for MIMe animations can be calculated in a shorter period. 
+
+mimesort changes the order of vertex information.  This requires that all
+files to be applied to mimefilt be applied to mimesort.  If only part of
+the files have been applied to mimesort, vertices become out of sync
+between TMD files, making it impossible to create a correct difference
+file. 
+
+A wild card can be used as an argument. 
+
+Up to 32 variation model files (TMD files other than base-model) can be
+specified.  If the number of variation model files exceeds 14, however, the
+specified models from the 15th onward are not used for sorting.  As only
+the first 14 models are used as information for sorting, vertex information
+is rearranged on the models from the 15th onward.  In other words, the
+variation model files from the 15th onward may possibly be made inefficient
+during output.  
+(See remarks to obtain as good results as possible.) 
+
+[Options] 
+
+[-d directory] 
+
+Specifies an output directory for saving a sorted TMD files.
+The default is "..\STMD".  An output directory must have been created.
+
+[-v] 
+
+A set of vertices before and after sorting can be standard-output so that
+the sorting process may be checked.  If this option has not been specified,
+no information is output.  
+The following gives the meaning of output. 
+
+file:  (vertex: a/b) 
+	file:  File name 
+	a:  Number of vertices included in a difference file 
+	b:  Total number of vertices 
+
+.....*****++*+++++++++*****.............
+	. : Vertex not included in a difference file as there is no difference 
+	+ : Vertex included in a difference file although there is no difference
+	* : Vertex included in a difference file as there is difference 
+
+[-stdin] 
+
+Loads a model file name from the standard input.  Entering only a line feed
+results in the termination of loading. 
+
+Example 1:  Manual file name input 
+
+C:\> mimesort -stdin 
+Source model:  md1.tmd[RET]   <- Enter the source model file name. 
+Variation model #1: md2.tmd[RET]   <- Enter the file name of variation model 1. 
+Variation model #2: md3.tmd[RET]   <- Enter the file name of variation model 2. 
+Variation model #3: [RET]   <- End of input 
+(Omitted) 
+
+Example 2:  Automatic input.  The -v option is also used. 
+
+C:\> type list 
+md1.tmd 
+md2.tmd 
+md3.tmd 
+                   <- The end blank line is required. 
+
+C:\> mimesort -stdin -v < list > output
+(Omitted) 
+
+Supplementary information 
+=========================
+The sorting of data (including normal data) other than vertex data is not
+supported. 
+
+A difference file is not always made to be smaller-sized.  
+Effect can be checked by means of vertex information output by the -v
+option.  Applying data before and after mimesort to mimefilt to compare the
+size of difference files allows the identification of more efficient data. 
+
+A TMD file to be entered must be able to be applied to mimefilt. 
+Furthermore, mimesort cannot be applied to a TMD file containing two or
+more objects. 
+
+A wild card can be used as the file name.  The start item must be the base
+file, however.  Should a variation model file be developed at the position
+of the source model file, the desired result of sorting cannot be acquired.
+ Check the message output during execution, "base files=", to make sure
+that the wild card is developed as expected. 
+
+Even though a sub-directory has been specified in a file for the source
+model or a variation model, a file is created right under the output
+directory.  Thus, the file with the same name in a different directory must
+not be specified for input. 
+
+The current directory must not be specified as the output directory.  If
+the current directory has been specified, the input file is overwritten and
+destroyed by the output file. 
+
+Note that the MS-DOS command line incurs restriction on the number of
+characters. 
+
+Remarks 
+=======
+[Notes on handling more than 14 variation model files] 
+
+The use of MIMe for key frame animations where key frames for models are
+arranged in time series may often result in an enormous number of MIMe
+parameters.  The concurrent application of too many parameters to a model
+consumes much time and memory, however.  The replacement of the base model
+for key frame animations at places where only few key frames are correlated
+with one another leads to efficiency enhancement. 
+
+Should more than 14 variation model files be specified, the files from the
+15th onward are not used as sorting information, with only vertex order
+rearranged according to the result of sorting the first 14 files.  (This is
+because integrity for mimefilt is maintained.)  Therefore, the following
+files should be specified as the files from the 15th onward. 
+
+
+o  Files for which less effects of sorting are expected 
+
+If nearly all vertices are moved, sorting effects are lowered. 
+
+
+o  There is another same file (under the standpoint of vertex movement). 
+
+If original vertexs provides the following results as viewed in -v, file2
+is not distinguished from file3 in the point of vertex movement.  If file2
+has been specified in any of the first 14 files, therefore, file3 may be
+specified in any of the subsequent files. 
+
+file1:  *++***... 
+file2:  ..**++*.. 
+file3:  ..**++*.. 
+file4:  ....**+** 
+
+file20: ..*****.. 
+
+
+o  Low importance 
+
+Files seldom used, or not subjected to high temporal restriction 
+
+
+Restrictions
+===============
+Version 1.0 
+	Can only sort vertex data. 
+	There is only one type of sorting algorithm. 
+	There is a maximum of 15 files consisting of 
+        base*1 + variant*14 that can be handled. 
+
+
+
+
+
+Changes
+=======
+Changes in version 1.1 
+
+Bugs on handling the TMD file having a large primitive section have been
+corrected. 
+
+Also for 15 to 32 variation model files, vertices are rearranged. 
+
+Changes in version 1.2 
+
+The -stdin option enables the standard input of a model file name. 
+
+Changes in version 1.3 
+
+The bug that a primitive other than triangle polygons cannot be handled
+properly has been corrected. 
+
+
+
+
+oo  PlayStation is a trademark owned by Sony Computer Entertainment Inc.  oo 

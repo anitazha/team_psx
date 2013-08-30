@@ -1,0 +1,36 @@
+
+                      PlayStation Tool Manual                         tim2bmp
+
+NAME
+        tim2bmp - Converts PlayStation texture data files 
+                  to Windows image data.
+
+FORMAT
+        tim2bmp [options] input-file ...
+
+DESCRIPTION 
+        A PlayStation TIM file (*.TIM) is converted
+        to a Windows 3.0 BMPformat image data file.
+        
+        [options]
+
+        -c       If this option is specified when the input data is 16-bit 
+                 mode and binary black/white, an 8-bit index format bitmap
+                 file is output.
+
+RESTRICTIONS
+        * Cannot handle BMP compressed format.
+
+        * Data input in 16-bit mode is converted to a 24-bit bitmap file.
+
+        * MS-DOS wildcards can be used in input-file specifications.
+
+
+CHANGES
+
+1.0->1.1
+        Fixed bug related to 4-bit mode and 8-bit mode TIM data 
+        not converting correctly.
+
+
+

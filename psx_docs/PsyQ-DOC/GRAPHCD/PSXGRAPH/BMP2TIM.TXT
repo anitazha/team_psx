@@ -1,0 +1,73 @@
+                      PlayStation Tool Manual                         bmp2tim
+
+NAME
+        bmp2tim - Converts Windows image data into PlayStation image data files.
+
+DATE
+        1996/Jan/25 Version 2.2
+
+FORMAT
+        bmp2tim [options] BMP-files ...
+
+DESCRIPTION 
+        A Windows3.0 BMPFORMAT image data file is converted to a PlayStation 
+        TIM file (*.tim).
+
+        The argument can contain wildcard identifiers. Multiple files can
+        be given to perform batch conversions. The ".bmp" extension in the 
+        filename can be omitted.
+        
+        [options]
+
+        -o output-file  Specifies the output filename.  The default is to 
+                        use the input filename with the extension ".tim" 
+                        and write it to the current directory.
+
+        -org x y        Specify image origin in VRAM.  Default is (0, 0).
+
+        -plt x y        Specify position of color palette in VRAM.
+                        Default is (0, 480).
+        
+        -t              Set transparency control bit ON for colors other than
+                        (0 0 0).  Colors other than (0 0 0) become semi-
+                        transparent.  The default is for all colors to be
+                        non-transparent.  
+
+        -b              Set transparency control bit OFF for (0 0 0).
+                        (0 0 0) becomes transparent.  The default is for 
+                        (0 0 0) to be displayed as black.
+
+        -v              Display detailed information related to conversion.
+
+Major Changes from Previous Version 2.1
+
+        This version allows to create a no-CLUT TIM from a Windows BMP file.
+	To do this, use the "-plt x y" option with a negative x or y:
+	for example,
+
+		bmp2tim -plt -1 -1 a.bmp
+
+Major Changes from Version prior to 2.1
+        * Now converts correctly even when width is not 4x.
+        * Even when an absolute path is provided for an input image file
+          (if not explicitly specified with the -o option), a TIM file 
+          is created in the current directory.
+        * The -mode option was eliminated.  The file is converted to the mode
+          closest to the size of the input BMP data pixels.  Please use
+          Photoshop or something similar to reduce the number of colors.
+        * Changed so that the -t option can set semi-transparency for
+          colors other than (0 0 0).
+        * The -b option was added.  It is used to select black or transparent
+          for (0 0 0).  In the previous version the default for (0 0 0) was
+          transparent, but in this version it is displayed as black.  If 
+          sprite areas other than characters are to be made transparent, 
+          (with PhotoShop or something similar), specify the -b option for
+          those areas which are to remain black when converting.
+
+RESTRICTIONS: The current version has the restrictions shown below.  
+
+          * Does not handle BMP compressed format.
+
+
+
+

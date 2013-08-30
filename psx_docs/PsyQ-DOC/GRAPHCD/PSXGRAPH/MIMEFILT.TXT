@@ -1,0 +1,170 @@
+PlayStation               3D Graphic Tool Manual                 mimefilt 
+
+
+Name 	MIMEFILT
+
+   Loads two or more TMD files to create the difference file for MIMe.
+
+Date
+
+   April 1, 1996, Version 1.51
+
+Syntax
+
+   mimefilt [options] base.tmd variant1.tmd variant2.tmd...
+   mimefilt [options] tmds.arg... 
+
+
+Explanation 
+
+	When two or more TMD files are given, creates a file covering
+	difference from the first TMD file to the TMD files from the
+	second onward.  The default creats only the difference file
+	(.vdf) for vertex information.
+
+	The wildcard can be used for an argument.  An extension of ".tmd"
+	in a filename can be omitted.
+
+	A lot of arguments can be given in an argument file (*.arg).
+	An extension of ".arg" in an argument filename cannot be omitted.
+
+[options] 
+
+-o output-file
+
+	Specifies an output filename.  This option is used for a vertex
+	difference filename (.vdf) and a normal difference filename
+	(.ndf).  The default is the first TMD filename without its
+	extension.
+
+-n
+
+	Creates a normal difference file (.ndf).  The default is OFF.
+
+-v
+
+	Outputs detailed information on conversion to a standard output.
+	The default is OFF.
+
+Major Improvements from previous release 1.5
+
+        *  Now compatable with wild card.
+
+        *  The initial SGI version is available.  (See psxgraph/sgi).
+
+Major improvements from previous version (Ver. 1.5 and before)
+
+        * All the arguments can be stored in a file.  
+
+        * A difference can be calculated in spite of the difference of 
+	  primitive types.
+        * The return code is 0.
+
+Major improvements from the previous version (Ver. 1.2)
+
+	* Always terminated normally.  This normal termination prevents
+	  interruption in a batch file or makefile.
+
+	* A file (*.arg) storing arguments can be passed.
+
+	* Even though primitives should not be completely the same
+	  between models for difference, a difference file can be
+	  created if they have the same number of vertices and normals.
+	  Thus, mapping textures only on the base model provides
+	  difference data for textured MIMe.
+
+
+Supplementary information
+
+	* All argument TMD files must have the same numbers of vertices.
+	  The use of the -n option requires the same numbers of normals.
+
+	* When creating TMD files, take care not to change the number and
+	  order of vertices.  Use a 3D modeler to create a base model
+	  reflecting fully fine polygons.  According to the base model,
+	  move planes and vertices to create other deformation models.
+	  Save each model in the DXF format.  Use DXF2RSD to convert the
+	  saved models into the RSD format.  Then, apply RSDLINK to each
+	  RSD file separately to create a TMD file.
+
+File format
+
+	The difference file created by MIMEFILT is the binary file which
+	blocks having a header and difference information for each object
+	are concatenated.  (The normal difference file also has the same 
+	format.)
+
+	C:> MIMEFILT M0.TMD M1.TMD M2.TMD
+
+0                                 32
+  -------------------------------------
+  |    Number of blocks (4 bytes)     | *1
+  |-----------------------------------| *2  --+
+  |      Object number (4 bytes)      |       |
+  |-----------------------------------|       |
+  |  Vertex number which differ first |       |
+  |-----------------------------------|       |
+  |  Number of difference vertices    |       |
+  |-----------------------------------|       |
+  |       dx0      |       dy0        | *3    |
+  |-----------------------------------|       |
+  |       dz0      |     (dummy)      |       |
+  |-----------------------------------|       |
+  |       dx1      |       dy1        |       |
+  |-----------------------------------|
+  |       dz1      |     (dummy)      |   Difference block of the
+  |-----------------------------------|   M0.TMD and M1.TMD
+  |       dx2      |       dy2        |
+  |-----------------------------------|       |
+  |       dz2      |     (dummy)      |       |
+  |-----------------------------------|       |
+  |       ...(8 bytes per vertex)     |       |
+  |-----------------------------------|       |
+  |      Object number (4 bytes)      | *4    |
+  |-----------------------------------|       |
+  |  Vertex number which differ first |       |
+  |-----------------------------------|       |
+  |  Number of difference vertices    |       |
+  |-----------------------------------|       |
+  |       dx0      |       dy0        |       |
+  |-----------------------------------|       |
+  |              .....                |     --+
+  |-----------------------------------|     --+
+  |      Object number (4 bytes)      | *5    |
+  |-----------------------------------|       |
+  |  Vertex number which differ first |       |
+  |-----------------------------------|       |
+  |  Number of difference vertices    |       |
+  |-----------------------------------|
+  |       dx0      |       dy0        |   Difference block of
+  |-----------------------------------|   M0.TMD and M1.TMD
+  |       dz0      |     (dummy)      |
+  |-----------------------------------|       |
+  |              .....                |       |
+  |-----------------------------------|       |
+  |      Object number (4 bytes)      | *6    |
+  |-----------------------------------|       |
+  |  Vertex number which differ first |       |
+  |-----------------------------------|       |
+  |              .....                |       |
+  |                                   |       |
+  -------------------------------------     --+
+  
+  
+  *1 Number of the argument TMD files - 1 ("2" in this case) 
+  
+  *2 "0" because this is the first object
+  
+  *3 dx, dy and dy are differences of coordinate values between M0.TMD
+     and M1.TMD.
+  
+  *4 "1" because this is the second object 
+  
+  *5 "0" because this is the first object in the second block 
+  
+  *6 "1" because this is the second object 
+  
+  
+PlayStation is a registered trademark owned by Sony Computer Entertainment Inc.
+  
+  

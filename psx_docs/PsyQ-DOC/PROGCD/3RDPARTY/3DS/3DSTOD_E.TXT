@@ -1,0 +1,516 @@
+		<< TOD plug-in document in English >>
+
+Name
+====
+  tod_i.kxp  ( 3D Studio TOD plug-in )
+
+
+VERSION
+=======
+  version 4.0f  (Dec 26, 1995)
+
+
+- Sony Computer Entertainment makes no expressed or implied warranty of
+  any kind with regard to these programs or to the supplemental documentation
+  in this manual. In no even shall Sony Computer Entertainment be liable
+  for incidental or consequential damages in connection with or arising out
+  of this program or documentation. This disclaimer includes, but is not
+  limited to, any loss of service, loss of business, or anticipatory profits,
+  or consequential damages resulting from the use or operation of the enclosed
+  software.
+
+- 3D Studio is a trade mark of Autodesk Inc.
+
+- PlayStation is a trade mark of Sony Computer Entertainment Inc.
+
+
+FUNCTION
+========
+This program is a plug-in program for the Autodesk 3D Studio (3DS).
+
+With this  plug-in, you can save 3DS object or animation data in PlayStation
+format (RST ,TOD) while using 3DS. You can also preview animation while
+using 3DS by sending animation data to PlayStation board (DTL-H2000).
+
+
+HISTORY
+=======
+Version 4.0f
+------------
+[Bug fix]
+1) Texture map UV value had been incorrect.
+
+Version 4.0e
+------------
+[Bug fix]
+1) Dummy object's parent was not correctly saved into TOD file.
+
+2) Texture UV was incorrect in some cases.
+
+   For instance, if a texture pixel size is w * h,
+	the correct UV range is,      (0,0) to (h-1, w-1),
+	but, it the UV range had been (0,0) to (h,w).
+
+3) TOD preview is now compiled with latest (version 3.*) library.
+You have to re-install the previewer. Please read installation section.
+
+
+Version 4.0d
+------------
+[New features]
+1) You can save hierarchy data into TOD file.
+
+2) You can select RST (Rotation, Scale, Translation) packet type.
+
+3) Load object from TOD plug-in dialog.
+
+4) Save (and load) plug TOD plug-in parameters into TOD.INI file.
+
+[Bug fix]
+1) There was a bug in scaling objects.
+
+
+Version 3.1
+-----------
+1) Object scale is converted to TOD data.
+
+2) Some sample data (for instance, IK_*.3DS) could not be handled in version
+2.1. This version can handle them.
+
+3) You can preview or save animation without re-invoking the plug-in.
+
+4) You can specify start and end frame of an animation to preview or save.
+
+5) Objects with more than 10 textures could not be processed in version 2.1.
+This version can handle them.
+
+6) In "Quick Preview" only TOD file is generated. TMD files are generated
+only once when you invoke "Preview". 
+
+7) You can save RSD file and TOD file independently.
+
+
+Version 2.1
+-----------
+1) You can save camera animation data into TOD, and preview it.
+ 
+2) You can save mesh objects in RSD files.
+
+3) You can configure plug-in environment.
+
+
+REQUIREMENT
+===========
+This plug-in runs only on 3DS R4. 
+In order to use previewer function, you also need DTL-H2000.
+
+FILES
+=====
+This plug-in kit contains following files.
+
+    3dstod_e.txt  ... Document in English
+    3dstod_j.txt  ... Document in Japanese
+
+    tod_i.kxp     ... Plug-in module.
+    tod.ini       ... Configuration file sample.
+
+    psboard.ini   ... DTL-H2000 port address configuration file.
+    psbload.exe   ... Communication program between DTL-H2000 and PC 
+    psreset.exe   ... Communication program between DTL-H2000 and PC 
+    psrun.exe     ... Communication program between DTL-H2000 and PC 
+
+    patchj.exe    ... DTL-H2000 patch program (Japanese version)
+    patchw.exe    ... DTL-H2000 patch program (non-Japanese version)
+
+    todvj.bat     ... TOD previewer batch file (Japanese version)
+    todvw.bat     ... TOD previewer batch file (non-Japanese version)
+    todview5.exe  ... TOD previewer
+    todview5.c    ... TOD previewer source code
+
+If you use do not use the preview feature, you need only three files,
+"tod_i.kxp", "tod.txt", and "tod.ini".
+
+
+INSTALLATION
+============
+1) Copy plug-in module "tod_i.kxp" to the "process" directory in the 3DS home
+directory.
+
+If you have installed your 3DS into "c:\3ds4", then you have to copy
+"tod_i.kxp" to "c:\3ds4\process" directory.
+
+
+2) Copy configuration file "tod.ini" into 3DS home directory.
+
+If you do not use the TOD previewer, installation is complete.
+If you do use TOD previewer, follow the installation steps below.
+
+3) Copy  "psboard.ini" to root directory "c:\".
+This file specifies the port address of DTL-H2000.
+
+If your DTL-H2000 card's port address is 0x1340, then the file must contain
+a line as follows.
+
+      addr=0x1340
+
+4) Copy all the following files to "c:\psxgraph\bin".
+
+	    todvj.bat
+	    todvw.bat
+	    psbload.exe
+	    psreset.exe  
+	    psrun.exe
+            patchj.exe
+            patchw.exe
+	    todview5.exe 
+
+If you are using the Japanese version of DTL-H2000, you have to rename
+"todvj.bat" to "todv.bat".
+
+If you are using the non-Japan-se version of DTL-H2000, you have to rename
+"todvw.bat" to "todv.bat".
+
+You can change the location of these programs. 
+Please read the customization section.
+
+
+5) Create working directory "c:\tmp" for the previewer.
+
+You can change the working directory.
+Please read the customization section.
+
+Installation is complete.
+
+
+ Attention!!
+ -----------
+ The TOD previewer does not work properly if  "DEXBIOS" is running on
+ your PC. If you have one, you can delete them from PC memory as follows,
+
+	 C:\> dexbios
+
+ If you see a message "Removing DEXBIOS" on the screen, 
+ then "DEXBIOS" is removed from memory.
+
+ Beware that, if you invoke the command when "DEXBIOS" is not running,
+ this causes DEXBIOS to start.
+ In this case you have  to invoke dexbios command again until you see the
+ "Removing DEXBIOS"  message on your screen.
+
+
+How to start
+============
+1) In the KeyFramer of 3DS, press "F12" key.
+
+2) Select "TOD" from KXP plug-in list.
+
+
+Previewer key bind
+==================
+The previewer's key bind is as follows.
+
+    L1, L2              Åc Change BG color
+    SELECT              Åc Pause
+    START               Åc Reset Pause
+
+You can proceed frame by frame, using SELECT key while you are in
+the Pause mode.
+
+
+FUNCTIONS
+=========
+scale:
+------
+Scales size of object size and translation of object/camera. 
+
+For instance, if you set scale value to 10.0, then the object size and
+translation of object and camera is expanded 10 times.
+
+You can specify the scale value to control the object size. Also, you use
+this value to get rid of the near-clip, far-clip and z-sort problems, which
+will occur on PS.
+
+
+Frames from:
+         to:
+------------
+Specify regions of animation frames you want to preview or save.
+
+You can use this function to extract some portion of animation, or to divide
+one animation to some peaces.
+
+
+TOD type:
+---------
+Specify TOD packet type.
+
+  Matrix ... MATRIX (Rotation Matrix + Translation)
+  RST    ...    RST (Rotation vector, Scale, Translation)
+
+Animation will look same whether you chose Matrix or RST. RST data is
+converted to Matrix on PlayStation, therefore RST type TOD animation will 
+consume much CPU power.
+
+
+Hierarchy:
+----------
+   On    ... Hierarchy relation of objects is saved.
+   Off   ... Hierarchy relation of objects is not saved.
+
+Animation will look same whether you chose On or Off. When you chose On,
+each object's animation data will be relative to its parent object. Whereas
+if you chose Off, the animation data will be relative to the WORLD.
+
+You do not have to save hierarchy information as far as you play the TOD
+data. But, if you have to animate a body of a robot with you program, for
+example, hands and legs of the robot will be disconnected because they are not
+linked to the body. In such a case you should save hierarchy information in the
+TOD file.
+
+In order to support hierarchy structure, dummy objects in 3DS will be saved
+in TOD file. Dummy object will be represented as an object which has
+coordination data only (TMD is null).
+
+
+Frames:
+-------
+Thin down the frame data.
+
+   All   ...  saves all the frames
+   1/2   ...  saved every 2 frames 
+   1/3   ...  saved every 3 frames 
+   1/4   ...  saved every 4 frames 
+   1/5   ...  saved every 5 frames
+
+If you specify "1/4", then only frames "1,5,9,13,..." will be saved. This will
+make the TOD data size 1/4. You can interpolate between frames to reproduce the
+original animation sequence on PlayStation. You can use this method to reduce
+the size of TOD data.
+
+The TOD previewer included in this tool, does not do interpolation. If the
+previewer finds some frames missing, then it will draw the previous frames
+again. For instance, if you had specified "1/3", then the frames will be like
+this.
+
+ TOD   frames:  1,    4,    7,    10, ...
+ Drawn frames:  1,1,1,4,4,4,7,7,7,10, ...
+
+
+Load obj:
+---------
+Loads new 3DS file without exiting from TOD plug-in.
+
+
+Preview:
+--------
+Invokes animation previewer on DTL-H2000.
+
+When you click this button, object data is saved as temporal RSD files.
+Then RSDLINK command converts the RSD files into one TMD file. Then,
+animation data is save as one TOD file. The TMD file and TOD file are
+transferred to DTL-H2000, where TOD previewer is invoked.
+
+You can speed up the invocation of the previewer by placing the working
+directory (specified as TMP_DIR in TOD.INI file) in the RAMDRIVE of you PC.
+
+
+Quick Preview:
+--------------
+Invokes animation previewer on DTL-H2000.
+
+Only TOD file (animation data file) is generated.  Instead of generating new
+TMD file (object data), previously generated TMD file found in
+(c:\tmp\tmp.tmd) is used for previewing.
+
+Quick Preview is useful when you have finished editing objects and you are
+frequently changing animation data only. In such cases, you invoke
+"Previewer" only once, and you can invoke repeatedly "Quick Previewer" after
+that. This speeds up the previewing process, because "Quick Previewer" skips
+generating RSD files and TMD file.
+
+In order to make object scale and animation scale reasonable, you have to
+set the scale value of "Preview" phase and the "Quick Preview" phase same.
+If you need to change the scale value, you have to invoke "Previewer" in
+order to save TMD file (object data) in the new scale.
+
+
+Save RSD:
+---------
+Object data is saved as RSD file.
+Each object is saved as different RSD file.
+
+System will ask "Generate File name automatically?".
+
+If you choose "Yes", system asks you a base name which will be used to
+generate new file names. System adds hexadecimal 3 digit to the end of the
+base name. Therefore only first five letters are used as base name.
+
+For instance, if you give "c:\psxgraph\data\rsd\mydata.rsd" as the
+base name, following RSD files will be generated automatically.
+
+	 c:\psxgraph\data\rsd\mydat000.rsd
+			      mydat001.rsd
+			      mydat002.rsd
+				  ...
+			      mydat00e.rsd
+			      mydat00f.rsd
+			      mydat010.rsd
+				  ...                             
+			      mydatfff.rsd
+
+
+The object names used in 3DS cannot be used as RSD files, because it can
+be longer than 8 letters.
+
+TOD plug-in also generates PRJ file (in the case above,"mydata.prj").
+Correspondence between object name and RSD file is specified in the project
+file.
+
+
+If you choose "No", you have to give all the RSD file names.
+
+You had better choose "Yes", except when you have to specify the file
+names by yourself.
+
+[Material]
+- 3DS material should be set as follows in order to generate Gouraud polygon
+in RSD file.
+
+   1) polygon is either, Gouraud, Phong, or meta.
+   2) at lease one of it edge is smooth.
+      which means that, it has at least same smoothing group with at lease
+      one its adjacent polygons.
+
+- "Diffuse color" in 3DS is converted into polygon color in RSD.
+
+- "Non 0 transparency value" in 3DS is converted into semi-transparent
+polygon in RSD.
+
+- Texture maps
+
+   1) Only the "texture 1" is converted to RSD.
+
+   2) Texture more than 256x256 can not correctly converted to RSD.
+
+   3) Tiling information is ignored.
+
+   4) Face map can be converted to RSD.
+
+- Any other 3DS material information is ignored.
+
+
+[!]
+Each object is save as RSD format in local coordinate. The difference of each
+object from the origin of world coordinate is saved in TOD file. For
+instance, if you have created human body which consists of number of parts,
+and saved each parts as different RSD file, those RSD file objects does not
+represent the location of each part in the body. In order to take account in
+the location of each object, you can follow following method,
+
+ 1) On PlayStation, specify each object's coordinate referring the TOD data.
+
+ 2) On 3DS attach all the parts in one object.
+
+TOD previewer is using the first method. Second method is valid only when
+each part of the body does not change the location each other.
+
+
+Save TOD:
+---------
+Keyframe animation data is save as TOD file.
+
+When you have many animation data for one character, you only have to save
+object data (RSD file) only once, and save each animation as different TOD
+file.
+
+
+LIMITATIONS
+===========
+1) Morphine data is not converted.
+
+2) Information on lights is not converted.
+
+3) Pivot:
+
+3DS's pivot is interpreted as translation and transformation in TOD data.
+Therefor as far as you play the TOD data on PS, the animation on 3DS is
+correctly reproduced on PS. But, the data of "pivot" itself is not converted
+to TOD data. So you cannot animate an object according to its pivot from
+your program. For instance, if you place a pivot of a robot's arm to its
+shoulder point, and if you try to rotate the arm around the shoulder point,
+the arm will rotate around its local axis, not around the shoulder point.
+
+You can use "dummy object" instead of pivot, to change the rotation axis.
+
+4) Link information:
+
+In 3DS, you can specify whether to propagate the rotation and scaling
+information from the parent object to the child object or not. On the other
+hand, PlayStation's library (libgs) always propagate those information from
+the parent to the child. Therefore, if you specify not to propagate any of
+those information on 3DS, the resultant TOD will not reproduce the same
+effect. To avoid those problems, you should not stop propagating the
+information from the parent to the child.
+
+5) Scaling:
+
+If the scale value exceed 8.0 on 3DS, it will not apply properly on
+PlayStation. It is because, PlayStation uses fix-point for the scale value.
+"8.0" is the maximum scaling value expressed in fix-point (4096 * 8).
+Notice that, in hierarchyly linked object, scale values are multiplied from
+all thorough it ancestors. So the scale value could exceed 8.0 even if its
+local scale is less than 8.0.
+
+
+GENERATED FILES
+===============
+TOD plug-in generates following files.
+
+1) Preview
+In temporally directory (c:\tmp),
+
+        RSD files
+	tmp.3ds
+	tmp.prj
+	tmp.tmd
+	tmp.tod
+
+2) Quick Preview
+In temporally directory (c:\tmp),
+
+	tmp.tod
+
+
+3) Save RSD
+In temporally directly (c:\tmp),
+
+	tmp.3ds
+
+In user specified directory.
+        
+        RSD files
+	PRJ file
+
+4) Save TOD
+In user specified directory.
+        
+        TOD file
+
+
+CUSTOMIZATION
+=============
+The TOD plug-in invokes TOD previewer as follows.
+
+	c:\psxgraph\bin\todv  c:\tmp\__000__.tmd  c:\tmp\__000__.tod
+
+The argument specifies an TOD file to preview. This file is created by
+the TOD plug-in. You can substitute the previewer batch command "todv.bat"
+with your own previewer.
+
+
+INFORMATION
+===========
+If you have any question on this program, please contact us (SCE).
+It is useless to call Autodesk, because they do not take any charge of this
+program.
+

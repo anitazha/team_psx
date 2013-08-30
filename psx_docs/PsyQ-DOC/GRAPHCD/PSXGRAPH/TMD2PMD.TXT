@@ -1,0 +1,63 @@
+Tmd2pmd.txt PlayStation Tool Manual
+
+NAME tmd2pmd - Converts TMD format modeling data to PMD format.
+
+DATE 1995/Oct/16 Version 1.14
+
+FORMAT
+ tmd2pmd [options] TMD-files ...
+
+DESCRIPTION 
+A TMD-format file (*.tmd) is converted to a PMD file (*.pmd). TMD is the PlayStation 3D modelling 
+data format, and PMD is the high-speed version of the modelling data format.
+The argument can contain wildcard identifiers. Multiple files can be given to perform batchconversions. 
+In this case, each file is converted to the same file name with a .pmd extension and is created in the 
+current directory.
+
+[options]
+-o output-file Specifies the output filename. The default is to use the input filename with the extension 
+".pmd" and write it to the current directory. This option can only be used if there is a single input file. 
+When two or more files are specified using a wildcard, this option will cause an error.
+
+-h Displays a list of selectable options and simple usage instructions.
+
+-v Displays detailed information related to conversion.
+
+-s Puts the vertex data in the created PMD file in shared vertex mode.
+
++s Puts the vertex data in the created PMD file in independent mode (default).
+
+-l Turns ON the light source calculation flag in the created PMD file.
+
++l Turns OFF the light source calculation flag in the created PMD file (default).
+
+-b Turns ON the Back clip flag in the created PMD file (default).
+
++b Turns OFF the Back clip flag in the created PMD file.
+
+-notge Turns TGE flag OFF for all packets in the created PMD file.
+
++notge TGE flag in packets in the created PMD file are copied from those in the input TMD file (default).
+
+NOTES In the TMD file, texture polygons with light source calculation do not include color information. 
+tmd2pmd sets this sort of data as a brightness of 0x80 together with R, G, B when it creates the PMD file.
+ 
+
+Release history:
+
+Ver 1.10 Changes
+Fixed a bug in which the ABE and TGE bits in the TMD packet were not reflected in the output PMD.
+
+Ver 1.11 Changes
+Added an option (-notge) so that the TGE bit in a TMD packet is ignored and the TGE bit in the output 
+PMD is forcibly set to 0.
+
+Ver 1.13 Changes
+Changed so that the directory which creates working files can be specified by the TMP environmental 
+variable.
+Fixed a bug in which some types of polygons did not have correct vertex colors in the created PMD file.
+
+Ver 1.14 Changes
+Fixed a bug in which TMD files containing only gradation polygons were not converted correctly.
+ 
+

@@ -1,0 +1,154 @@
+==========  Movie Tool  ==========
+
+[ Movie Tool ]        < MovConv > 
+       
+MovConv is a movie data converter for PlayStation.        
+It accepts movie data input in a variety of formats such as        
+Video For Windows avi, and converts them to movies for         
+use with the PlayStation.  For a detailed description of this        
+tool, please see the online help available after bringing up         
+the MovConv "help" menu.       
+ 
+	*  Batch Processing Function (From ver.1.95)    
+    
+A function has been added to sequentially process the examples         
+described in the script file (batch file).        
+
+Refer to the file [your parent directory]\psxgraph\bin\sample.scr  
+for script description methods and functions used in the current version.       
+
+ < MovPack >     
+   
+MovPack is a tool for interleaving streaming data created with         
+MovConv together with XA-ADPCM data for use in multi-channel         
+streaming.
+
+
+[ Movie Tool Installation ]   
+     
+"MovConv" can be installed either by the Setup Tool on the 
+Programmer Tools CD or the Graphic Artist Tools CD.  Place the CDROM
+in the drive, and double-click on the icon in [cdrom]:\setup\setup.exe.
+When Setup provides you a list of components to install, be sure that
+the  "Executables and compilers" component has a check mark next to it.
+
+Alternatively, you can do the following:              
+
+1. Start Windows and open File Manager.               
+2. Copy gauge.vbx and threed.vbx to the Windows 3.1 system                    
+   directory (c:\windows\system, etc.).                 
+3. Drag the copied movconv.exe and movpack.exe to File                    
+   Manager and drop them in the appropriate group in Program Manager.
+   (*.vbx, *.exe and *.hlp are in \psxgraph\bin.)        
+
+This completes installation.
+
+[ HOW TO USE ]        
+Refer to online help for each tool.  However , 
+"movconv.hlp" is  slightly obsolete; here's an update:
+
+	=== New features which are not described in the help file ===
+
+	[ Script ]
+	MovConv has a batch processing cabability.  A script defines the processing
+	sequence.  The script for MovConv is very simple.  It is a sequence of
+	functions which defines each conversion.  See \psxgraph\bin\sample.scr to
+	check the syntax of the MovConv script. 
+
+
+	[ Q matrix ]
+	The "Q matrix" is a quantization matrix which is used in the quantization stage of
+	MDEC compression.  The MDEC quantization stage is the same as a JPEG or MPEG
+	quantization stage.  (Please refer to other documentation about this for
+	more details).  Normally, you don't need to change the  Q matrix value.  
+	If you are very familiar with JPEG or MPEG compression, you can change the Q matrix
+	value to optimize compression.
+
+	[ Leap sector ]
+	A "leap sector" is a sector which is put on output data to syncronize video
+	with audio.  To be exact,  the NTSC video frame rate is not 60.00 fps but
+	59.94 fps.  If you import video using video capture equipment, the base
+	frame rate of imported video is 59.94 fps.  But the PlayStation streaming
+	mechanism expects video data to be 60.00fps.  So, if you play this video
+	data with PlayStaion, it is played slightly faster than it should be.
+	Usually, it doesn't matter while you play only video data because the frame
+	rate difference is very small.  But if you play audio data with video
+	data, you will recognize that synchronization of video and audio gradually becomes
+	incorrect .  You can solve this problem by putting a leap sector on the 
+	original 59.94fps video.  This makes 59.94 fps video 60.00 fps.
+
+	Please refer below to see whether you should or should not put in a leap sector.
+
+		===============================================================
+		Data is imported from video tape		Leap sector on
+		(59.94fps)
+		---------------------------------------------------------------
+		Data is created on computer			Leap sector off
+		(60.00fps)
+		===============================================================
+
+      Release History
+
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+	
+
+     -----------------------------------------------------------
+      movconv.exe - Changes from Version 1.96e to Version 1.98e
+      -----------------------------------------------------------
+      *   Capability to change quantization matrices is added.
+          Users can change them from MDEC params dialog box.
+
+      *   Capability to output warning to a log file while script
+          execution is added.
+ 
+      *   MovConv has been enhanced to run under Windows95.
+
+      *   MovConv has been enhanced to recognize '_' as a part of 
+          file name in the script capability. 
+  
+      
+      -----------------------------------------------------------
+      movconv.exe - Changes from Version 1.95e to Version 1.96e
+      -----------------------------------------------------------
+
+      *   Added batch capability for WAV to XA conversion.
+      
+
+      -----------------------------------------------------------
+      movconv.exe - Changes from Version 1.93e to Version 1.95e
+      -----------------------------------------------------------
+
+      *   Batch functionality is added to MovConv.
+          MovConv reads script(batch) file and executes functions in it.
+          You can specify multiple functions in a script file.
+          
+          Sample.scr is a sample script file for the batch 
+          functionality.  Please refer sample.scr for more information.
+
+
+      -----------------------------------------------------------
+      movconv.exe - Changes from Version 1.9e to Version 1.93e
+      -----------------------------------------------------------
+
+      *   New frame rate choices are added.  Followings are additional
+          options.
+
+          10   fps
+          12.5 fps
+          15   fps
+          16.7 fps
+          20   fps
+          25   fps
+          30   fps
+
+          10 fps, 15 fps, 20 fps and 30 fps are suitable for NTSC 
+          TV system.  10 fps, 12.5 fps, 16.7 fps and 25 fps are
+          suitable for PAL TV system.  However you can use any of the
+          options for each TV mode.
+
+      *   Normal CD-ROM speed movie is supported.
+
+      *   Straight 16bit PCM audio can be compressed as XA audio 
+          format.
+
+	

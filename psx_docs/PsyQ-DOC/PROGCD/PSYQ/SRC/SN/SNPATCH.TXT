@@ -1,0 +1,202 @@
+[See end of this file for revision history]
+
+             A FIX FOR PROBLEMS WITH PATCHX.CPE
+             **********************************
+
+
+Many developers have reported problems with PATCHX. There were many
+reported symptoms but the most common was that certain parts of the
+new kernel did not seem to function correctly, particularly if
+another program was run immediately after PATCHX.
+
+A close investigation of the PATCHX.CPE program showed that:-
+
+1) It has an obsolete MW3 start-up!
+
+2) It has cache coherency problems: This is because it runs
+   from cached memory and copies to cached memory yet it does not
+   flush the cache before executing the new kernel. This means
+   that if any of the old kernel remains in the cache when the
+   replacement is executed then the cpu will execute a mixture of
+   the old and new kernel code!
+
+We have isolated the new kernel data from PATCHX.CPE and incorporated
+them into the NEWDEX installation program along with the original
+debugger stub update (necessary for debugging with callbacks and for
+hardware data-breakpoint support).
+
+The result is SNPATCH.CPE which installs much faster than PATCHX and
+does not suffer from the aforementioned cache coherency problems.
+
+Note that SNPATCH replaces both PATCHX *and* NEWDEX. You would be
+advised to delete those latter programs from your PC.
+
+So, for those of you setting up the PSX in a batch file...
+
+change this:                    to this:-
+
+  RESETPS 1                       RESETPS 1
+  RUN /w4 PATCHX                  RUN /w4 SNPATCH
+  DELAY
+  RUN /w4 NEWDEX                  
+
+...and the result is a lot faster and more reliable.
+
+
+
+NOTE: The kernel installed by SNPATCH is the same as the one in
+PATCHX, We just install it correctly. Unfortunately the kernel itself
+is a little unstable for a short while (less than 0.5 sec) so if you
+want to RUN something else in the same batch file that runs SNPATCH
+then you would be advised to insert a small (0.5 sec) delay before
+you RUN your app. There is a suitable DELAY program in this archive,
+(execute DELAY /? for help):-
+
+             RESETPS 1
+             RUN /w4 SNPATCH
+             DELAY
+             RUN /w4 MYPROG
+
+-----------------------------------------------------------------
+
+     WHILE WE HAVE YOUR ATTENTION: *** IMPORTANT WARNING ***
+
+WE KNOW THAT SOME OF YOU ARE USING OBSOLETE MW3 VERSIONS OF LIBSN
+
+You may have updated LIBSN at an earlier date and then overwritten it
+with an older LIBSN from a recent library update. PLEASE CHECK NOW!
+The current LIBSN.LIB is about 19 Kbytes in size and contains C++ support
+and user-definable ramsize support. Do not worry about the
+larger size - the extra modules are only linked if referenced.
+
+To check that you are using the correct LIBSN change to your GNU
+library directory and enter:-
+
+	PSYLIB /l libsn.lib
+
+The resulting output should include the PUREV module near the top
+(this is the __pure_virtual function support required by GNU C++ from
+version 2.6.3 on). If you have this module then you can be fairly
+sure you have an up-to-date LIBSN.LIB
+
+If you do not have this module in your lIBSN.LIB then you should
+stop what you are doing and update to the latest LIBSN immediately.
+
+If you continue to use an old MW3 LIBSN you *will* have problems
+because the MW3 start-up read dip switches to determine ram size at
+startup. Since the ISA card PSX does not have these DIP switches it
+will not correctly initialise the stack and heap!
+
+ALSO NOTE that you should not use 8M.OBJ and 2M.OBJ to adjust
+your program for DTL-H2000 or production Playstion.
+Use the variables referenced by LIBSN.LIB start-up (e.g. _ramsize ).
+See the readme with LIBSN for further details.
+
+--------------------------------------------------------------------
+                *** ANOTHER WORD OF WARNING ***
+
+Although SN Systems are not aware of the mechanism used by many of
+the kernel functions, in light of the PATCHX problems we would advise
+any developers to beware of other cache coherency problems in their
+own code.
+
+The only similar situation which comes to mind would apply to anyone
+using code overlays on the Playstation. You should be aware than any
+data read or copied into memory is not placed into the instruction
+cache. Therefore, if this data contains program code to be executed you
+should force the cpu to flush the instruction cache before calling
+the new program code.
+
+Source code for SNPATCH is available for your reference. Although
+it is written in assembly language you can very easily assemble
+fragments using ASMPSX to produce object modules for linking to C.
+
+--------------------------------------------------------------------
+
+REVISION HISTORY
+
+After running SNPATCH you will find that RUN (by itself) will report
+a higher version number (currently 4.04)...
+
+***07-Mar-95
+
+SNPATCH with debug stub 4.03 fixes a problem in 4.02 whereby a 
+pollhost() call in a callback (e.g. VBL) causes fileserver operations
+(or printf() ) in your main program to fail (or even hang).
+
+*** 31-May-95
+
+SNPATCH 4.04:
+
+A minor update on SNPATCH 4.03, this just adds one more handy break
+function to the debug stub:-
+
+	BREAK $0407
+
+...which pauses program execution at that point. Execution can be
+resumed by hitting f9 (RUN) in the debugger.
+
+Remember that this will only function if the debug stub is hooked in.
+i.e. it won't work if you code is booted of CD using a RESETPS 0
+
+
+This has also been added to LIBSN.H as a macro for use from C:-
+
+#define	PSYQpause() asm("break 1031")	/* inline to keep variable scope */
+
+Please copy the enclosed LIBSN.H file to your Playstation GNU include
+directory.
+
+
+To use this in your C source add a line like:-
+
+	PSYQpause();
+
+Note that the C local variable scope at the pause point is preserved
+if you are debugging.
+
+
+
+*** 23-Aug-95
+
+SN versions of SCE's PATCHJ.CPE and PATCHW.CPE
+
+Note: PATCHJ is identical to the old PATCHX and it's equivalent is
+the old SNPATCH. For consistency I have renamed this to SNPATCHJ.CPE
+
+SNPATCHW.CPE is our fixed version of SCE's PATCHW.CPE
+
+Here is the data from SCE:-
+
+>Updates of patchx.cpe:
+>===================================================================
+>
+>In addition to the existing KANJI fonts, the user-defined character
+>font (245 characters) is added to PlayStation for overseas as the
+>built-in font data.
+>
+>       * Latin alphabets with diacritical marks
+>       * Greek alphabets with diacritical marks
+>       * Kyrill alphabets
+>       * Latin alphabets
+>
+>     We release patchw.cpe for these data. And the name, patchx.cpe,
+>is changed to patchj.cpe.  Patchw.cpe can be treated in the same way
+>as patchj.cpe.
+>
+> patchj.cpe : for SCEI's titles
+> patchw.cpe : for SCEA's or SCEE's titles
+>
+>     Use Krom2RawAdd2() instead of Krom2RawAdd() when the access to
+>the user-defined character data is made after the executing of
+>patchw.cpe.  Krom2RawAdd2() is included in libgpu.lib of PS-X
+Library
+>Version 3.2 or later.
+>
+>     Refer to 'Updates of KANJI Font Utility' for details (Patchy.cpe
+>which was included in this package is the same file as patchw.cpe).
+>
+
+
+
+-- Andy Beveridge

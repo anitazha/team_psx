@@ -1,0 +1,394 @@
+PlayStation      3D Graphics Tool Manual   dxf2rsd
+
+
+NAME
+        dxf2rsd - Converts DXF files to the PlayStation 3D model data file format.
+
+DATE
+        1996/May/01 Version 2.81
+
+FORMAT
+        dxf2rsd [options] DXF-files ...
+
+DESCRIPTION
+        A DXF filename is provided as an argument. The following four files are created.
+                * RSD file (*.rsd)
+                * polygon file (*.ply)
+                * material file (*.mat)
+                * group file (*.grp)
+
+        The argument can contain wildcard identifiers. Multiple files can be given to 
+        perform batch conversions. The ".dxf" extension in the filename can be omitted.
+
+Changes in Ver 2.81
+	 Memory related bug has been fixed.
+
+	 New release of an SGI version. (See psxgraph/sgi)
+
+        [options]
+
+        -o output-file: Specifies the output RSD filename. Extensions will be removed.
+                        The default is the filename of the input file without the 
+                        extension.
+
+        -col r g b:     Specifies the colors in the entire model as RGB (values of 0-255
+                        for each). The default is gray (200 200 200).
+
+        -cf color-file: Specifies the color table file.
+
+        -cl:            Outputs a list of undefined colors to standard output. Polygons 
+                        having the same color will be sorted and output to a MAT file. 
+                        The default setting is OFF. (See Example 2.)
+
+        -info:          Displays information regarding the input DXF file. Approximate size 
+                        and polygon counts can be viewed. Conversion is not performed.
+
+        -max n-poly:    Specifies the maximum polygon count that can be converted. The 
+                        default setting is 10000.
+
+        -quad:          Triangulation is not performed for 4-vertex 3DFACE. Combined with 
+                        -quad1, it is possible to decrease the total polygon count in a 
+                        model. The default setting is OFF.
+
+        -quad2 (threshold): Combines two adjacent triangles into one four-sided polygon. If 
+                        an argument is specified, the difference in orientations of two         
+                        triangles (normal vectors) can be specified as an angle, and         
+                        triangles for which the angle is not more than this value are 
+                        combined. When the argument is 0.0, triangles are combined only if 
+                        they have identical normal vectors. When the argument is 10.0, 
+                        differences of up to 10 degrees are allowed. Decimal numbers between 
+                        0.0 and 90.0 should be specified. The default setting is 1.0. (See 
+                        Example 4.)
+
+         -quad3:        Four-sided polygons having identical third and fourth vertices are 
+                        generated from triangles. This allows all polygons to be four-sided 
+                        polygons.
+
+         -s or -g:      Performs smooth (Gouraud) shading. The default setting is OFF.
+
+         -e distance:   All vertices existing within a sphere having a radius specified by 
+                        the distance argument are considered identical. This allows the 
+                        vertex count and the polygon count to be decreased. The calculation 
+                        of distance is performed after scaling has been performed with -sc.
+
+Page 2 
+
+         -r:            The normal count is decreased by not generating identical normal 
+                        vectors. This is effective for cases involving flat shading. The 
+                        default setting is OFF. (See Example 3.)
+
+        -n:             Normals are not created. This option is used when light source 
+                        calculations are not performed. The default setting is OFF.
+
+        -sc factor:     Reduces or enlarges the model. The scale is indicated by the 
+                        argument. The default setting is 1.0.
+
+        -t  x y z:      Translates the model. The translation is specified by the argument. 
+                        The default is (0.0, 0.0, 0.0).
+
+        -auto:          Translates the model near the origin and enlarges or reduces the 
+                        model to an appropriate size (so that it fits in a cube having a 
+                        side 1000). The default setting is OFF.
+
+        -back:          Reverses the direction of the normals for all the polygons. The 
+                        default setting is OFF.
+
+        -both:          Creates all polygons as two-sided polygons. The default setting is 
+                        OFF.
+
+        -dup:           Polygons are created on both the front and back of all the polygons. 
+                        The polygon count is doubled. The default setting is OFF.
+
+        -nopl:          Ignores POLYLINE and converts only 3DFACEs. The default setting is 
+                        OFF.
+
+        -Y-Z      
+        -Y+Z
+        +Y-Z
+        +Y+Z
+        -Z-Y
+        -Z+Y
+        +Z-Y
+        +Z+Y
+                        These settings specify the method used to convert the coordinate 
+                        system. The settings specify the top coordinate axis and the axis 
+                        coming forward and their orientations when the modeler's
+                        coordinate system is looked at from the front. For example, "-Y+Z" 
+                        indicates that the negative of the Y axis comes forward, and the 
+                        positive of the Z axis goes up. The coordinate system here is
+                        that of the DXF, and is not necessarily identical to that of the 
+                        modeler screen. The default is "-Y+Z". In dxf2rsd, this is converted 
+                        to the PlayStation coordinate system (-Z-Y). (In the PS coordinate 
+                        system, the negative of the Z axis comes forward, and the negative 
+                        of the Y axis goes up.)
+
+        -v:             Detailed information regarding conversion is output to standard 
+                        output. (See Example 1.)
+
+Main improvements over the previous version (ver.2.7).
+
+        * The -quad2 option is implemented. Two adjacent co-planar triangles are converted 
+          to a four-sided polygon. The margin of error in conversion can also be specified.         
+          This allows the total polygon count to be reduced. (See Example 4.)
+
+        * Triangle and quadrilateral groups can be created and written as GRP files.
+
+        * When the -cl option is specified, groups are created by color, and GRP files are 
+          written.
+
+Page 3
+
+RESTRICTIONS: The current version has the restrictions shown below.
+
+        * Only DXF files in ASCII format can be handled.
+
+        * Of the DXF entities, only 3DFACE and POLYLINE can be handled.
+
+        * In some cases, large POLYLINEs cannot be converted. If possible, DXF files should 
+          be created by converting to 3DFACE (three-sided or quadrilaterals) from the 
+          modeler.
+
+        * If the four vertices in a quadrilateral are not co-planar, the polygon may not be 
+          correctly displayed.
+
+        * The maximum number of polygons that can be converted is influenced by the number 
+          of vertices and normals to be generated. About 5000 polygons should be considered 
+          the maximum.
+
+NOTES
+
+        * 3DFACE, POLYLINE are both formats for representing polygons in DXF. In 3DFACE, a
+          single polygon (three-sided or four-sided) is represented with four vertices. In 
+          POLYLINE, multiple polygons are represented through connected lines. 3DFACE files 
+          tend to be larger but provide better compatibility. POLYLINE files tend to be 
+          smaller, but there is greater freedom in expression so that exchanging data with 
+          different modelers can be a problem.
+
+          3DFACE can be converted directly to RSD, but triangulation must first be performed 
+          for POLYLINE. This division is generally expensive, and can sometimes be 
+          unsuccessful (a "Fail to triangulate!" error message will be displayed).         
+          Furthermore, even if triangulation is completed successfully, the orientations of 
+          some of the polygons may be reversed with POLYLINE.
+
+          However, the POLYLINEs generated by 3D Studio are called POLYFACE MESH, and these 
+          use a representation method that is equivalent to 3DFACE. Thus, there are no 
+          problems in conversion for these cases.
+
+        * On the console, the practical maximum limit for animating a single object is 
+          approximately 2000 polygons. Model data should be prepared accordingly.
+
+        * If the polygon count is too high for conversion using flat shading, it may be 
+          possible to perform the conversion by specifying Gouraud shading.
+
+        * The orientation of polygons will be reversed each time the Y-Z coordinate axes are 
+          exchanged or when the sign of an axis is swapped.
+
+        * With certain modelers the orientation of the polygons will be reversed even when a 
+          3DFACE output is made. If all the polygons are reversed, the coordinate system can 
+          be changed (+Y+Z, for example) or the -back option can be used. If only some of 
+          the polygons are reversed, the reversed faces need to be reversed from the 
+          modeler.
+
+Page  4
+
+        * Below is a list of commercial 3D modelers for which conversion with dxf2rsd has 
+          been checked.
+
+          The options for converting coordinate systems are also noted.
+
+          3D modeler (version)               Hardware  Option for coordinate conversion
+          =============================================================================
+          form Z (2.1 and later versions)    Mac      -Y+Z
+          Strata Studio Pro (1.0-)           Mac      +Z+Y
+          StrataVision 3d(2.0-)              Mac      +Z+Y
+          Sculptura (1.1)                    PC       -Y+Z
+          trueSpace (1.0-)                   PC       -Y-Z
+
+          (The PlayStation version of trueSpace can directly output RSD files, so dxf2rsd is 
+           not needed)
+
+          Alias Upfront (1.1)                PC       -Y+Z
+          3D Studio (4.0)                    PC       -back
+
+          The following have been confirmed as currently not being capable of conversion:
+          MacroModel (1.5)                   PC
+          ShadeIII (1.0)                     Mac
+
+          The necessary conditions for "convertability" are that DXFs of all the 3DFACEs can 
+          be output  and that the orientation for polygons can be reversed individually. 
+          Conversion can be possible even if these conditions are not met. It is also 
+          possible to use another modeler to read a DXF file and save it, so that conversion 
+          is possible for a file that cannot be directly converted.
+
+        * If the data size is too large and not all the normals can be generated, the -n 
+          option will assume that the normals have been generated and will create an RSD 
+          without normals.
+
+        * The -r option is not valid when Gouraud shading is performed. Also, since the -r 
+          option changes the normal count and the ordering, it cannot be used when 
+          performing a normal MIMe.
+
+        * A Z sort may occur if -quad2 is used to combine two triangles into a 
+          quadrilateral.
+
+        * If two triangles to be combined in -quad2 were specified by the modeler to have 
+          different colors in the DXF, it is possible to override -quad2 just for that 
+          portion. When doing this, the -cl option should also be invoked, as in 
+          dxf2rsd -quad2 -cl.
+
+Page  5
+
+EXAMPLE 1: Sample output when the -v option is used.
+
+        > dxf2rsd -v -auto +Z+Y -quad -s foo
+
+        ========================================      <Description>
+        Input DXF file: foo.dxf                       <input DXF filename>
+
+  [DXF] SIZE      :     40230 lines                   <number of lines in the DXF file>
+        VERTEX    :     4320                          <number of vertices in the DXF file>
+        POLYGON   :     1468 (estimate)               <estimated polygon count>
+        3-poly    :     1376 (contents)               1376 triangles
+        4-poly    :     32                            32 quadrilaterals
+        (9<)-poly :     2                             <2 polygons with 10 or more sides>
+        polylines :     2 (max size=32)               <2 polylines (with 32 vertices)>
+        RANGE  x  :     -1.015 ...   +0.785           <minimum ... maximum for each axis
+               y  :     -2.533 ...   +0.768           (the Y,Z axes are converted to PS axes
+               z  :     -1.161 ...   +0.625            when necessary)>
+        SCALE     :     302.870                       <scale>
+        MOVE      :    (dx,dy,dz)=(34.788, 267.255, 81.207) <translation>
+        MATERIAL  :     0                             <number of colored polygons>
+
+  [RSD] VERTEX    :     796                           <number of vertices after conversion>
+        POLYGON   :     1468                          <number of polygons after conversion
+        triangles  :    1436 (contents)               1436 triangles
+        quadrangles:    32                             <32 quadrilaterals>
+        RANGE x   :    -272.477 ... +272.477          <minimum ... maximum for each axis
+              y   :    -500.000 ... +500.000           after resizing and translation>
+              z   :    -270.510 ... +270.510
+        MATERIAL  :    0                              <number of polygons with materials>
+        NORMAL    :    796                            <number of normals>
+
+   Output files   : foo.[rsd, ply, mat, grp]          <output filename>
+
+
+EXAMPLE 2: Using color data
+
+        The color data used in the modeler can be reflected in the RSD. To do this, the -cl 
+        option should be specified. Polygons will be colored "approximately". "Approximately" 
+        means that the colors will be different from the modeler's, but portions that had the 
+        same color will be assigned a single color. This is because DXF does not use RGB 
+        values and instead only saves "color numbers". Colors can then be specified by editing 
+        the MAT file using a text editor or by creating a color table file as described below.
+
+        > dxf2rsd -cl foo > foo.cl <create a color table file>
+
+        > type foo.cl   <creates a file containing color numbers>
+
+          183
+          40
+          253
+          0
+          8
+
+        A text editor is used to enter RGB values (0 - 255) following each of the color 
+        numbers.
+
+        > type foo.cl
+
+	  183	100 100 200
+	  40	 58  20  43
+	  253	 10 100  10
+	  0	212  20 100
+	  8	  0 128 126
+
+Page  6
+
+        dxf2rsd is executed again using the -cf option.
+
+        > dxf2rsd -cf foo.cl foo
+
+        The newly created RSD will have colors assigned according to the color table file.
+
+
+EXAMPLE 3: Converting large data files
+
+        When a data file is too detailed, the -e option can be used to combine a number of 
+        vertices into a single vertex. In the following example, two vertices that are         
+        separated by a distance of 100 or less are considered identical. This results in 
+        decreased vertex, polygon and normal counts (note that distances are calculated based 
+        on the scale after scaling has been performed).
+
+        While it depends on the data, an appropriate distance setting can generally reduce the 
+        size of the data with almost no change in shape.
+
+        > dxf2rsd -v -e 100 -sc 1000 big.dxf
+
+==================================================
+        Input DXF file: big.dxf
+
+  [DXF] SIZE    : 134628 lines   
+	VERTEX  : 18982
+	POLYGON : 8618 (estimate)
+		  3-poly     : 1746
+		  4-poly     : 3436
+        RANGE  x:   -1.644 ...   +1.545   <scale is small so scale by a
+               y:   -2.352 ...   +0.000    factor of 1000>
+	       z:   -3.649 ...   +3.993
+	SCALE   : 1000.000
+	MATERIAL:    0
+
+  [RSD] VERTEX  : 1208
+        POLYGON : 2708 (68% reduced)   <polygon count reduced to approximately 30 percent>
+		  triangles  : 2708
+	RANGE  x: -1643.811 ... +1545.072
+	       y: -2352.365 ...   +0.000
+	       z: -3649.154 ... +3992.687
+	MATERIAL:    0
+	NORMAL  : 2708
+
+  Output files  : big.[rsd, ply, mat, grp]
+
+Furthermore, the normal count can be reduced by specifying the -r option.
+
+Page  7
+
+EXAMPLE 4: Combining into quadrilaterals
+
+        By specifying the -quad2 option, two adjacent triangles can be combined into a single
+        quadrilateral. In the following example, two triangles having an angle between them of 
+        5 degrees or less are combined into four-side polygons. This results in the polygon         
+        count reduced by almost a half.
+
+        > dxf2rsd -v -quad2 5.0 earth
+
+==================================================
+  Input DXF file: earth.dxf
+
+  [DXF] SIZE    : 88158 lines   
+	VERTEX  : 8811
+	POLYGON : 2937 (estimate)
+                  3-poly     : 2937  <- initially 2937 triangles
+	RANGE  x:   -4.000 ...   +3.986
+	       y:   -3.997 ...   +3.997
+	       z:   -4.000 ...   +4.000
+	MATERIAL:    0
+
+  [RSD] VERTEX  : 2231
+        POLYGON : 1686               <- 2502 triangles were combined
+                  triangles  :  43      to form 1251 quadrilaterals.
+                  quadrangles: 1251     1686 polygons total.
+	MATERIAL:    0
+	NORMAL  : 1686 (quad2 < 4.9870)
+
+  Output files  : earth.[rsd, ply, mat, grp]
+
+
+	NORMAL  : 1686 (quad2 < 4.9870)
+
+        In the above, the "4.9870" indicates the largest angle out of the maximum angle (in 
+        this case 5.0) that was actually converted. Thus, executing the command again with a 
+        "-quad2 4.986" option would further reduce the number of combined quadrilaterals 
+        somewhat.
+
+** PlayStation is a registered trademark of Sony Computer Entertainment Ltd. **

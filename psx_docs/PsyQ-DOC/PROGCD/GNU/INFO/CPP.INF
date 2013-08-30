@@ -1,0 +1,75 @@
+This is Info file cpp.info, produced by Makeinfo-1.55 from the input
+file cpp.texi.
+
+   This file documents the GNU C Preprocessor.
+
+   Copyright 1987, 1989, 1991, 1992, 1993, 1994 Free Software
+Foundation, Inc.
+
+   Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+   Permission is granted to copy and distribute modified versions of
+this manual under the conditions for verbatim copying, provided also
+that the entire resulting derived work is distributed under the terms
+of a permission notice identical to this one.
+
+   Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions.
+
+
+Indirect:
+cpp.i1: 784
+cpp.i2: 49408
+cpp.i3: 88168
+
+Tag Table:
+(Indirect)
+Node: Top784
+Node: Global Actions3345
+Node: Commands5849
+Node: Header Files7493
+Node: Header Uses8145
+Node: Include Syntax9637
+Node: Include Operation12767
+Node: Once-Only14623
+Node: Inheritance17046
+Node: Macros19606
+Node: Simple Macros20520
+Node: Argument Macros23501
+Node: Predefined29297
+Node: Standard Predefined29727
+Node: Nonstandard Predefined35182
+Node: Stringification38758
+Node: Concatenation41684
+Node: Undefining44957
+Node: Redefining45990
+Node: Macro Pitfalls47290
+Node: Misnesting48394
+Node: Macro Parentheses49408
+Node: Swallow Semicolon51285
+Node: Side Effects53185
+Node: Self-Reference54883
+Node: Argument Prescan57159
+Node: Cascaded Macros62161
+Node: Newlines in Args63306
+Node: Conditionals64651
+Node: Conditional Uses65997
+Node: Conditional Syntax67418
+Node: #if Command67996
+Node: #else Command70268
+Node: #elif Command70923
+Node: Deleted Code72285
+Node: Conditionals-Macros73346
+Node: Assertions77024
+Node: #error Command81254
+Node: Combining Sources82682
+Node: Other Commands85578
+Node: Output87013
+Node: Invocation88168
+Node: Concept Index99789
+Node: Index102587
+
+End Tag Table

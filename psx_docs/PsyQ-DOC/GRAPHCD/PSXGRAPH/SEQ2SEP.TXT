@@ -1,0 +1,18 @@
+
+<SEQ2SEP>
+
+   SEQ2SEP collects together separate SEQ files and converts them to SEP.
+   The number of SEQ files which can be collected together at one time is 16.
+   The SEQs in a SEP are given an ID number starting from 0.   
+
+   Execution Method:
+
+        SEQ2SEP -o <foo.sep> <seq1> <seq2> <seq3> ....
+
+
+
+                             (C) 1994 Sony Computer Entertainment Inc.
+
+
+
+

@@ -1,0 +1,32 @@
+
+
+Changes in Ver 1.3e
+
+    
+      o   Version 1.3e.
+          Termination data can be specified for each channel.
+          One can specify "No Data".  If the data to be interleaved
+          is XA-ADPCM data and your program expects video data as 
+          termination data, then one should specify "Video sector" 
+          and its length.  If you need null sectors after channel
+          data, you can specify "Null sector" and its length.  The 
+          unit for length is 1 sector. 
+
+
+
+Changes in Ver 1.4e
+
+    
+      o   Version 1.4e.
+          Termination data can be specified for each channel.
+          One can specify "No Data".  If the data to be interleaved
+          is XA-ADPCM data and your program expects video data as 
+          termination data, then one should specify "Video sector" 
+          and its length.  If you need null sectors after channel
+          data, you can specify "Null sector" and its length.  The 
+          unit for length is 1 sector. 
+
+
+
+
+

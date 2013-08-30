@@ -1,0 +1,62 @@
+
+psxcons.exe is a console program for DEX2000(DTL-H2000).
+
+Before running the program, make sure DEVICE=ANSI.SYS is specified in
+the config.sys file.
+
+At present, psxcons.exe starts with the default board I/O address as 0x1340 
+and 10 as the IRQ.
+
+To modify these, specify the address and interrupt with option -p0x as 
+follows.
+        c:>  psxcons -p0x320,10
+
+Or, start the program after setting the environment variable DEX2000 as 
+follows.
+        set DEX2000=0x320,10
+
+psxcons.exe cannot coexist with dexbios.com, so delete dexbios.com first from
+resident memory before starting the program.
+
+If resetps 2 is run before the program is started, or if F7 2 RET F9 F10 is pressed after the program has started, control transfers to an internal ROM
+debugger.
+
+Once the program is running, pressing the F1 key will bring up some simple
+help.
+
+If you can remember how to use the keys F2, F3,and F4, you should easily be 
+able to use this program.  Please refer to the manual for details. 
+(psxcons.dvi can be printed out with print.man).
+
+CHANGE LOG-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+1994/06/16 09:04:49 Version
+        Internal SCE release.
+1994/07/01 14:05 Version
+        Added command to command group for automatic execution.
+1994/07/19 18:11:50 Version
+        Changed bload command to via FIFO.
+        DMA not supported.
+1995/02/16 07:07:03 Version
+        Added load function for the three formats of a.out,PSX-EXE,CPE.
+        This reduced the necessity of bload, so changed assignments of 
+        functionkeys.
+        The F4 key loads s-format/a.out/psx-exe/cpe file.
+        (Format is selected automatically.)
+1995/04/07 09:52:43 Version
+        Corrected the problem of loading the three formats of a.out, PSX-EXE, 
+        and CPE not ending normally if started in non-interrupt mode.
+        Handled development system board.  (Bus separation function 
+        handling.)
+        Added check of whether or not there's a live target when starting.
+        Stopped occurrence of atn interrupt trigger when outputting to command
+        port (PCAT -> PSX). 
+        Changed default IO address from 0x320 to 0x1340.
+1995/04/20 09:54:45 Version
+        Changed start message. 
+        Debugged development system board.
+1995/08/24 08:30:05 Version
+        Fixed bug in cpe file load function.
+
+
+

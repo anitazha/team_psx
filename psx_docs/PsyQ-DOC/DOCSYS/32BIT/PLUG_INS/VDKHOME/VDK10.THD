@@ -1,0 +1,17 @@
+# topic31.thd	314.2 - 4/9/93
+# @(#)Copyright (C) 1987-1993 Verity, Inc.
+# Thesaurus Database Descriptor
+#
+$control: 1
+descriptor:
+  /packed = YES
+  /_encrypt = YES
+{
+  data-table: thf
+  {
+    worm:	THDSTAMP	date
+    varwidth:	WORD           thv
+    varwidth:	SYNONYMS       thv
+  }
+}
+$$

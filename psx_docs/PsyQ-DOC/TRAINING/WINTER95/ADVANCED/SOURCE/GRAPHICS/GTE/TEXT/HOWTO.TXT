@@ -1,0 +1,263 @@
+No.0 **************************************************************** 483
+add_cube(ot, s, vp, np, c)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *c;
+{
+	int	i;
+	long	otz, flg, clip;
+
+ 
+	for (i=0; i<12; i++,s++,vp+=3,np+=3) {
+
+		clip=RotAverageNclipColorCol3(
+			vp[0], vp[1], vp[2],
+			np[0], np[1], np[2],
+			&c[i],
+			(long *)&s->x0,(long *)&s->x1,(long *)&s->x2,
+			(CVECTOR *)&s->r0,(CVECTOR *)&s->r1,(CVECTOR *)&s->r2,
+			&otz,&flg);
+
+		if (clip <=0)  continue; 
+
+		if((flg & 0x80000000)==0){ 	
+			otz >>= (14-OTLENGTH);
+			addPrim( ot + OTSIZE - otz, s);
+		}
+
+	}
+}
+
+No.1 ****************************************************************** 512
+add_cube(ot, s, vp, np, c)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *c;
+{
+	int	i;
+	long	otz, flg, clip;
+
+ 
+	for (i=0; i<12; i++,s++,vp+=3,np+=3) {
+
+		gte_RotAverageNclipColorCol3(
+			vp[0],vp[1],vp[2],
+			np[0],np[1],np[2],
+			&c[i],
+			(long *)&s->x0,(long *)&s->x1,(long *)&s->x2,
+			(CVECTOR *)&s->r0,(CVECTOR *)&s->r1,(CVECTOR *)&s->r2,
+			&otz,&flg,&clip);
+
+		if (clip <=0)  continue; 
+
+		if((flg & 0x80000000)==0){ 	
+			otz >>= (14-OTLENGTH);
+			addPrim( ot + OTSIZE - otz, s);
+		}
+
+	}
+}
+
+No.2 ****************************************************************** 392
+add_cube(ot, s, vp, np, c)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *c;
+{
+	int	i;
+	long	otz, flg, clip;
+
+ 
+	for (i=0; i<12; i++,s++,vp+=3,np+=3) {
+
+		gte_ldv3(vp[0],vp[1],vp[2]);
+		gte_rtpt();
+		gte_stflg(&flg);
+		gte_nclip();
+		gte_stopz(&clip);
+
+		if (clip <=0)  continue; 
+
+		gte_ldv3(np[0],np[1],np[2]);
+		gte_ldrgb(&c[i]);
+		gte_ncct();
+
+		if((flg & 0x80000000)==0){ 	
+
+			gte_stsxy3(&s->x0,&s->x1,&s->x2);
+			gte_strgb3(&s->r0,&s->r1,&s->r2);
+			gte_avsz3();
+
+			gte_stotz(&otz);
+
+			otz >>= (14-OTLENGTH);
+			addPrim( ot + OTSIZE - otz, s);
+		}
+
+	}
+}
+No.3 ***************************************************************** 463 
+add_cube(ot, s, vp, np, col)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *col;
+{
+	int	i;
+
+	struct wk {
+		u_long	*ot;
+		POLY_G3	*s;
+		long	otz, flg, clip;
+		CVECTOR *c;		
+	} *wk;
+
+	wk = (struct wk *)getScratchAddr(0);
+	wk->c = col; 
+	wk->ot = ot; 
+	for (i=0; i<12; i++,s++,vp+=3,np+=3) {
+
+		wk->clip = RotAverageNclipColorCol3(
+			vp[0], vp[1], vp[2],
+			np[0], np[1], np[2],
+			&(wk->c[i]),
+			(long *)&s->x0,(long *)&s->x1,(long *)&s->x2,
+			(CVECTOR *)&s->r0,(CVECTOR *)&s->r1,(CVECTOR *)&s->r2,
+			&wk->otz,&wk->flg);
+
+		if (wk->clip <=0)  continue; 
+
+		if((wk->flg & 0x80000000)==0){ 	
+			wk->otz >>= (14-OTLENGTH);
+			addPrim( wk->ot + OTSIZE - wk->otz, s);
+		}
+
+	}
+}
+No.4 ****************************************************************** 483
+add_cube(ot, s, vp, np, col)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *col;
+{
+	int	i;
+
+	struct wk {
+		u_long	*ot;
+		POLY_G3	*s;
+		long	otz, flg, clip;
+		CVECTOR *c;		
+	} *wk;
+
+	wk = (struct wk *)getScratchAddr(0);
+	wk->c = col; 
+	wk->ot = ot; 
+	for (i=0; i<12; i++,s++,vp+=3,np+=3) {
+
+		gte_RotAverageNclipColorCol3(
+			vp[0],vp[1],vp[2],
+			np[0],np[1],np[2],
+			&(wk->c[i]),
+			(long *)&s->x0,(long *)&s->x1,(long *)&s->x2,
+			(CVECTOR *)&s->r0,(CVECTOR *)&s->r1,(CVECTOR *)&s->r2,
+			&wk->otz,&wk->flg,&wk->clip);
+
+		if (wk->clip <=0)  continue; 
+
+		if((wk->flg & 0x80000000)==0){ 	
+			wk->otz >>= (14-OTLENGTH);
+			addPrim( wk->ot + OTSIZE - wk->otz, s);
+		}
+
+	}
+}
+No.5 ****************************************************************** 370
+add_cube(ot, s, vp, np, col)
+u_long	*ot;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+CVECTOR *col;
+{
+	int	i;
+
+	struct wk {
+		u_long	*ot;
+		POLY_G3	*s;
+		long	otz, flg, clip;
+		CVECTOR *c;		
+	} *wk;
+
+	wk = (struct wk *)getScratchAddr(0);
+	wk->c = col; 
+	wk->ot = ot; 
+	for (i=0; i<12; i++,s++,vp+=3,np+=3) {
+
+		gte_ldv3(vp[0],vp[1],vp[2]);
+		gte_rtpt();
+		gte_stflg(&wk->flg);
+		gte_nclip();
+		gte_stopz(&wk->clip);
+
+		if (wk->clip <=0)  continue; 
+
+		gte_ldv3(np[0],np[1],np[2]);
+		gte_ldrgb(&wk->c[i]);
+		gte_ncct();
+		if((wk->flg & 0x80000000)==0){ 	
+			gte_stsxy3(&s->x0,&s->x1,&s->x2);
+			gte_strgb3(&s->r0,&s->r1,&s->r2);
+			gte_avsz3();
+			gte_stotz(&wk->otz);
+
+			wk->otz >>= (14-OTLENGTH);
+			addPrim( wk->ot + OTSIZE - wk->otz, s);
+		}
+
+	}
+}
+
+No.6 ****************************************************************** 366
+add_cube(wk, s, vp, np)
+WK	*wk;
+POLY_G3	*s;
+SVECTOR	**vp;
+SVECTOR **np;
+{
+	int	i;
+
+
+	for (i=0; i<12; i++,s++,vp+=3,np+=3) {
+
+		gte_ldv3(vp[0],vp[1],vp[2]);
+		gte_rtpt();
+		gte_stflg(&wk->flg);
+		gte_nclip();
+		gte_stopz(&wk->clip);
+
+		if (wk->clip <= 0)  continue; 
+
+		gte_ldv3(np[0],np[1],np[2]);
+		gte_ldrgb(&wk->c[i]);
+		gte_ncct();
+
+		if((wk->flg & 0x80000000)==0){ 	
+			gte_stsxy3(&s->x0,&s->x1,&s->x2);
+			gte_strgb3(&s->r0,&s->r1,&s->r2);
+			gte_avsz3();
+			gte_stotz(&wk->otz);
+			wk->otz >>= (14-OTLENGTH);
+			addPrim( wk->ot + OTSIZE - wk->otz, s);
+		}
+
+	}
+}

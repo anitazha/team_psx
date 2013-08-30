@@ -1,0 +1,381 @@
+# @(#)Copyright (C) 1987-1995 Verity, Inc.
+#
+# Acrobat Exchange Language file for English
+#
+$control: 1
+
+language:
+{
+ table: CTYPE
+ {
+  text:   0 "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x08\x08\x08\x08\x00\x00"
+  text:  16 "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+  text:  32 "\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+  text:  48 "\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x00\x00\x00\x00\x00\x00"
+  text:  64 "\x00\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01"
+  text:  80 "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x00\x00\x00\x00\x00"
+  text:  96 "\x00\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02"
+  text: 112 "\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x00\x00\x00\x00\x00"
+  text: 128 "\x01\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x01\x01"
+  text: 144 "\x01\x02\x01\x02\x02\x02\x02\x02\x02\x01\x01\x02\x00\x01\x00\x00"
+  text: 160 "\x02\x02\x02\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+  text: 176 "\x00\x00\x00\x00\x00\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00"
+  text: 192 "\x00\x00\x00\x00\x00\x00\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00"
+  text: 208 "\x02\x01\x01\x01\x01\x00\x01\x01\x01\x00\x00\x00\x00\x00\x01\x00"
+  text: 224 "\x01\x02\x01\x01\x02\x01\x00\x02\x01\x01\x01\x01\x02\x01\x00\x00"
+  text: 240 "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+ }
+ table: TOUPPER
+ {
+  text:   0 "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+  text:  16 "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F"
+  text:  32 "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2A\x2B\x2C\x2D\x2E\x2F"
+  text:  48 "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3A\x3B\x3C\x3D\x3E\x3F"
+  text:  64 "\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4A\x4B\x4C\x4D\x4E\x4F"
+  text:  80 "\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5A\x5B\x5C\x5D\x5E\x5F"
+  text:  96 "\x60\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4A\x4B\x4C\x4D\x4E\x4F"
+  text: 112 "\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5A\x7B\x7C\x7D\x7E\x7F"
+  text: 128 "\x80\x9A\x90\xB6\x8E\xB7\x8F\x80\xD2\xD3\xD4\xD8\xD7\xDE\x8E\x8F"
+  text: 144 "\x90\x92\x92\xE2\x99\xE3\xEA\xEB\x98\x99\x9A\x9D\x9C\x9D\x9E\x9F"
+  text: 160 "\xB5\xD6\xE0\xE9\xA5\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF"
+  text: 176 "\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF"
+  text: 192 "\xC0\xC1\xC2\xC3\xC4\xC5\xC7\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF"
+  text: 208 "\xD1\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF"
+  text: 224 "\xE0\xE1\xE2\xE3\xE5\xE5\xE6\xE8\xE8\xE9\xEA\xEB\xED\xED\xEE\xEF"
+  text: 240 "\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF"
+ }
+ table: TOLOWER
+ {
+  text:   0 "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+  text:  16 "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F"
+  text:  32 "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2A\x2B\x2C\x2D\x2E\x2F"
+  text:  48 "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3A\x3B\x3C\x3D\x3E\x3F"
+  text:  64 "\x40\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6A\x6B\x6C\x6D\x6E\x6F"
+  text:  80 "\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7A\x5B\x5C\x5D\x5E\x5F"
+  text:  96 "\x60\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6A\x6B\x6C\x6D\x6E\x6F"
+  text: 112 "\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7A\x7B\x7C\x7D\x7E\x7F"
+  text: 128 "\x87\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x84\x86"
+  text: 144 "\x82\x91\x91\x93\x94\x95\x96\x97\x98\x94\x81\x9B\x9C\x9B\x9E\x9F"
+  text: 160 "\xA0\xA1\xA2\xA3\xA4\xA4\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF"
+  text: 176 "\xB0\xB1\xB2\xB3\xB4\xA0\x83\x85\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF"
+  text: 192 "\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC6\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF"
+  text: 208 "\xD0\xD0\x88\x89\x8A\xD5\xA1\x8C\x8B\xD9\xDA\xDB\xDC\xDD\x8D\xDF"
+  text: 224 "\xA2\xE1\x93\x95\xE4\xE4\xE6\xE7\xE7\xA3\x96\x97\xEC\xEC\xEE\xEF"
+  text: 240 "\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF"
+ }
+ table: SORTORDER
+ {
+  text:   0 "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2A\x2B\x2C\x2D\x2E\x2F"
+  text:  16 "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3A\x3B\x3C\x3D\x3E\x3F"
+  text:  32 "\x40\x41\x61\xB5\xA0\xB6\x83\xB7\x85\xC7\xC6\x42\x62\x43\x63\x80"
+  text:  48 "\x87\x44\x64\x45\x65\x90\x82\xD3\x89\xD2\x88\xD4\x8A\x46\x66\x47"
+  text:  64 "\x67\x48\x68\x49\x69\xD6\xA1\xD8\x8B\xD7\x8C\xDE\x8D\x4A\x6A\x4B"
+  text:  80 "\x6B\x4C\x6C\x4D\x6D\x4E\x6E\xA5\xA4\x4F\x6F\xE0\xA2\xE2\x93\xE3"
+  text:  96 "\x95\xE5\xE4\x50\x70\x51\x71\x52\x72\x53\x73\xE1\x54\x74\x55\x75"
+  text: 112 "\xE9\xA3\x9A\x81\xEA\x96\xEB\x97\x56\x76\x57\x77\x58\x78\x59\x79"
+  text: 128 "\xED\xEC\x98\x5A\x7A\x8F\x86\x8E\x84\x92\x91\x99\x94\x9D\x9B\xD1"
+  text: 144 "\xD0\xE8\xE7\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D"
+  text: 160 "\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D"
+  text: 176 "\x1E\x1F\x5B\x5C\x5D\x5E\x5F\x60\x7B\x7C\x7D\x7E\x7F\x9C\x9E\x9F"
+  text: 192 "\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB8"
+  text: 208 "\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC8\xC9\xCA"
+  text: 224 "\xCB\xCC\xCD\xCE\xCF\xD5\xD9\xDA\xDB\xDC\xDD\xDF\xE6\xEE\xEF\xF0"
+  text: 240 "\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF\x00"
+ }
+
+  stemtable:
+    /minlen = 3
+    {
+    map: "'S"             ""               L_INFLECTIONS    3
+    map: "'"              ""               L_INFLECTIONS    3
+    map: "'D"             ""               L_DONE           3
+    map: "'M"             ""               L_DONE           3
+    map: "'LL"            ""               L_DONE           4
+    map: "'RE"            ""               L_DONE           4
+    map: "'VE"            ""               L_DONE           4
+    map: "CAN'T"          CAN              L_DONE           5
+    map: "WON'T"          WILL             L_DONE           5
+    map: "N'T"            ""               L_DONE           5
+
+    label: L_INFLECTIONS
+    map: SSES             SS               L_DERIVATIONS    7
+    map: IES              I                L_DERIVATIONS    6
+    map: SS               SS               L_DERIVATIONS    3
+    map: S                ""               L_DERIVATIONS    4
+    map: EED              EED              L_DONE           6
+    map: ED               ""               L_E              5
+    map: YING             I                L_DERIVATIONS    8
+    map: RING             R                L_E              7
+    map: ING              ""               L_E              6
+    map: ALISTICALLY      ""               L_DONE           14
+    map: IZATIONALLY      ""               L_DONE           14
+    map: ISATIONALLY      ""               L_DONE           14
+    map: ATIONALLY        ""               L_DONE           12
+    map: RYSTALLICALLY    RYSTAL           L_DONE           16
+    map: METALLICALLY     METAL            L_DONE           15
+    map: ALLICALLY        ""               L_DONE           13
+    map: ISTICALLY        ""               L_DONE           12
+    map: ENTIALLY         ""               L_DONE           11
+    map: AICALLY          ""               L_DONE           10
+    map: ATIVELY          ""               L_DONE           10
+    map: ATINGLY          ""               L_DONE           10
+    map: ENTALLY          ""               L_DONE           10
+    map: IONALLY          ""               L_DONE           10
+    map: OIDALLY          ""               L_DONE           10
+    map: INEARLY          ""               L_DONE           10
+    map: EFULLY           ""               L_DONE           9
+    map: EOUSLY           ""               L_DONE           9
+    map: ICALLY           ""               L_DONE           9
+    map: IFULLY           ""               L_DONE           9
+    map: IOUSLY           ""               L_DONE           9
+    map: LESSLY           ""               L_DONE           9
+    map: ARILY            ""               L_DONE           8
+    map: ATELY            ""               L_DONE           8
+    map: ELILY            ""               L_DONE           8
+    map: ENTLY            ""               L_DONE           8
+    map: FULLY            ""               L_DONE           8
+    map: IALLY            ""               L_DONE           8
+    map: IEDLY            I                L_DONE           8
+    map: INGLY            ""               L_DONE           8
+    map: IVELY            ""               L_DONE           8
+    map: OUSLY            ""               L_DONE           8
+    map: ABLY             ""               L_DONE           7
+    map: ALLY             ""               L_DONE           7
+    map: ARLY             ""               L_DONE           7
+    map: INEALY           ""               L_DONE           9
+    map: EDLY             ""               L_DONE           7
+    map: ENLY             ""               L_DONE           7
+    map: IBLY             ""               L_DONE           7
+    map: LILY             ""               L_DONE           7
+    map: ELY              ""               L_DONE           6
+    map: ILY              ""               L_DONE           6
+    map: LY               ""               L_DONE           5
+    map: Y                I                L_DERIVATIONS    4
+    map: ""               ""               L_DERIVATIONS    3
+
+    label: L_E
+    map: AT               ATE              L_DERIVATIONS    5
+    map: BL               BLE              L_DERIVATIONS    5
+    map: IZ               IZE              L_DERIVATIONS    5
+    map: IS               ISE              L_DERIVATIONS    5
+    map: IV               IVE              L_DERIVATIONS    5
+    map: NC               NCE              L_DERIVATIONS    5
+    map: BB               B                L_DONE           4
+    map: DD               D                L_DONE           4
+    map: GG               G                L_DONE           4
+    map: MM               M                L_DONE           4
+    map: NN               N                L_DONE           4
+    map: PP               P                L_DONE           4
+    map: RR               R                L_DONE           4
+    map: TT               T                L_DONE           4
+
+    label: L_DERIVATIONS
+    map: ATIONAL          ""               L_NORMALIZE      10
+    map: ITIONAL          ""               L_NORMALIZE      10
+    map: ISTICAL          ""               L_NORMALIZE      10
+    map: TIONAL           ""               L_NORMALIZE      9
+    map: ANCIAL           ""               L_NORMALIZE      9
+    map: ENTIAL           ""               L_NORMALIZE      9
+    map: METAL            METAL            L_NORMALIZE      8
+    map: RYSTAL           RYSTAL           L_NORMALIZE      9
+    map: AICAL            ""               L_NORMALIZE      8
+    map: ARIAL            ""               L_NORMALIZE      8
+    map: ENTAL            ""               L_NORMALIZE      8
+    map: IONAL            ""               L_NORMALIZE      8
+    map: OIDAL            ""               L_NORMALIZE      8
+    map: ICAL             ""               L_NORMALIZE      7
+    map: AL               ""               L_NORMALIZE      5
+    map: ANCE             ""               L_NORMALIZE      8
+    map: ANCI             ""               L_NORMALIZE      7
+    map: ENCE             ""               L_NORMALIZE      8
+    map: ENCI             ""               L_NORMALIZE      7
+    map: RYSTALLIC        RYSTAL           L_NORMALIZE      12
+    map: METALLIC         METAL            L_NORMALIZE      11
+    map: ALLIC            ""               L_NORMALIZE      8
+    map: TITIC            ""               L_NORMALIZE      8
+    map: LLITIC           ""               L_NORMALIZE      9
+    map: ARIC             ""               L_NORMALIZE      7
+    map: ATIC             ""               L_NORMALIZE      7
+    map: IFIC             ""               L_NORMALIZE      7
+    map: IC               ""               L_NORMALIZE      5
+    map: ARIZER           ""               L_NORMALIZE      9
+    map: ARISER           ""               L_NORMALIZE      9
+    map: ARIZE            ""               L_NORMALIZE      8
+    map: ARISE            ""               L_NORMALIZE      8
+    map: IZER             ""               L_NORMALIZE      7
+    map: ISER             ""               L_NORMALIZE      7
+    map: ARIZATION        ""               L_NORMALIZE      12
+    map: ARISATION        ""               L_NORMALIZE      12
+    map: EIZATION         ""               L_NORMALIZE      11
+    map: EISATION         ""               L_NORMALIZE      11
+    map: IZATION          ""               L_NORMALIZE      10
+    map: ISATION          ""               L_NORMALIZE      10
+    map: ENTIATION        ""               L_NORMALIZE      12
+    map: ENTATION         ""               L_NORMALIZE      11
+    map: FICATION         ""               L_NORMALIZE      11
+    map: INATION          ""               L_NORMALIZE      10
+    map: FACTION          ""               L_NORMALIZE      10
+    map: ATION            ""               L_NORMALIZE      8
+    map: ATOR             ""               L_NORMALIZE      7
+    map: ATORI            ""               L_NORMALIZE      8
+    map: ICATE            ""               L_NORMALIZE      8
+    map: ATIVE            ""               L_NORMALIZE      8
+    map: ALIZE            ""               L_NORMALIZE      8
+    map: IDINE            ""               L_NORMALIZE      8
+    map: ICIDE            ""               L_NORMALIZE      8
+    map: ELIHOOD          ""               L_NORMALIZE      10
+    map: IHOOD            ""               L_NORMALIZE      8
+    map: HOOD             ""               L_NORMALIZE      7
+    map: YISH             I                L_NORMALIZE      8
+    map: ISH              ""               L_NORMALIZE      7
+    map: EFUL             ""               L_NORMALIZE      7
+    map: IFUL             ""               L_NORMALIZE      7
+    map: FUL              ""               L_NORMALIZE      6
+    map: ATIVISM          ""               L_NORMALIZE      10
+    map: ICALISM          ""               L_NORMALIZE      10
+    map: IALISM           ""               L_NORMALIZE      9
+    map: OIDISM           ""               L_NORMALIZE      9
+    map: ALISM            ""               L_NORMALIZE      8
+    map: ICISM            ""               L_NORMALIZE      8
+    map: INISM            ""               L_NORMALIZE      8
+    map: IZEMENT          ""               L_NORMALIZE      11
+    map: ISEMENT          ""               L_NORMALIZE      11
+    map: EMENT            ""               L_NORMALIZE      9
+    map: ATIVENESS        ""               L_NORMALIZE      12
+    map: EABLENESS        ""               L_NORMALIZE      12
+    map: IONALNESS        ""               L_NORMALIZE      12
+    map: ITOUSNESS        ""               L_NORMALIZE      12
+    map: ABLENESS         ""               L_NORMALIZE      11
+    map: ICALNESS         ""               L_NORMALIZE      11
+    map: EOUSNESS         ""               L_NORMALIZE      11
+    map: IOUSNESS         ""               L_NORMALIZE      11
+    map: LESSNESS         ""               L_NORMALIZE      11
+    map: ARINESS          ""               L_NORMALIZE      10
+    map: ATENESS          ""               L_NORMALIZE      10
+    map: FULNESS          ""               L_NORMALIZE      10
+    map: INGNESS          ""               L_NORMALIZE      10
+    map: IVENESS          ""               L_NORMALIZE      10
+    map: OUSNESS          ""               L_NORMALIZE      10
+    map: ALNESS           ""               L_NORMALIZE      9
+    map: NESS             ""               L_NORMALIZE      7
+    map: IONALITI         ""               L_NORMALIZE      11
+    map: ICALITI          ""               L_NORMALIZE      10
+    map: IALITI           ""               L_NORMALIZE      9
+    map: LINITI           ""               L_NORMALIZE      9
+    map: ACITI            ""               L_NORMALIZE      8
+    map: ICITI            ""               L_NORMALIZE      8
+    map: ALITI            ""               L_NORMALIZE      8
+    map: ARITI            ""               L_NORMALIZE      8
+    map: IVITI            ""               L_NORMALIZE      8
+    map: ARIZABILITI      ""               L_NORMALIZE      14
+    map: ARISABILITI      ""               L_NORMALIZE      14
+    map: IZABILITI        ""               L_NORMALIZE      12
+    map: ISABILITI        ""               L_NORMALIZE      12
+    map: ABILITI          ""               L_NORMALIZE      10
+    map: IBILITI          ""               L_NORMALIZE      10
+    map: ARIZABLE         ""               L_NORMALIZE      11
+    map: ARISABLE         ""               L_NORMALIZE      11
+    map: IZABLE           ""               L_NORMALIZE      9
+    map: ISABLE           ""               L_NORMALIZE      9
+    map: ATABLE           ""               L_NORMALIZE      9
+    map: ABLE             ""               L_NORMALIZE      8
+    map: IBLE             ""               L_NORMALIZE      8
+    map: TION             ""               L_NORMALIZE      8
+    map: IOUR             ""               L_NORMALIZE      8
+    map: ANT              ""               L_NORMALIZE      7
+    map: ENT              ""               L_NORMALIZE      7
+    map: IZE              ""               L_NORMALIZE      7
+    map: ISE              ""               L_NORMALIZE      7
+    map: IOR              ""               L_NORMALIZE      7
+    map: ISM              ""               L_NORMALIZE      6
+    map: ATE              ""               L_NORMALIZE      7
+    map: LION             LION             L_NORMALIZE      7
+    map: NION             NION             L_NORMALIZE      7
+    map: IFI              ""               L_NORMALIZE      7
+    map: ITI              ""               L_NORMALIZE      7
+    map: OUS              ""               L_NORMALIZE      7
+    map: IER              I                L_NORMALIZE      6
+    map: IC               ""               L_NORMALIZE      6
+    map: ION              ""               L_NORMALIZE      6
+    map: OU               ""               L_NORMALIZE      6
+    map: IST              ""               L_NORMALIZE      6
+    map: IVE              ""               L_NORMALIZE      6
+    map: AINE             AINE             L_NORMALIZE      6
+    map: CINE             CINE             L_NORMALIZE      6
+    map: EINE             EINE             L_NORMALIZE      6
+    map: MINE             MINE             L_NORMALIZE      6
+    map: INE              ""               L_NORMALIZE      6
+    map: DITE             D                L_NORMALIZE      6
+    map: FITE             F                L_NORMALIZE      6
+    map: PHITE            PH               L_NORMALIZE      6
+    map: THITE            TH               L_NORMALIZE      6
+    map: LITE             L                L_NORMALIZE      6
+    map: ERITE            ER               L_NORMALIZE      6
+    map: ORITE            OR               L_NORMALIZE      6
+    map: ESITE            ES               L_NORMALIZE      6
+    map: TITE             T                L_NORMALIZE      6
+    map: WARD             ""               L_NORMALIZE      7
+    map: WISE             ""               L_NORMALIZE      7
+    map: RYL              ""               L_NORMALIZE      8
+    map: NYL              ""               L_NORMALIZE      8
+    map: NONE             ""               L_NORMALIZE      8
+    map: LAR              L                L_NORMALIZE      6
+    map: IAR              I                L_NORMALIZE      6
+    map: INEAR            INE              L_NORMALIZE      6
+
+    label: L_NORMALIZE
+    map: LL               L                L_DONE           5
+    map: IEV              IEF              L_DONE           5
+    map: UCT              UC               L_DONE           5
+    map: UMPT             UM               L_DONE           5
+    map: RPT              RB               L_DONE           5
+    map: URS              UR               L_DONE           5
+    map: ISTR             ISTER            L_DONE           5
+    map: METR             METER            L_DONE           5
+    map: NTR              NTER             L_DONE           5
+    map: OUR              OR               L_DONE           5
+    map: OLV              OLUT             L_DONE           5
+    map: AUL              AUL              L_DONE           5
+    map: IUL              IUL              L_DONE           5
+    map: OUL              OUL              L_DONE           5
+    map: UL               L                L_DONE           5
+    map: BEX              BIC              L_DONE           5
+    map: DEX              DIC              L_DONE           5
+    map: PEX              PIC              L_DONE           5
+    map: TEX              TIC              L_DONE           5
+    map: AX               AC               L_DONE           5
+    map: EX               EC               L_DONE           5
+    map: IX               IC               L_DONE           5
+    map: LUX              LUC              L_DONE           5
+    map: UAD              UAS              L_DONE           5
+    map: VAD              VAS              L_DONE           5
+    map: CID              CIS              L_DONE           5
+    map: LID              LIS              L_DONE           5
+    map: ERID             ERIS             L_DONE           5
+    map: PAND             PANS             L_DONE           5
+    map: SEND             SEND             L_DONE           5
+    map: END              ENS              L_DONE           5
+    map: OND              ONS              L_DONE           5
+    map: LUD              LUS              L_DONE           5
+    map: RUD              RUS              L_DONE           5
+    map: PHER             PHER             L_DONE           5
+    map: THER             THER             L_DONE           5
+    map: HER              THES             L_DONE           5
+    map: MIT              MIS              L_DONE           5
+    map: MEND             MEND             L_DONE           5
+    map: END              ENS              L_DONE           5
+    map: ERT              ERS              L_DONE           5
+    map: NET              NET              L_DONE           5
+    map: ET               ES               L_DONE           5
+    map: YT               YS               L_DONE           5
+    map: YZ               YS               L_DONE           5
+    map: LI               ""               L_DONE           6
+    map: EEN              EEN              L_DONE           5
+    map: REN              ""               L_DONE           5
+    map: MEN              MAN              L_DONE           5
+    map: EN               ""               L_DONE           5
+    map: E                ""               L_DONE           4
+    label: L_DONE
+    }
+}
+$$

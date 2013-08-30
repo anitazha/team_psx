@@ -1,0 +1,35 @@
+ ----------------------------------------------------------------
+aiff2vag v1.7 (July 1, 1995)
+     convert AIFF files to VAGs.
+     (C) 1995 Sony Computer Entertainment Inc.
+usage: aiff2vag [-L | -1] [-R fs [-E]] aiff-files...
+     -1 : force non-looping
+     -L : force looping
+     -R : RAW (16bit straight PCM) source
+     fs : sampling rate in Hz (ex: 44100)
+     -E : do not convert endian
+----------------------------------------------------------------
+<AIFF2VAG v1.7>
+
+   This tool converts 16-bit straight PCM monaural data to PlayStation wave 
+   data format VAG.
+   
+   If there are markers in the AIFF data, the first two are used to create a 
+   loop.  Unmarked oneshot data can also be encoded as loop data by using 
+   the -L option.  
+
+   16-bit straight PCM data can be handled by specifying the -R option.  
+   Always specify the sampling rate when converting straight PCM.
+   
+   EXAMPLE: (In this example, 8 kHz straight PCM data is converted.)
+   
+   > aiff2vag -r 8000 voice.raw
+   
+   EXAMPLE: (In this example, two AIFF data are converted consecutively.)
+   
+   > aiff2vag drum.aif piano.aif
+   
+
+                                (C) 1995 Sony Computer Entertainment Inc.
+
+

@@ -1,0 +1,49 @@
+                        PlayStation Tool Manual
+
+NAME        pict2tim - Converts Macintosh image data to PlayStation image data
+                    files.
+
+DATE        	
+1995/Oct/13 Version 3.1
+
+FORMAT        	
+pict2tim [options] PICT-files ...
+
+DESCRIPTION    
+ A Macintosh PICT2 format image data file is converted to  
+ a PS-XTIM file (*.TIM).    
+    
+The argument can contain wildcard identifiers. Multiple files can        
+be given to perform batchconversions.         
+
+[options]        
+
+-o output-file  Specifies the output filename.  
+
+		The default is to use the input filename with the extension ".tim"                         
+		and write it to the current directory.        
+
+-org x y        Specify image origin in VRAM.  Default is (0, 0).  
+      
+-plt x y        Specify position of color palette in VRAM.                        
+		Default is (0, 480).    
+            
+-t              Set transparency control bit ON for colors other than   
+		(0 0 0).  Colors other than (0 0 0) become semi-      
+                transparent.  The default is for all colors to be    
+                non-transparent.
+          
+-b              Set transparency control bit OFF for (0 0 0).                       
+ 		(0 0 0) becomes transparent.  The default is for                        
+ 		(0 0 0) to be displayed as black. 
+       
+-v              Display detailed information related to conversion.
+
+RESTRICTIONS    
+The current version has the restrictions shown below.        
+	* The PICT data which can be converted is limited to Pixmap.        
+	* 32-bit PICT cannot be converted.Changes in Ver 3.0
+          
+Changed so that 1, 2, 4-bit PICT can be converted.         
+These are converted to 4-bit TIM.     
+

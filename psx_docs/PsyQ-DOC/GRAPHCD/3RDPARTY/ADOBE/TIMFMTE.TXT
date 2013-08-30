@@ -1,0 +1,118 @@
+TIM format file input/output plug-in module                               version 1.2E
+
+[ Operating environment ]
+
+Adobe Photoshop 2.5, Windows 3.1
+
+
+
+[ Contents ]
+
+TIMFMTE.8BI: TIM format module.  Allows importing files with a ".TIM" file 
+extension.
+
+TIMFMTE.TXT: This file.
+
+
+
+[ Installation ]
+
+Copy TIMFMTE.8BI into the "PLUGINS" sub-directory, found in the directory that 
+PHOTOSHP.EXE is located in.
+
+
+
+[ Usage ]
+
+Opening TIM format files
+
+To open TIM format files, choose "File / Open..." from the menu bar, and select 
+a file with the ".TIM" extension.
+
+Saving TIM format files
+
+1 In the "Save" or "Save As..." dialog box, select "TIM (*.TIM)" from the 
+"File Format" list.
+           
+2 Enter an appropriate file name, and click "OK".
+
+3 The warning message "Some picture information cannot be saved" will be 
+displayed.  Click "OK".
+
+4 The TIM Format Output Options dialog box is displayed.  The texture CLUT 
+address and texture page address from the last file opened  (or saved) 
+remain saved.
+
+<<<<< insert File: DLGFMTE.EPS  here >>>>>
+
+* Image data modes
+Sets the PMODE of the TIM format file.  
+Set as follows according to the source image mode:
+        Indexed color: 4 bit or 8 bit CLUT
+        RGB color: 16 bit or 24 bit Direct
+
+* CLUT section
+Sets the address (from the upper left) of the CLUT in VRAM.
+You may set the width (W) and height (H) as follows:
+        4 bit CLUT: Width:  16 (fixed), Height: 1-16 (as need)
+        8 bit CLUT: Width: 256 (fixed), Height: 1 (fixed)
+
+* Pixel data section
+Sets the address (from the upper left) of the pixel data in VRAM.  
+The image width (W) and height (H) is displayed, but cannot be changed.
+
+* Except black -> Translucent
+In conversion to TIM format, sets the transparency control bit for pixels or 
+CLUT entries other than those where the (R, G, B) values are set to (0, 0, 0). 
+As a result, these become translucent only in translucent mode.
+(This check box is unchecked by default).
+ 
+* Black -> Transparent
+In conversion to TIM format, clears the transparency control bit for pixels or 
+CLUT entries where the (R, G, B) values are set to (0, 0, 0).
+As a result, black becomes transparent, regardless of translucency mode.
+(This check box is checked by default).
+
+* Cancel
+Cancels the save operation.
+
+* Default
+Sets the standard addresses for the CLUT section and Pixel data section.
+This operation cannot be undone.
+
+* OK
+Saves the image data as a TIM format file.
+
+
+******************************** IMPORTANT ************************************
+
+* The TIM format, except when in 24 bit mode, has a bit for transparency control, 
+but this is not supported by Photoshop.  Therefore, when files are imported into 
+Photoshop the transparency control bit is lost, and "Transparent" and "Translucent 
+black/Opaque black" attributes become the same in the Photoshop format.  This is 
+manipulated when saving through the two check boxes found in this plug-in module 
+which set the transparency control bit.  However, you cannot save a single TIM 
+file which uses both "Transparent" and "Translucent black/Opaque black" attributes 
+at the same time.  For situations such as this, set all "black" pixels to an 
+alternate value such as (R, G, B) = (0, 0, 1) in the TIM format.
+
+* RGB components in Photoshop are used at a resolution of 8 bits each, but the 
+TIM format only uses 5 bits for each (except in 24 bit mode).  Therefore, when 
+a TIM format file is opened, 0s will be inserted into the lower 3 bits, and 
+when the file is saved only the upper 5 bits are retained.
+
+* Photoshop's indexed color images use a 256-entry CLUT, so even for 4-bit CLUT 
+TIM files up to 256 colors may be maintained.  However, when the image is 
+displayed in Photoshop only the first 16 CLUT will be used.
+  
+* This software may not be transferred or resold to any third party.
+
+* Reverse engineering of this software is forbidden.
+
+* Adobe Photoshop is an international trademark or registered trademark of Adobe 
+Systems Incorporated.
+
+* Windows is a registered trademark of Microsoft Corporation.
+
+                                                        Copyright (C) 1994 Sony Computer Entertainment Inc.
+                                                        All rights reserved.

@@ -1,0 +1,103 @@
+
+				PlayStation Tool Manual
+
+NAME
+	timutil - convert each bit map format of the TIM, BMP, PICT, RGB
+		to one of them.
+
+DATE
+	1995/Apr/3 Version 1.36e
+
+SYNOPSIS
+	timutil
+
+DESCRIPTION
+	TIM utility is a Windows application which allows you to convert
+	each bit map format on the PlayStation TIM, Windows BMP, Macintosh
+	PICT, and general-purpose RGB to one of them.  Works on
+	PC/AT compatibles under Windows 3.1 
+
+	See on-line help for more details.
+
+	[options]
+
+	none
+
+NOTES
+	The timutil uses the SPIN.VBX. Install the SPIN.VBX into the
+	\WINDOWS\SYSTEM directory.
+
+	The compressed format BMP, JPEG compressed PICT, 32-bit PICT and
+	PICT without bit map cannot be read-in.
+
+	Write-out as the compressed format BMP or JPEG compressed format PICT
+	file is not allowed.
+	Write-out file bit depth is limited to 4, 8, 16 or 24-bit.
+
+	In data conversion in which the bit depth reduces, for example, from
+	16-bit to 8-bit, color information is approximated.
+	As this approximation is not realized with a method such as color
+	compression but with color map on which R, G and B are uniformly
+	allocated, the color accuracy may deteriorate.
+
+	As a rule, overwriting to the file which was read in is not allowed.
+	However, overwriting is allowed when both read-in format and
+	write-out format are TIM and only image origin and pallet origin were
+	changed.
+	This function is equal to TIMPOS.EXE of Commandline version.
+
+Changes in Ver 1.10
+
+	Now, a TIM file can be displayed on Artist Board(DTL-H200)
+	by selecting [TIM view...].
+	(This command is equivalent to timview.exe on the command line.)
+
+	The function of timpos.exe has been incorporated into [Convert...].
+
+	[Save all...] has been added to the file menu.
+
+Changes in Ver 1.15
+
+	You can use a program called "aboard.exe" to change an I/O address to
+	communicate with Artist Board(DTL-H200).
+
+	[Preferences...] has been added to the file menu. This command changes
+	default values of conversion.
+
+Changes in Ver 1.20
+
+	[Pallette to use] list has been added to the [Parameter setting window]
+	to support "multi-CLUT" TIM files.
+
+Changes in Ver 1.30
+
+	[TIM layout...] has been added to the window menu.
+
+Changes in Ver 1.35
+
+	Modification has been made to display the area 480 in height (double
+	the area 240 in height) considering the double buffer even if the
+	height of the display area is 240 in the [TIM layout] dialog box.
+
+	Debugging has been made to normally display the TIM file whose
+	[Image org] is off the texture page boundary in the [TIM view].
+
+	Modification has been made to open a RSD file. The system operates
+	as if all the TIM files included in the RSD file were opened.
+
+	Modification has been made so that Drag & Drop from the file manager
+	or opening a file from the file opened prior to the file menu can
+	change the current directory. This change has allowed the directory
+	of the last opened file to become the current directory.
+	(In the previous version, the current directory was changed only when
+	the file dialog box was used, that is a file was opened using the
+	[Open...] file menu or the directory was changed using the
+	[Save all...] menu.)
+
+	Debugging has been made so that the check of data overwrite to the
+	same file is made for a change to [Palette to use].
+
+Changes in Ver 1.36
+
+	A bug has been fixed that a BMP file using fewer colors than
+	calculated by the bit depth cannnot be read in.
