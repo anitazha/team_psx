@@ -1,0 +1,14 @@
++-----------------------------------------------+
+|                     CPU                       |
++-----------------------------------------------+
+
+- file name or link here
+(list some key words/points about the doc)
+
++-----------------------------------------------+
+|                     GPU                       |
++-----------------------------------------------+
+
+- http://psx.rules.org/gpu.txt
+(frame buffer, primitives, textures, texture pages, CLUT, rendering, registers...)
+
