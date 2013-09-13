@@ -1,4 +1,11 @@
 +-----------------------------------------------+
+|                    BIOS                       |
++-----------------------------------------------+
+
+- PsyQ-DOC/DOCREFS/OS.pdf
+(Talks about the kernel and stuff!)
+
++-----------------------------------------------+
 |                     CPU                       |
 +-----------------------------------------------+
 
@@ -9,9 +16,9 @@
 |                     GTE                       |
 +-----------------------------------------------+
 
-- PSQ-DOC/TECHNOTE/GTE_REG.pdf
+- PsyQ-DOC/TECHNOTE/GTE_REG.pdf
 (Register list and description)
-- PSQ-DOC/TECHNOTE/GTE_REF.pdf
+- PsyQ-DOC/TECHNOTE/GTE_REF.pdf
 (Instruction descriptions)
 
 +-----------------------------------------------+
@@ -20,4 +27,12 @@
 
 - http://psx.rules.org/gpu.txt
 (frame buffer, primitives, textures, texture pages, CLUT, rendering, registers...)
+- PsyQ-DOC/DOCREFS/HRDWR.pdf
+(High level and information on GPU and its memory)
 
++-----------------------------------------------+
+|                   Memory                      |
++-----------------------------------------------+
+
+- PsyQ-DOC/DOCREFS/OS.pdf
+(Has memory map and info on caches)
