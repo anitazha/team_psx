@@ -6,6 +6,15 @@
 (list some key words/points about the doc)
 
 +-----------------------------------------------+
+|                     GTE                       |
++-----------------------------------------------+
+
+- PSQ-DOC/TECHNOTE/GTE_REG.pdf
+(Register list and description)
+- PSQ-DOC/TECHNOTE/GTE_REF.pdf
+(Instruction descriptions)
+
++-----------------------------------------------+
 |                     GPU                       |
 +-----------------------------------------------+
 
