@@ -117,10 +117,10 @@ void    HAL_SetGPIO_State (UCHAR, UCHAR);
 BOOL    HAL_RxInt1Pending (void);
 BOOL    HAL_RxInt2Pending (void);
 BOOL    HAL_TxIntPending (void);
-void 	HAL_PlatformInit(UINT32 i2cBaseAddr,
-					     UINT32 timerBaseAddr,
-					     UINT32 timerIntMask,
-					     UINT32 intcBaseAddr);
+void HAL_PlatformInit(UINT32 i2cBaseAddr,
+					  UINT32 timerDevId,
+					  UINT32 timerIntCtrlDevId,
+					  UINT32 timerIntId);;
 UINT16  HAL_GetHwRevision (void);
 char   *HAL_GetPlatformName (void);
 UCHAR   HAL_GetRxBoardRevision (void);
