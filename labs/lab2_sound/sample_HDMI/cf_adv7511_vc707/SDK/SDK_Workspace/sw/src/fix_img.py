@@ -12,7 +12,7 @@ for l in f:
     if (len(l) >= 1 and l[0] == "\t"):
         i = int(l.strip()[:-1], 16);
         h = ctypes.c_uint32(~i).value;
-        l = "\t\t" + ("0x%08X" % h) + ",\n";
+        l = "\t\t" + ("0x%02X" % ((i >> 24) & 0xFF)) + ("%06X" % (h & 0xFFFFFF)) + ",\n";
     res += l;
 
 nfh.write(res);
