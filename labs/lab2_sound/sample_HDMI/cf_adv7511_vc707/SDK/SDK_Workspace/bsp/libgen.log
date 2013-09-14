@@ -1,0 +1,55 @@
+Release 2013.2 - libgen Xilinx EDK 2013.2 Build EDK_P.68d
+ (lin64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+Command Line: libgen -hw ../hw/system.xml -pe microblaze_0 -log libgen.log
+system.mss 
+
+WARNING:EDK - axidma -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 27 - deprecated driver!
+WARNING:EDK - iic -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 39 - deprecated driver!
+WARNING:EDK - intc -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 45 - deprecated driver!
+WARNING:EDK - tmrctr -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 57 - deprecated driver!
+WARNING:EDK - axivdma -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 63 - deprecated driver!
+WARNING:EDK - uartlite -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 75 - deprecated driver!
+WARNING:EDK - bram -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 81 - deprecated driver!
+WARNING:EDK - bram -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 87 - deprecated driver!
+WARNING:EDK - uartlite -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 93 - deprecated driver!
+WARNING:EDK - cpu -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 14 - deprecated processor!
+WARNING:EDK - standalone -
+   /work/team_psx/labs/lab2_sound/sample_HDMI/cf_adv7511_vc707/SDK/SDK_Workspace
+   /bsp/system.mss line 5 - deprecated os!
+
+Staging source files.
+Running DRCs.
+Running generate.
+Running post_generate.
+Running include - 'gmake -s include "COMPILER=mb-gcc" "ARCHIVER=mb-ar"
+"COMPILER_FLAGS=-mlittle-endian -mno-xl-soft-mul -mxl-multiply-high
+-mxl-barrel-shift -mxl-pattern-compare -mno-xl-soft-div -mcpu=v8.40.b  -O2 -c"
+"EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections"'.
+
+Running libs - 'gmake -s libs "COMPILER=mb-gcc" "ARCHIVER=mb-ar"
+"COMPILER_FLAGS=-mlittle-endian -mno-xl-soft-mul -mxl-multiply-high
+-mxl-barrel-shift -mxl-pattern-compare -mno-xl-soft-div -mcpu=v8.40.b  -O2 -c"
+"EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections"'.
+Running execs_generate.
