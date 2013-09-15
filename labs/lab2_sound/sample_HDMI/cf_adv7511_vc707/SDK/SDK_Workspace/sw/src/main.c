@@ -197,7 +197,7 @@ int main()
 		APP_ChangeResolution();
 		COUNT++;
 
-		if (COUNT>>31 & 1)
+		if (COUNT>>6 & 1)
 		  {
 			TDesc = (STD_TIMING *)(Edid->DetailedTiming);
 
