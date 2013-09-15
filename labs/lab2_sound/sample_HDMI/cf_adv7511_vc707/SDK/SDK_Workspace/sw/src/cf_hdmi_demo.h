@@ -38,8 +38,8 @@
  *   SVN Revision: $WCREV$
 *******************************************************************************/
 
-#define IMG_LENGTH 175656
-static u32 IMG_DATA[] = {
+#define IMG_LENGTH_I 175656
+static u32 IMG_DATA_I[] = {
 		0xFF000000,
 		0xFF000000,
 		0xFF000000,

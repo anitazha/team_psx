@@ -46,6 +46,7 @@
 #include "xparameters.h"
 #include "cf_hdmi.h"
 #include "cf_hdmi_demo.h"
+#include "cf_hdmi_demo_org.h"
 #include "xil_cache.h"
 
 /*****************************************************************************/
@@ -115,24 +116,32 @@ static const unsigned long detailedTiming[7][9] =
  * @brief DDRVideoWr.
 *******************************************************************************/
 void DDRVideoWr(unsigned short horizontalActiveTime,
-				unsigned short verticalActiveTime)
+		unsigned short verticalActiveTime, unsigned short invert)
 {
 	unsigned long  pixel      = 0;
 	unsigned long  backup     = 0;
 	unsigned short line       = 0;
 	unsigned long  index      = 0;
 	unsigned char  repetition = 0;
+	unsigned int length = IMG_LENGTH;
+	int* data = IMG_DATA;
+
+	if (invert)
+	  {
+	    length = IMG_LENGTH_I;
+	    data = IMG_DATA_I;
+	  }
 
 	while(line < verticalActiveTime)
 	{
-		for(index = 0; index < IMG_LENGTH; index++)
+		for(index = 0; index < length; index++)
 		{
-			for (repetition = 0; repetition < ((IMG_DATA[index]>>24) & 0xff); repetition++)
+			for (repetition = 0; repetition < ((data[index]>>24) & 0xff); repetition++)
 			{
 				backup = pixel;
 				while((pixel - line*horizontalActiveTime) < horizontalActiveTime)
 				{
-					Xil_Out32((VIDEO_BASEADDR+(pixel*4)), (IMG_DATA[index] & 0xffffff));
+					Xil_Out32((VIDEO_BASEADDR+(pixel*4)), (data[index] & 0xffffff));
 					pixel += 640;
 				}
 				pixel = backup;
@@ -207,7 +216,7 @@ void InitHdmiVideoPcore(unsigned short horizontalActiveTime,
 	unsigned short verticalDeMin	   = 0;
 	unsigned short verticalDeMax	   = 0;
 
-	DDRVideoWr(horizontalActiveTime, verticalActiveTime);
+	DDRVideoWr(horizontalActiveTime, verticalActiveTime, 0);
 
 	horizontalCount = horizontalActiveTime +
 					  horizontalBlankingTime;
