@@ -104,6 +104,8 @@ typedef struct
 
 TRANSMITTER_TX_VARS	TransmitterTxVars;
 
+EDID_STRUCT    *Edid;
+
 #define CurrMuteState			TransmitterTxVars.CurrMuteState
 #define TxStatus				TransmitterTxVars.TxStatus
 

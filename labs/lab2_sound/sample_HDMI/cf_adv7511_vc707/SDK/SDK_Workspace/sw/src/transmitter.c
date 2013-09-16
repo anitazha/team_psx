@@ -431,7 +431,6 @@ void TRANSMITTER_NewEdidSegment(UINT16 SegmentNum, UCHAR *SegPtr)
 {
 	UCHAR  		   EdidData[256];
 	UINT16 		   SpaOffset;
-	EDID_STRUCT    *Edid;
 	STD_TIMING     *TDesc;
 	unsigned short horizontalActiveTime     = 0;
 	unsigned short verticalActiveTime       = 0;

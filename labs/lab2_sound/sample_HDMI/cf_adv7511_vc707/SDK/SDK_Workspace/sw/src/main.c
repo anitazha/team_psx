@@ -151,6 +151,12 @@ int main()
 {
 	UINT32 StartCount;
 
+	UINT32 COUNT = 0;
+	int invert = 1;
+	STD_TIMING* TDesc;
+	unsigned short horizontalActiveTime;
+	unsigned short verticalActiveTime;
+
 	MajorRev     = 1;
 	MinorRev     = 1;
 	RcRev        = 1;
@@ -189,6 +195,20 @@ int main()
 			}
 		}
 		APP_ChangeResolution();
+		COUNT++;
+
+		if (COUNT>>6 & 1)
+		  {
+			TDesc = (STD_TIMING *)(Edid->DetailedTiming);
+
+			horizontalActiveTime = ((TDesc->HActBlnk44 & 0xf0) << 4) |
+			  TDesc->HActive;
+			verticalActiveTime = ((TDesc->VActBlnk44 & 0xf0) << 4) |
+			  TDesc->VActive;
+			DDRVideoWr(horizontalActiveTime, verticalActiveTime, invert);
+			invert = ~invert & 1;
+			COUNT = 0;
+		  }
 	}
 
 	Xil_DCacheDisable();
