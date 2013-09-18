@@ -45,7 +45,7 @@ module spdif(
    bit [7:0] 		      stored_preamble;
    bit [2:0] 		      stored_preamble_bits;
    
-   bit [9:0] 		      subframe_count;
+   bit [8:0] 		      subframe_count;
 
    bit 			      bcm_out;
    
@@ -126,15 +126,15 @@ module spdif(
    /* Subframe Count register */
    always @(posedge clk, posedge rst) begin
       if (rst) begin
-	 subframe_count <= 10'b0;
+	 subframe_count <= 9'b0;
       end
       else begin
 	 if (stored_bits == 5'd1) begin
-	    if (subframe_count < 10'd191) begin
-	       subframe_count <= stored_bits + 10'd1;
+	    if (subframe_count < 9'd383) begin
+	       subframe_count <= stored_bits + 9'd1;
 	    end
 	    else begin
-	       subframe_count <= 10'd0;
+	       subframe_count <= 9'd0;
 	    end
 	 end
       end // else: !if(rst)

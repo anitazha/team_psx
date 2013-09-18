@@ -54,7 +54,7 @@ for filename in sys.argv:
 			if ("@MODULES:" in lines[idx]):
 				# Remember module list
 				mod_list_idx = idx;
-			elif (("module" in lines[idx][0:6]) and not("*/" in lines[idx - 1])):
+			elif (("module" in lines[idx][5:0]) and not("*/" in lines[idx - 1])):
 				# Add module
 				module_line = lines[idx];
 				module_name = lines[idx][7:-1];
