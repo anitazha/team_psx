@@ -6,7 +6,7 @@ module iic_config (input  wire clk,
 		   input  wire rst,
 		   output wire SDA,
 		   output wire SCL,
-		   output wire DONE);
+		   output wire done);
 
    parameter   CLK_RATE_MHZ = 200;
    parameter   SCK_PERIOD_US = 30;
@@ -69,7 +69,7 @@ module iic_config (input  wire clk,
    
    reg 	                        SDA_out;
    reg 	                        SCL_out;
-   reg 	                        DONE;
+   reg 	                        done;
    reg [TRANSITION_CYCLE_MSB:0] cycle_count;
    reg [4:0] 			write_count;
    reg [31:0] 			bit_count;
@@ -206,6 +206,9 @@ module iic_config (input  wire clk,
    assign transition = (cycle_count == TRANSITION_CYCLE);
 
    always_comb begin
+      /* Defaults */
+      next_state = curr_state;
+      
       case (curr_state)
 	IDLE: begin
 	   if (~rst)
