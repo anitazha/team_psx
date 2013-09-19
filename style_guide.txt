@@ -1,0 +1,64 @@
+################################################################
+#  ____ _______   ___     _____    ____ _   _ ___ ____  _____  #
+# / ___|_   _\ \ / / |   | ____|  / ___| | | |_ _|  _ \| ____| #
+# \___ \ | |  \ V /| |   |  _|   | |  _| | | || || | | |  _|   #
+#  ___) || |   | | | |___| |___  | |_| | |_| || || |_| | |___  #
+# |____/ |_|   |_| |_____|_____|  \____|\___/|___|____/|_____| #
+#                                                              #
+#                           Team PSX                           #
+#                             18545                            #
+#                         Michael Rosen                        #
+#                            mrrosen                           #
+#                           9-19-2013                          #
+#                                                              #
+################################################################
+
+RULE 1: Do not talk about the style guide
+
+RULE 2: Do NOT talk about the style guide
+
+RULE 3: Module Declarations
+  S1:   Each module shall be lower case, with underscores ("_")
+        between words in multiword names
+  S2:   Each input/inout/output shall begin on the line following
+        the module name
+  S3:   Each module will have inputs listed before inouts and 
+        inouts before outputs
+  S4:   Inputs/inouts/outputs shall have their type and widths
+        declared inside the module parens
+  S5:   All input/inout/outputs shall be lower case with
+        underscores ("_") between words in multiword lines if
+        the line does not connect directly to an FPGA pin
+  S6:   For input/inout/outputs that connect directly to an
+        FPGA pin, the name shall be all caps and descriptive
+        to the pin to be connected (even if the pin goes through
+        one or more higher level modules)
+
+RULE 4: Parameters
+  S1:   Parameters shall be declared immedately after module
+        declarations and shall be all caps
+  S2:   Start of parameters shall be commented as such:
+        /* Parameters */
+
+RULE 5: Signal Lines
+  S1:   Signal lines shall follow the convension for input/inout/
+        outputs that are not connected to FPGA pins
+  S2:   All signal lines shall be declared after parameters.
+  S3:   State of signal lines shall be commented as such:
+        /* Internal Lines */
+
+RULE 6: always_comb blocks
+  S1:   All always_comb blocks shall have a comment above them
+        indicating the purpose of the logic
+  S2:   All always_comb blocks shall have default values given
+        for ALL signal lines set within them at the begining of
+        the block. This shall be commented:
+        /* Defaults */
+
+RULE 7: always_ff blocks
+  S1:   All always_ff blocks shall have a comment above them
+        indicating what is stored
+  S2:   rst lines are asserted HIGH
+  S3:   All always_ff blocks must have a special case for 
+        asynchronous reset which does not include any synchronous
+        conditions
