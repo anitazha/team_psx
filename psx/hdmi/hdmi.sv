@@ -40,13 +40,13 @@ module hdmi(
    assign audio_rdy = audio_mod_rdy & config_done;
    
    /* IIC Module */
-   iic_config iic_config0(.DONE(config_done),
+   iic_config iic_config0(.done(config_done),
 			  .SDA(IIC_SDA),
 			  .SCL(IIC_SCL),
 			  .*);
 
    /* HDMI Video Module */
-   hdmi_video hdmi_video0(.data({r, g, b}),
+   video video0(.data({r, g, b}),
 			  .en(video_valid),
 			  .rdy(video_mod_rdy),
 			  .out_data({HDMI_D[35:28], HMDI_D[23:16], HDMI_D[11:4]}),
