@@ -62,3 +62,30 @@ RULE 7: always_ff blocks
   S3:   All always_ff blocks must have a special case for 
         asynchronous reset which does not include any synchronous
         conditions
+
+RULE 8: FSMs
+  S1:   All states declared in an enum shall have names formatted
+        in all caps
+  S2:   The state register shall always load the next state if no
+        reset is asserted
+
+RULE 9: Reset
+  S1:  System asynchronous reset shall have the name rst and shall
+       be asserted HIGH
+  S2:  All modules with sequential circuitry must take in system
+       reset
+
+RULE 10: Clocks
+  S1:  System clock shall have the name clk
+  S2:  All sequential elements shall change on the posedge unless
+       other reasons require negedge
+  S3:  All other clocks shall have have the name clk_freq where
+       freq is the frequency of that clock, unless the clock is
+       an external signal in which case it shall follow the naming
+       convention for external connections
+
+RULE 11: Other Style Guidelines
+  S1:  Lines shall not exceed 100 character in length
+  S2:  Lines should be maximum of 80 characters in length
+  S3:  Values shall always have width (though some widths may be
+       the empty width)
