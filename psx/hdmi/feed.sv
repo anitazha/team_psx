@@ -29,19 +29,22 @@ module hdmi_test_feeder(
 			output bit 	  audio_valid, video_valid);
 
    /* Internal Lines */
-   bit [31:0] 				  audio_addr;
+   bit [18:0] 				  audio_addr;
    
    
-   hdmi_test_sender #(32) audio_sender(.addr(audio_addr),
+   hdmi_test_sender #(19) audio_sender(.addr(audio_addr),
 				       .valid(audio_valid),
 				       .rdy(audio_rdy),
 				       .*);
 
    /* Memories */
-   bit [15:0] 				  audio_mem[32'hFFFFFFFF];
+   bit [15:0] 				  audio_mem[19'h7FFFF];
    assign audio_out = audio_mem[audio_addr];
 
    initial $readmemh("audio_mem.hex", audio_mem);
+
+   /* Video data temp */
+   assign video_out = 24'hFF0000;
 
 endmodule // hdmi_test_feeder
 
