@@ -11,20 +11,23 @@
 // vblank - 45    vsync - 
 //
 
+// rdy -- when we're ready for the next pixel, en -- when the pixel is ready
 module video(
     input  logic [35:0] data,
     input  logic        en, rst, clk,
-    output logic [35:0] hdmi_data,
-    output logic        hdmi_vsync, hdmi_hsync, hdmi_en, hdmi_clk);
+    output logic [35:0] HDMI_DATA,
+    output logic        rdy, HDMI_VSYNC, HDMI_HSYNC, HDMI_EN, HDMI_CLK);
 
+    logic pixclk;
+    logic [36:0] pixel;
     logic hs_cnt_en, hb_cnt_en, vs_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en;
     logic hs_cnt_clr, hb_cnt_clr, vs_cnt_clr, vb_cnt_clr, hp_cnt_clr, vp_cnt_clr;
     logic [$clog2(480):0] vp_sum;
     logic [$clog2(720):0] hp_sum;
-    logic [$clog2(88):0]  hs_sum;
+    logic [$clog2(20):0]  hs_sum;
     logic [$clog2(138):0] hb_sum;
-    logic [$clog2(45):0]  vs_sum;
-    logic [$clog2(20):0]  vb_sum;
+    logic [$clog2(20):0]  vs_sum;
+    logic [$clog2(45):0]  vb_sum;
 
     // hblank/hsync counters
     counter #(20) hsync_count (.en(hs_cnt_en), .clr(hs_cnt_clr), .rst(rst),
@@ -45,18 +48,27 @@ module video(
                              .clk(clk), .sum(vp_sum));
 
     video_fsm fsm (.*);
+    register #(36) pixel_reg (.in(data), .en(en), .rst(rst), .clk(clk), .out(pixel));
+
+    pixel_clock pclk (.clk(clk), .pixclk(pixclk));
 
     // data and clock don't matter as long as FSM outputs correct enables
-    assign hdmi_data = data;
-    assign hdmi_clk = clk;
+    assign HDMI_DATA = pixel;
+    assign HDMI_CLK = pixclk;
 
 endmodule: video
 
 module video_fsm(
-    input  logic en, hs_sum, hb_sum, vs_sum, vb_sum, hp_sum, vp_sum, rst, clk,
-    output logic hs_cnt_en, hb_cnt_en, vs_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en,
+    input  logic [$clog2(480):0] vp_sum,
+    input  logic [$clog2(720):0] hp_sum,
+    input  logic [$clog2(20):0]  hs_sum,
+    input  logic [$clog2(138):0] hb_sum,
+    input  logic [$clog2(20):0]  vs_sum,
+    input  logic [$clog2(45):0]  vb_sum,
+    input  logic en, rst, clk,
+    output logic rdy, hs_cnt_en, hb_cnt_en, vs_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en,
     output logic hs_cnt_clr, hb_cnt_clr, vs_cnt_clr, vb_cnt_clr, hp_cnt_clr, vp_cnt_clr,
-    output logic hdmi_vsync, hdmi_hsync, hdmi_en);
+    output logic HDMI_VSYNC, HDMI_HSYNC, HDMI_EN);
 
     enum logic [4:0] {
         init,
@@ -70,11 +82,12 @@ module video_fsm(
         send_data
     } curr_state, next_state;
 
-    always_ff @(posedge clk, posedge rst)
+    always_ff @(posedge clk, posedge rst) begin
         if (rst)
-            next_state <= init;
+            curr_state <= init;
         else
-            next_state <= curr_state;
+            curr_state <= next_state;
+    end
 
     always_comb begin
         next_state = curr_state;
@@ -84,7 +97,8 @@ module video_fsm(
         hs_cnt_clr = 'b0; hb_cnt_clr = 'b0;
         vs_cnt_clr = 'b0; vb_cnt_clr = 'b0;
         hp_cnt_clr = 'b0; vp_cnt_clr = 'b0;
-        hdmi_vsync = 'b0; hdmi_hsync = 'b0; hdmi_en = 'b0;
+        HDMI_VSYNC = 'b0; HDMI_HSYNC = 'b0; HDMI_EN = 'b0;
+        rdy = 'b0;
 
         case (curr_state)
             init:
@@ -103,8 +117,8 @@ module video_fsm(
                 vb_cnt_en = 'b1;
                 hs_cnt_en = 'b1;
                 vs_cnt_en = 'b1;
-                hdmi_vsync = 'b1;
-                hdmi_hsync = 'b1;
+                HDMI_VSYNC = 'b1;
+                HDMI_HSYNC = 'b1;
                 if (hs_sum == 'd20) next_state = wait_syncs;
             end
             wait_syncs: begin
@@ -137,12 +151,13 @@ module video_fsm(
             send_hsync: begin
                 hb_cnt_en = 'b1;
                 hs_cnt_en = 'b1;
-                hdmi_hsync = 'b1;
+                HDMI_HSYNC = 'b1;
                 if (hs_sum == 'd20) next_state = send_hblank;
             end
             send_data: begin
-                hp_cnt_en = 'b1;
-                hdmi_en = 'b1;
+                rdy = 1'b1;
+                HDMI_EN = en;
+                hp_cnt_en = en;
                 if (hp_sum == 'd720) next_state = send_hblank;
                 else if (vp_sum == 'd480) next_state = send_frame;
             end
@@ -151,21 +166,54 @@ module video_fsm(
 endmodule: video_fsm
 
 module counter(
-    input               en, clr, rst, clk,
-    output [$clog2(WIDTH):0]  sum);
+    input  logic                    en, clr, rst, clk,
+    output logic [$clog2(WIDTH):0]  sum);
 
-   /* Parameters */
-   parameter WIDTH = 'd32;
+    /* Parameters */
+    parameter WIDTH = 'd32;
 
-    always_ff @(posedge clk) begin
-        sum = 'b0;
-
+    always_ff @(posedge clk, posedge rst) begin
         if (rst)
-            sum <= 1'b0;
+            sum <= 'd0;
         else if (clr)
-            sum <= 1'b0;
+            sum <= 'd0;
         else if (en)
-            sum <= sum + 1'b1;
+            sum <= sum + 'd1;
     end
 
 endmodule: counter
+
+module pixel_clock(
+    input  logic clk, rst,
+    output logic pixclk);
+
+    logic count;
+
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            count <= 'd0;
+            pixclk <= 'd0;
+        end
+        else begin
+            count <= count + 1'b1;
+            if (count == 1'b1)
+                pixclk <= ~pixclk;
+        end
+    end
+
+endmodule: pixel_clock
+
+module register 
+    #(parameter WIDTH = 'd32) (
+    input  logic [WIDTH-1:0] in,
+    input  logic             en, rst, clk,
+    output logic [WIDTH-1:0] out);
+
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst)
+            out <= 'd0;
+        else if (en)
+            out <= in;
+    end
+
+endmodule: register
