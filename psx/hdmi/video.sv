@@ -11,7 +11,7 @@
 // vblank - 45    vsync - 
 //
 
-module video (
+module video(
     input  logic [35:0] data,
     input  logic        en, rst, clk,
     output logic [35:0] hdmi_data,
@@ -52,7 +52,7 @@ module video (
 
 endmodule: video
 
-module video_fsm (
+module video_fsm(
     input  logic en, hs_sum, hb_sum, vs_sum, vb_sum, hp_sum, vp_sum, rst, clk,
     output logic hs_cnt_en, hb_cnt_en, vs_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en,
     output logic hs_cnt_clr, hb_cnt_clr, vs_cnt_clr, vb_cnt_clr, hp_cnt_clr, vp_cnt_clr,
@@ -144,10 +144,12 @@ module video_fsm (
 
 endmodule: video_fsm
 
-module counter
-    #(parameter WIDTH = 32) (
+module counter(
     input               en, clr, rst, clk,
     output [$clog2(WIDTH):0]  sum);
+
+   /* Parameters */
+   parameter WIDTH 'd32;
 
     always_ff @(posedge clk) begin
         sum = 'b0;
