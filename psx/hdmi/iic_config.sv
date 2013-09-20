@@ -1,7 +1,28 @@
+/* 18545 Fall 2013
+ * Team PSX
+ * 09-19-2013
+ *
+ * @MODULES:
+ * iic_config (input  wire clk
+ * 
+ * @DESCRIPTION:
+ * {Insert Description Here}
+ *
+ * @AUTHOR:
+ * {Insert Name Here}
+ * {Insert andrewID Here}
+ *
+ */
+
 typedef enum reg [2:0] {IDLE, INIT, START, CLK_FALL,
                         SETUP, CLK_RISE, WAIT} iic_fsm_t;
 
 
+
+/* @MODULE: iic_config (input  wire clk
+ * @DESCRIPTION:
+ * {Insert Description Here}
+ */
 module iic_config (input  wire clk,
 		   input  wire rst,
 		   output wire SDA,
@@ -270,3 +291,6 @@ module iic_config (input  wire clk,
    end // always_comb begin
 
 endmodule // iic_config
+
+
+/* @COMMENTING COMPLETE; EOF */
