@@ -87,3 +87,5 @@ RULE 10: Clocks
 RULE 11: Other Style Guidelines
   S1:  Lines shall not exceed 100 character in length
   S2:  Lines should be maximum of 80 characters in length
+  S3:  Values shall always have width (though some widths may be
+       the empty width)
