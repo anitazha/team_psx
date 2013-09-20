@@ -1,0 +1,71 @@
+addr data  label   opcode  operands
+---- ----  -----   ------  --------
+1000 0C00          LDI     R0 
+1001 4000                  BEGIN 
+1002 0C09          LDI     R1 
+1003 400F                  END 
+1004 0C2D          LDI     R5 
+1005 7FFF                  CLEAR 
+1006 0C36          LDI     R6 
+1007 8000                  SET 
+1008 0810  loop1   LDR     R2 R0 
+1009 0C1B          LDI     R3 
+100A 0000                  $0 
+100B 0C24          LDI     R4 
+100C 000F                  $F 
+100D 1E1A  loop11  XOR     R3 R2 
+100E 2412          LSHR    R2 
+100F 2A00          BRZ     
+1010 1016                  hzbit 
+1011 1624          DECR    R4 
+1012 2A00          BRZ     
+1013 1016                  hzbit 
+1014 2800          BRA     
+1015 100D                  loop11 
+1016 0810  hzbit   LDR     R2 R0 
+1017 241B  setbit  LSHR    R3 
+1018 4800          BRC     
+1019 101D                  clrbit 
+101A 1C16          OR      R2 R6 
+101B 2800          BRA     
+101C 101E                  store 
+101D 1A15  clrbit  AND     R2 R5 
+101E 0A02  store   STR     R0 R2 
+101F 1400          INCR    R0 
+1020 4601          CMR     R0 R1 
+1021 2C00          BRN     
+1022 1008                  loop1 
+1023 0C00          LDI     R0 
+1024 4000                  BEGIN 
+1025 0C1B          LDI     R3 
+1026 0000                  $0 
+1027 0C24          LDI     R4 
+1028 400F                  END 
+1029 1624  loop2   DECR    R4 
+102A 080C          LDR     R1 R4 
+102B 1E19          XOR     R3 R1 
+102C 4604          CMR     R0 R4 
+102D 2A00          BRZ     
+102E 1031                  done 
+102F 2800          BRA     
+1030 1029                  loop2 
+1031 181B  done    NOT     R3 
+1032 061B          STA     R3 
+1033 400F                  END 
+1034 3000          STOP    
+4000 FFFE  BEGIN   .DW     $FFFE 
+4001 1999          .DW     $1999 
+4002 DC55          .DW     $DC55 
+4003 5DDD          .DW     $5DDD 
+4004 8000          .DW     $8000 
+4005 9810          .DW     $9810 
+4006 0006          .DW     $6 
+4007 0007          .DW     $7 
+4008 0008          .DW     $8 
+4009 0009          .DW     $9 
+400A 000A          .DW     $A 
+400B 000B          .DW     $B 
+400C 000C          .DW     $C 
+400D 000D          .DW     $D 
+400E 000E          .DW     $E 
+400F 000F  END     .DW     $F 
