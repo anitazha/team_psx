@@ -13,13 +13,13 @@
 
 // rdy -- when we're ready for the next pixel, en -- when the pixel is ready
 module video(
-    input  logic [35:0] data,
+    input  logic [23:0] data,
     input  logic        en, rst, clk,
     output logic [35:0] HDMI_DATA,
     output logic        rdy, HDMI_VSYNC, HDMI_HSYNC, HDMI_EN, HDMI_CLK);
 
     logic pixclk;
-    logic [36:0] pixel;
+    logic [35:0] pixel, hdmi_data;
     logic hs_cnt_en, hb_cnt_en, vs_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en;
     logic hs_cnt_clr, hb_cnt_clr, vs_cnt_clr, vb_cnt_clr, hp_cnt_clr, vp_cnt_clr;
     logic [$clog2(480):0] vp_sum;
@@ -28,6 +28,8 @@ module video(
     logic [$clog2(138):0] hb_sum;
     logic [$clog2(20):0]  vs_sum;
     logic [$clog2(45):0]  vb_sum;
+
+    assign hdmi_data = {{data[23:16], 4'b0}, {data[15:8], 4'b0}, {data[7:0], 4'b0}};
 
     // hblank/hsync counters
     counter #(20) hsync_count (.en(hs_cnt_en), .clr(hs_cnt_clr), .rst(rst),
@@ -48,9 +50,9 @@ module video(
                              .clk(clk), .sum(vp_sum));
 
     video_fsm fsm (.*);
-    register #(36) pixel_reg (.in(data), .en(en), .rst(rst), .clk(clk), .out(pixel));
+    register #(36) pixel_reg (.in(hdmi_data), .en(en), .rst(rst), .clk(clk), .out(pixel));
 
-    pixel_clock pclk (.clk(clk), .pixclk(pixclk));
+    pixel_clock pclk (.clk(clk), .pixclk(pixclk), .rst(rst));
 
     // data and clock don't matter as long as FSM outputs correct enables
     assign HDMI_DATA = pixel;
@@ -191,8 +193,8 @@ module pixel_clock(
 
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
-            count <= 'd0;
-            pixclk <= 'd0;
+            count <= 1'b0;
+            pixclk <= 1'b0;
         end
         else begin
             count <= count + 1'b1;

@@ -3,14 +3,15 @@
  * 09-19-2013
  *
  * @MODULES:
- * iic_config (input  wire clk
+ * iic_config
  * 
  * @DESCRIPTION:
- * {Insert Description Here}
+ * Write to configuration registers on ADV7511 chip
+ * Set up for HDMI video+audio
  *
  * @AUTHOR:
- * {Insert Name Here}
- * {Insert andrewID Here}
+ * Arnob Mallick
+ * amallick
  *
  */
 
@@ -19,16 +20,17 @@ typedef enum reg [2:0] {IDLE, INIT, START, CLK_FALL,
 
 
 
-/* @MODULE: iic_config (input  wire clk
+/* @MODULE: iic_config
  * @DESCRIPTION:
- * {Insert Description Here}
+ * Serially program ADV7511 registers for HDMI output
  */
-module iic_config (input  wire clk,
-		   input  wire rst,
-		   output wire SDA,
-		   output wire SCL,
-		   output wire done);
+module iic_config (input  logic clk,
+		   input  logic rst,
+		   output logic SDA,
+		   output logic SCL,
+		   output logic done);
 
+   /* Parameters */
    parameter   CLK_RATE_MHZ = 200;
    parameter   SCK_PERIOD_US = 30;
    parameter   TRANSITION_CYCLE = (CLK_RATE_MHZ * SCK_PERIOD_US) / 2;
@@ -38,7 +40,8 @@ module iic_config (input  wire clk,
    localparam  SLAVE_ADDR = 7'b1110110;
    localparam  ACK = 1'b1;
    localparam  WRITE = 1'b0;
-   
+
+   /* register addresses */
    localparam  REG_ADDR00 = 8'h41;  /* power-up & power-down */
    localparam  REG_ADDR01 = 8'h98;  /* required registers */
    localparam  REG_ADDR02 = 8'h9A;
@@ -62,6 +65,7 @@ module iic_config (input  wire clk,
    localparam  REG_ADDR20 = 8'h0B;  /* SPDIF Enable */
    localparam  REG_ADDR21 = 8'h0C;  /* I2S Enable */
 
+   /* value that needs to be put in the above registers */
    localparam  DATA00 = 8'h10;      /* power-up */
    localparam  DATA01 = 8'h03;      /* values for required registers */
    localparam  DATA02 = 8'hE0;
@@ -90,20 +94,21 @@ module iic_config (input  wire clk,
    
    reg 	                        SDA_out;
    reg 	                        SCL_out;
-   reg 	                        done;
+   reg 	                        done_out;
    reg [TRANSITION_CYCLE_MSB:0] cycle_count;
    reg [4:0] 			write_count;
    reg [31:0] 			bit_count;
    reg [SDA_BUFFER_MSB:0] 	SDA_BUFFER;
    iic_fsm_t                    curr_state, next_state;
-   wire 			transition;
-
-   always @ (posedge clk) begin
-      if (~rst || curr_state == IDLE) begin
+   wire 			next_reg;
+   
+   /* push MSB of serial data & set output lines for different states */   
+   always @ (posedge clk, posedge rst) begin
+      if (rst || curr_state == IDLE) begin
 	 SDA_out <= 1'b1;
 	 SCL_out <= 1'b1;
       end
-      else if (curr_state = INIT && transition) begin
+      else if (curr_state == INIT && next_reg) begin
 	 SDA_out <= 1'b0;
       end
       else if (curr_state == SETUP) begin
@@ -113,20 +118,22 @@ module iic_config (input  wire clk,
 	       bit_count == SDA_BUFFER_MSB) begin
 	 SDA_out <= 1'b1;
       end
+      // generate SCL signal (clock)
       else if (curr_state == CLK_FALL) begin
 	 SCL_out <= 1'b0;
       end
-      else if (curr_state = CLK_RISE) begin
+      else if (curr_state == CLK_RISE) begin
 	 SCL_out <= 1'b1;
       end
    end // always @ (posedge clk)
 
    assign SDA = SDA_out;
    assign SCL = SCL_out;
+   assign done = done_out;
 
-   always @ (posedge clk) begin
+   always @ (posedge clk, posedge rst) begin
       // reset-end condition
-      if (~rst) begin
+      if (rst) begin
 	 SDA_BUFFER <= {SLAVE_ADDR, WRITE, ACK, REG_ADDR00,
 			ACK, DATA00, ACK, STOP_BIT};
 	 cycle_count <= 0;
@@ -185,8 +192,6 @@ module iic_config (input  wire clk,
 			     DATA20, ACK, STOP_BIT};
 	   20:SDA_BUFFER <= {SLAVE_ADDR, WRITE, ACK, REG_ADDR21, ACK,
 			     DATA21, ACK, STOP_BIT};
-	   21:SDA_BUFFER <= {SLAVE_ADDR, WRITE, ACK, REG_ADDR22, ACK,
-			     DATA22, ACK, STOP_BIT};
 	   default: SDA_BUFFER <= 28'dx;
 	 endcase // case (write_count)
 
@@ -196,91 +201,85 @@ module iic_config (input  wire clk,
 	cycle_count <= cycle_count + 1;
    end // always @ (posedge clk)
 
-   always @ (posedge clk) begin
-      if (~rst)
-	write_count <= 5'd0;
+   /* increment write counter - keeps track of how many registers set */
+   always @ (posedge clk, posedge rst) begin
+      if (rst)
+	write_count <= 0;
       else if (curr_state == WAIT && cycle_count == TRANSITION_CYCLE)
 	write_count <= write_count + 1;
    end
 
-   always @ (posedge clk) begin
-      if (~rst)
-	DONE <= 1'b0;
+   /* assert done signal when registers have been set */
+   always @ (posedge clk, posedge rst) begin
+      if (rst)
+	done_out <= 1'b0;
       else if (curr_state == IDLE)
-	DONE <= 1'b1;
+	done_out <= 1'b1;
    end
 
-   always @ (posedge clk) begin
-      if (!rst || curr_state == WAIT)
+   always @ (posedge clk, posedge rst) begin
+      if (rst || curr_state == WAIT)
 	bit_count <= 0;
-      else if (curr_state == CLK_RISE && cycle_count == TRANSITION_CYCLE)
+      else if ((curr_state == CLK_RISE) && (cycle_count == TRANSITION_CYCLE))
 	bit_count <= bit_count + 1;
    end
 
-   always @ (posedge clk) begin
-      if (~rst)
+   /* FSM next state logic */
+   always @ (posedge clk, posedge rst) begin
+      if (rst)
 	curr_state <= INIT;
-      else
+      else 
 	curr_state <= next_state;
    end
 
-   assign transition = (cycle_count == TRANSITION_CYCLE);
+   /* transition asserted whenever ready for next transition */
+   assign next_reg = (cycle_count == TRANSITION_CYCLE);
 
    always_comb begin
       /* Defaults */
       next_state = curr_state;
       
       case (curr_state)
+	// completion state - remain IDLE after configuration complete
 	IDLE: begin
-	   if (~rst)
-	     next_state = INIT;
-	   else
-	     next_state = IDLE;
+	   next_state = IDLE;
 	end
 	INIT: begin
-	   if (transition)
+	   if (next_reg)
 	     next_state = START;
 	   else
 	     next_state = INIT;
 	end
 	START: begin
-	   if (~rst) 
-	     next_state = INIT;
-	   else if (transition)
+	   if (next_reg)
 	     next_state = SETUP;
 	   else
 	     next_state = CLK_FALL;
 	end
 	CLK_FALL: begin
-	   if (~rst)
-	     next_state = INIT;
-	   else if (transition)
+	   if (next_reg)
 	     next_state = SETUP;
 	   else
 	     next_state = CLK_FALL;
 	end
 	SETUP: begin
-	   if (~rst) 
-	     next_state = INIT;
-	   else if (transition) 
+	   if (next_reg) 
 	     next_state = CLK_RISE;
 	   else 
-	     next_state = START;
+	     next_state = SETUP;
 	end
 	CLK_RISE: begin
-	   if (~rst)
-	     next_state = INIT;
-	   else if (transition && bit_count == SDA_BUFFER_MSB)
+	   if (next_reg && bit_count == SDA_BUFFER_MSB)
 	     next_state = WAIT;
-	   else if (transition)
+	   else if (next_reg)
 	     next_state = CLK_FALL;
 	   else
 	     next_state = CLK_RISE;
 	end
 	WAIT: begin
-	   if (~rst | (transition && write_count != 5'd22))
+	   if (next_reg && write_count != 5'd21)
 	     next_state = INIT;
-	   else if (transition)
+	   else if (next_reg)
 	     next_state = IDLE;
 	   else
 	     next_state = WAIT;

@@ -1,13 +1,14 @@
-
+`default_nettype none
+  
 /* Defines */
 `define sim
 
 module top_test(
 		input bit 	  RESET, SYSCLK_P, SYSCLK_N,
-		inout bit 	  IIC_SDA,
+		output bit 	  IIC_SDA,
 		output bit 	  IIC_SCL,
 		output bit 	  HDMI_PXL_CLK,
-		output bit 	  HDMI_SPDIF, HDMI_DE, HMDI_HSYNC, HDMI_VSYNC,
+		output bit 	  HDMI_SPDIF, HDMI_DE, HDMI_HSYNC, HDMI_VSYNC,
 		output bit [35:0] HDMI_D);
 
 
@@ -56,12 +57,16 @@ module top_test(
    end
       
    initial begin
+	  rst <= 1'b0;
+	  #1
       rst <= 1'b1;
       #3;
       rst <= 1'b0;
-      repeat 50000 begin
+      repeat (7000000) begin
 	 @(posedge clk);
       end
+	  $finish;
+	  
    end
 `endif
 endmodule // top_test

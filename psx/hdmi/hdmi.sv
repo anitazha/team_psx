@@ -26,7 +26,7 @@ module hdmi(
 	    input bit 	      video_valid,
 	    input bit [15:0]  audio_in,
 	    input bit 	      audio_valid,
-	    inout bit 	      IIC_SDA,
+	    output bit 	      IIC_SDA,
 	    output bit 	      audio_rdy, video_rdy,
 	    output bit 	      IIC_SCL,
 	    output bit [35:0] HDMI_D,
@@ -49,17 +49,17 @@ module hdmi(
    video video0(.data({r, g, b}),
 			  .en(video_valid),
 			  .rdy(video_mod_rdy),
-			  .out_data({HDMI_D[35:28], HMDI_D[23:16], HDMI_D[11:4]}),
-			  .out_en(HDMI_DE),
-			  .out_hsync(HDMI_HSYNC),
-			  .out_vsync(HDMI_VSYNC),
-			  .out_clk(HDMI_PXL_CLK),
+			  .HDMI_DATA(HDMI_D),
+			  .HDMI_EN(HDMI_DE),
+			  .HDMI_HSYNC(HDMI_HSYNC),
+			  .HDMI_VSYNC(HDMI_VSYNC),
+			  .HDMI_CLK(HDMI_PXL_CLK),
 			  .*);
 
    /* HDMI Audio Module */
    spdif spdif0(.data(audio_in),
 		.valid(audio_valid),
-		.spdif_out(HDMI_SPDIF),
+		.SPDIF_OUT(HDMI_SPDIF),
 		.rdy(audio_mod_rdy),
 		.*);
 
