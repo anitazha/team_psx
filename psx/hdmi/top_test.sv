@@ -9,7 +9,8 @@ module top_test(
 		output bit 	  IIC_SCL,
 		output bit 	  HDMI_PXL_CLK,
 		output bit 	  HDMI_SPDIF, HDMI_DE, HDMI_HSYNC, HDMI_VSYNC,
-		output bit [35:0] HDMI_D);
+		output bit [35:0] HDMI_D,
+        output bit    GPIO_LED_0_LS, GPIO_LED_1_LS);
 
 
    /* Internal Lines */
@@ -31,6 +32,9 @@ module top_test(
    assign RESET = rst;
 `endif
    
+   assign GPIO_LED_0_LS = video_valid;
+   assign GPIO_LED_1_LS = video_rdy;
+
    /* HDMI Module */
    hdmi hdmi0(.r(video_data[23:16]),
 	      .g(video_data[15:8]),
