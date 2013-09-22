@@ -37,6 +37,11 @@ module hdmi_test_feeder(
 									   .rdy(audio_rdy),
 									   .*);
    
+   hdmi_test_sender #(19) video_sender(.addr(),
+									   .valid(video_valid),
+									   .rdy(video_rdy),
+									   .*);
+   
    /* Memories */
    bit [15:0] 				  audio_mem[19'h7FFFF];
    assign audio_out = audio_mem[audio_addr];
