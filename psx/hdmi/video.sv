@@ -56,7 +56,8 @@ module video(
          * the ready once for the current system clock, saw_pix tells us
          * the FSM processed the current pixel. we want it such that we
          * don't assert the ready again until the fsm moves to new state */
-        else if (!saw_rdy & saw_pix) begin
+        else begin
+	   if (!saw_rdy & saw_pix) begin
             rdy <= 1'b1;
             saw_rdy <= 1'b1;
         end
@@ -73,6 +74,7 @@ module video(
         else if (~saw_pix) begin
             pixel_rdy <= pix_rdy;
         end
+	end
     end
 
 endmodule: video
