@@ -30,7 +30,7 @@ module video(
                                 .clk(clk_pix), .sum(vb_sum));
 
     // height/width counters
-    counter #(640) h_pixel_count (.en(hp_cnt_en), .clr(hp_cnt_clr), .rst(rst),
+    counter #(720) h_pixel_count (.en(hp_cnt_en), .clr(hp_cnt_clr), .rst(rst),
                              .clk(clk_pix), .sum(hp_sum));
     counter #(480) v_pixel_count (.en(vp_cnt_en), .clr(vp_cnt_clr), .rst(rst),
                              .clk(clk_pix), .sum(vp_sum));
