@@ -77,8 +77,7 @@ module video_fsm(
     enum logic [1:0] {
         INIT,
         SEND_BLANK,
-        SEND_DATA,
-        WAIT_DATA
+        SEND_DATA
     } curr_vstate, next_vstate, curr_hstate, next_hstate;
 
     always_ff @(posedge clk_pix, posedge rst) begin
@@ -117,16 +116,14 @@ module video_fsm(
             end
             SEND_DATA: begin
                 if (pixel_rdy) begin
-                    hb_cnt_clr = 'b1;
                     hp_cnt_en = 'b1;
                     HDMI_EN = 'b1;
                     saw_pix = 'b1;
-                    next_hstate = WAIT_DATA;
                 end
-                if (hp_sum == 'd720) next_hstate = SEND_BLANK;
-            end
-            WAIT_DATA: begin
-                next_hstate = SEND_DATA;
+                if (hp_sum == 'd720) begin
+                    hb_cnt_clr = 'b1;
+                    next_hstate = SEND_BLANK;
+                end
             end
         endcase
     end
@@ -149,7 +146,7 @@ module video_fsm(
             end
             SEND_BLANK: begin
                 vp_cnt_clr = 'b1;
-                if (hb_sum == 'd121) vb_cnt_en = 'b1;
+                if (hb_sum == 'd0) vb_cnt_en = 'b1;
                 if ((vb_sum > 'd9) && (vb_sum <= 'd15)) HDMI_VSYNC = 'b0;
                 else if (vb_sum == 'd36) next_vstate = SEND_DATA;
             end
