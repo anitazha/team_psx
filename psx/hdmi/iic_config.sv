@@ -40,58 +40,73 @@ module iic_config (input  logic clk,
    localparam  SLAVE_ADDR = 7'b1110110;
    localparam  ACK = 1'b1;
    localparam  WRITE = 1'b0;
-
-   /* register addresses */
-   localparam  REG_ADDR00 = 8'h41;  /* power-up & power-down */
-   localparam  REG_ADDR01 = 8'h98;  /* required registers */
-   localparam  REG_ADDR02 = 8'h9A;
-   localparam  REG_ADDR03 = 8'h9C;
-   localparam  REG_ADDR04 = 8'h9D;
-   localparam  REG_ADDR05 = 8'hA2;
-   localparam  REG_ADDR06 = 8'hA3;
-   localparam  REG_ADDR07 = 8'hE0;
-   localparam  REG_ADDR08 = 8'hF9;
-   localparam  REG_ADDR09 = 8'h15;  /* video input format */
-   localparam  REG_ADDR10 = 8'h16;  /* video output format */
-   localparam  REG_ADDR11 = 8'h17;
-   localparam  REG_ADDR12 = 8'h18;  /* CSC - color space converter */
-   localparam  REG_ADDR13 = 8'hAF;  /* HDMI-DVI mode */
-   localparam  REG_ADDR14 = 8'h40;  /* GC enable */
-   localparam  REG_ADDR15 = 8'h4C;  /* GC Color Depth */
-   localparam  REG_ADDR16 = 8'h01;  /* N Value */
-   localparam  REG_ADDR17 = 8'h02;
-   localparam  REG_ADDR18 = 8'h03;
-   localparam  REG_ADDR19 = 8'h0A;  /* Audio Select */
-   localparam  REG_ADDR20 = 8'h0B;  /* SPDIF Enable */
-   localparam  REG_ADDR21 = 8'h0C;  /* I2S Enable */
-
-   /* value that needs to be put in the above registers */
-   localparam  DATA00 = 8'h10;      /* power-up */
-   localparam  DATA01 = 8'h03;      /* values for required registers */
-   localparam  DATA02 = 8'hE0;
-   localparam  DATA03 = 8'h30;
-   localparam  DATA04 = 8'h61;
-   localparam  DATA05 = 8'hA4;
-   localparam  DATA06 = 8'hA4;
-   localparam  DATA07 = 8'hD0;
-   localparam  DATA08 = 8'h00;
-   localparam  DATA09 = 8'h00;      /* 4:4:4 */
-   localparam  DATA10 = 8'h20;      /* 4:4:4, 12-bit */
-   localparam  DATA11 = 8'h00;      /* 4:3 aspect ratio */
-   localparam  DATA12 = 8'h46;
-   localparam  DATA13 = 8'h06;
-   localparam  DATA14 = 8'h80;
-   localparam  DATA15 = 8'h00;
-   localparam  DATA16 = 8'h00;
-   localparam  DATA17 = 8'h18;
-   localparam  DATA18 = 8'h00;
-   localparam  DATA19 = 8'h10;
-   localparam  DATA20 = 8'h8E;
-   localparam  DATA21 = 8'h00;
-
    localparam  STOP_BIT = 1'b0;
    localparam  SDA_BUFFER_MSB = 27;
+
+   /* register addresses */
+   localparam  REG_ADDR_00 = 8'h0A;  /* audio type select */
+   localparam  REG_ADDR_01 = 8'h0B;  /* SPDIF config */
+   localparam  REG_ADDR_02 = 8'h14;  /* audio sample word length */
+   localparam  REG_ADDR_03 = 8'h15;  /* input video format */
+   localparam  REG_ADDR_04 = 8'h16;  /* color depth, video input edge, RGB */
+   localparam  REG_ADDR_05 = 8'h17;  /* vsync hsync polarity */
+   localparam  REG_ADDR_06 = 8'h3C;  /* VIC to send to Rx */
+   localparam  REG_ADDR_07 = 8'h41;  /* power-up power-down */
+   localparam  REG_ADDR_08 = 8'h55;  /* video output format */
+   localparam  REG_ADDR_09 = 8'h73;  /* audio channel count */
+   localparam  REG_ADDR_10 = 8'h9D;  /* input pixel clock divide */
    
+   /* value that needs to be put in the above registers */
+   localparam  DATA_00 = 8'h10;      /* SPDIF, MCLK */
+   localparam  DATA_01 = 8'hC7;
+   localparam  DATA_02 = 8'h02;      /* 16-bit */
+   localparam  DATA_03 = 8'h00;      /* 24-bit RGB 4:4:4 */
+   localparam  DATA_04 = 8'h32;      /* color depth 8-bit, rising edge */
+   localparam  DATA_05 = 8'h60;      /* low polarity */
+   localparam  DATA_06 = 8'h02;
+   localparam  DATA_07 = 8'h10;      /* keep board powered on */
+   localparam  DATA_08 = 8'h00;      /* RGB output */
+   localparam  DATA_09 = 8'h01;      /* 2-channel audio */
+   localparam  DATA_10 = 8'h60;      /* clock not divided */
+   
+   /* other required registers (not for config) */
+   localparam  REG_ADDR_00 = 8'h3B;
+   localparam  REG_ADDR_01 = 8'h44;
+   localparam  REG_ADDR_02 = 8'h48;
+   localparam  REG_ADDR_03 = 8'h94;
+   localparam  REG_ADDR_04 = 8'h98;
+   localparam  REG_ADDR_05 = 8'h99;
+   localparam  REG_ADDR_06 = 8'h9A;
+   localparam  REG_ADDR_07 = 8'h9B;
+   localparam  REG_ADDR_08 = 8'h9C;
+   localparam  REG_ADDR_09 = 8'h9F;
+   localparam  REG_ADDR_10 = 8'hA1;
+   localparam  REG_ADDR_11 = 8'hA2;
+   localparam  REG_ADDR_12 = 8'hA3;
+   localparam  REG_ADDR_13 = 8'hA4;
+   localparam  REG_ADDR_14 = 8'hA5;
+   localparam  REG_ADDR_15 = 8'hA6;
+   localparam  REG_ADDR_16 = 8'hA7;
+   localparam  REG_ADDR_17 = 8'hA8;
+   localparam  REG_ADDR_18 = 8'hA9;
+   localparam  REG_ADDR_19 = 8'hAA;
+   localparam  REG_ADDR_20 = 8'hAB;
+   
+   localparam  DATA_00 = 8'hE0;
+   localparam  DATA_01 = 8'h00;
+   localparam  DATA_02 = 8'h00;
+   localparam  DATA_03 = 8'hC0;
+   localparam  DATA_04 = 8'h03;
+   localparam  DATA_05 = 8'h02;
+   localparam  DATA_06 = 8'hE0;
+   localparam  DATA_07 = 8'h1E;
+   localparam  DATA_08 = 8'h30;
+   localparam  DATA_09 = 8'h00;
+   localparam  DATA_10 = 8'h00;
+   localparam  DATA_11 = 8'hA4;
+   
+   
+   /* internal lines */
    reg 	                        SDA_out;
    reg 	                        SCL_out;
    reg 	                        done_out;
