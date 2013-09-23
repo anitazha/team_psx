@@ -8,29 +8,29 @@ module video(
     logic clk_pix, pix_clr;
 
     // used to synchronize pixel clock signal with external ready signal
-    logic saw_rdy, saw_pix, pixel_rdy, pix_rdy; 
+    logic saw_rdy, saw_pix, pixel_rdy; 
     logic [35:0] pixel, pix_data;
     logic hb_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en;
     logic hb_cnt_clr, vb_cnt_clr, hp_cnt_clr, vp_cnt_clr;
     logic [$clog2(480):0] vp_sum;
-    logic [$clog2(640):0] hp_sum;
-    logic [$clog2(160):0] hb_sum;
-    logic [$clog2(45):0]  vb_sum;
+    logic [$clog2(720):0] hp_sum;
+    logic [$clog2(121):0] hb_sum;
+    logic [$clog2(36):0]  vb_sum;
 
     assign HDMI_DATA = pixel;
     assign HDMI_CLK = clk_pix;
     assign pix_data = {{data[23:16], 4'b0}, {data[15:8], 4'b0}, {data[7:0], 4'b0}};
 
     // hblank/hsync counters
-    counter #(160) hblank_count (.en(hb_cnt_en), .clr(hb_cnt_clr), .rst(rst),
+    counter #(121) hblank_count (.en(hb_cnt_en), .clr(hb_cnt_clr), .rst(rst),
                                 .clk(clk_pix), .sum(hb_sum));
 
     // vblank/vsync counters
-    counter #(45) vblank_count (.en(vb_cnt_en), .clr(vb_cnt_clr), .rst(rst),
+    counter #(36) vblank_count (.en(vb_cnt_en), .clr(vb_cnt_clr), .rst(rst),
                                 .clk(clk_pix), .sum(vb_sum));
 
     // height/width counters
-    counter #(640) h_pixel_count (.en(hp_cnt_en), .clr(hp_cnt_clr), .rst(rst),
+    counter #(720) h_pixel_count (.en(hp_cnt_en), .clr(hp_cnt_clr), .rst(rst),
                              .clk(clk_pix), .sum(hp_sum));
     counter #(480) v_pixel_count (.en(vp_cnt_en), .clr(vp_cnt_clr), .rst(rst),
                              .clk(clk_pix), .sum(vp_sum));
@@ -38,8 +38,6 @@ module video(
     // buffered input signals -- pixel and ready
     register #(36) pixel_reg (.in(pix_data), .en(en), .rst(rst),
                               .clr(1'b0), .clk(clk), .out(pixel));
-    register #(1) pixel_rdy_reg (.in(en), .en(en), .rst(rst),
-                                 .clr(rdy), .clk(clk), .out(pix_rdy));
 
     video_fsm fsm (.*);
     pixel_clock pclk (.clk(clk), .clk_pix(clk_pix), .rst(rst));
@@ -49,52 +47,37 @@ module video(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             rdy <= 1'b1;
-            saw_rdy <= 1'b0;
             pixel_rdy <= 1'b0;
         end
-        /* Ghetto clock synchronization -- saw_data tells us we asserted
-         * the ready once for the current system clock, saw_pix tells us
-         * the FSM processed the current pixel. we want it such that we
-         * don't assert the ready again until the fsm moves to new state */
-        else begin
-	   if (!saw_rdy & saw_pix) begin
-            rdy <= 1'b1;
-            saw_rdy <= 1'b1;
-        end
-        else if (~saw_pix) begin
-            saw_rdy <= 1'b0;
-        end
-        else begin
+        else if (en) begin
+            pixel_rdy <= 1'b1;
             rdy <= 1'b0;
         end
-        
-        if (en) begin
-            pixel_rdy <= 1'b1;
+        else if (saw_pix) begin
+            pixel_rdy <= 1'b0;
         end
-        else if (~saw_pix) begin
-            pixel_rdy <= pix_rdy;
+        else if (!pixel_rdy && !saw_pix) begin
+            rdy <= 1'b1;
         end
-	end
     end
 
 endmodule: video
 
 module video_fsm(
     input  logic [$clog2(480):0] vp_sum,
-    input  logic [$clog2(640):0] hp_sum,
-    input  logic [$clog2(160):0] hb_sum,
-    input  logic [$clog2(45):0]  vb_sum,
+    input  logic [$clog2(720):0] hp_sum,
+    input  logic [$clog2(121):0] hb_sum,
+    input  logic [$clog2(36):0]  vb_sum,
     input  logic pixel_rdy, rst, clk_pix,
     output logic saw_pix,
     output logic hb_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en,
     output logic hb_cnt_clr, vb_cnt_clr, hp_cnt_clr, vp_cnt_clr,
     output logic HDMI_VSYNC, HDMI_HSYNC, HDMI_EN);
 
-    enum logic [4:0] {
+    enum logic [1:0] {
         INIT,
         SEND_BLANK,
-        SEND_DATA,
-        WAIT_DATA
+        SEND_DATA
     } curr_vstate, next_vstate, curr_hstate, next_hstate;
 
     always_ff @(posedge clk_pix, posedge rst) begin
@@ -128,19 +111,19 @@ module video_fsm(
             SEND_BLANK: begin
                 hb_cnt_en = 'b1;
                 hp_cnt_clr = 'b1;
-                if ((hb_sum > 'd16) && (hb_sum < 'd103)) HDMI_HSYNC = 'b0;
-                else if (hb_sum == 'd160) next_hstate = SEND_DATA;
+                if ((hb_sum > 'd16) && (hb_sum <= 'd78)) HDMI_HSYNC = 'b0;
+                else if (hb_sum == 'd121) next_hstate = SEND_DATA;
             end
             SEND_DATA: begin
-                hb_cnt_clr = 'b1;
-                hp_cnt_en = pixel_rdy;
-                saw_pix = pixel_rdy;
-                HDMI_EN = pixel_rdy;
-                if (hp_sum == 'd640) next_hstate = SEND_BLANK;
-                else if (pixel_rdy) next_hstate = WAIT_DATA;
-            end
-            WAIT_DATA: begin
-                if (pixel_rdy) next_hstate = SEND_DATA;
+                if (pixel_rdy) begin
+                    hp_cnt_en = 'b1;
+                    HDMI_EN = 'b1;
+                    saw_pix = 'b1;
+                end
+                if (hp_sum == 'd720) begin
+                    hb_cnt_clr = 'b1;
+                    next_hstate = SEND_BLANK;
+                end
             end
         endcase
     end
@@ -163,13 +146,13 @@ module video_fsm(
             end
             SEND_BLANK: begin
                 vp_cnt_clr = 'b1;
-                if (hb_sum == 'd160) vb_cnt_en = 'b1;
-                if ((vb_sum > 'd10) && (vb_sum < 'd13)) HDMI_VSYNC = 'b0;
-                else if (vb_sum == 'd45) next_vstate = SEND_DATA;
+                if (hb_sum == 'd0) vb_cnt_en = 'b1;
+                if ((vb_sum > 'd9) && (vb_sum <= 'd15)) HDMI_VSYNC = 'b0;
+                else if (vb_sum == 'd36) next_vstate = SEND_DATA;
             end
             SEND_DATA: begin // in vertical, used to hold vblank/vsync
                 vb_cnt_clr = 'b1;
-                if (hp_sum == 'd640) vp_cnt_en = 'b1;
+                if (hp_sum == 'd720) vp_cnt_en = 'b1;
                 if (vp_sum == 'd480) next_vstate = SEND_BLANK;
             end
         endcase
@@ -208,7 +191,7 @@ module pixel_clock(
         end
         else begin
             count <= count + 1'b1;
-            if (count == 2'd2) begin
+            if (count == 2'd3) begin
                 clk_pix <= ~clk_pix;
                 count <= 2'd0;
             end
