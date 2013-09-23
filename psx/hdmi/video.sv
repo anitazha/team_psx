@@ -8,7 +8,7 @@ module video(
     logic clk_pix, pix_clr;
 
     // used to synchronize pixel clock signal with external ready signal
-    logic saw_rdy, saw_pix, pixel_rdy, pix_rdy; 
+    logic saw_rdy, saw_pix, pixel_rdy; 
     logic [35:0] pixel, pix_data;
     logic hb_cnt_en, vb_cnt_en, hp_cnt_en, vp_cnt_en;
     logic hb_cnt_clr, vb_cnt_clr, hp_cnt_clr, vp_cnt_clr;
@@ -38,8 +38,6 @@ module video(
     // buffered input signals -- pixel and ready
     register #(36) pixel_reg (.in(pix_data), .en(en), .rst(rst),
                               .clr(1'b0), .clk(clk), .out(pixel));
-    register #(1) pixel_rdy_reg (.in(en), .en(en), .rst(rst),
-                                 .clr(rdy), .clk(clk), .out(pix_rdy));
 
     video_fsm fsm (.*);
     pixel_clock pclk (.clk(clk), .clk_pix(clk_pix), .rst(rst));
@@ -49,32 +47,18 @@ module video(
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
             rdy <= 1'b1;
-            saw_rdy <= 1'b0;
             pixel_rdy <= 1'b0;
         end
-        /* Ghetto clock synchronization -- saw_data tells us we asserted
-         * the ready once for the current system clock, saw_pix tells us
-         * the FSM processed the current pixel. we want it such that we
-         * don't assert the ready again until the fsm moves to new state */
-        else begin
-	   if (!saw_rdy & saw_pix) begin
-            rdy <= 1'b1;
-            saw_rdy <= 1'b1;
-        end
-        else if (~saw_pix) begin
-            saw_rdy <= 1'b0;
-        end
-        else begin
+        else if (en) begin
+            pixel_rdy <= 1'b1;
             rdy <= 1'b0;
         end
-        
-        if (en) begin
-            pixel_rdy <= 1'b1;
+        else if (saw_pix) begin
+            pixel_rdy <= 1'b0;
         end
-        else if (~saw_pix) begin
-            pixel_rdy <= pix_rdy;
+        else if (!pixel_rdy && !saw_pix) begin
+            rdy <= 1'b1;
         end
-	end
     end
 
 endmodule: video
@@ -132,15 +116,17 @@ module video_fsm(
                 else if (hb_sum == 'd121) next_hstate = SEND_DATA;
             end
             SEND_DATA: begin
-                hb_cnt_clr = 'b1;
-                hp_cnt_en = pixel_rdy;
-                saw_pix = pixel_rdy;
-                HDMI_EN = pixel_rdy;
+                if (pixel_rdy) begin
+                    hb_cnt_clr = 'b1;
+                    hp_cnt_en = 'b1;
+                    HDMI_EN = 'b1;
+                    saw_pix = 'b1;
+                    next_hstate = WAIT_DATA;
+                end
                 if (hp_sum == 'd720) next_hstate = SEND_BLANK;
-                else if (pixel_rdy) next_hstate = WAIT_DATA;
             end
             WAIT_DATA: begin
-                if (pixel_rdy) next_hstate = SEND_DATA;
+                next_hstate = SEND_DATA;
             end
         endcase
     end
