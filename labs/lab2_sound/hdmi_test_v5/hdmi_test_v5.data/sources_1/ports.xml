@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<Interface Version="1" Minor="1">
+	<Ifc Id="ROOT" Top="1">
+		<Bus Id="HDMI_D">
+			<Port Id="35" Dir="OUT"/>
+			<Port Id="34" Dir="OUT"/>
+			<Port Id="33" Dir="OUT"/>
+			<Port Id="32" Dir="OUT"/>
+			<Port Id="31" Dir="OUT"/>
+			<Port Id="30" Dir="OUT"/>
+			<Port Id="29" Dir="OUT"/>
+			<Port Id="28" Dir="OUT"/>
+			<Port Id="27" Dir="OUT"/>
+			<Port Id="26" Dir="OUT"/>
+			<Port Id="25" Dir="OUT"/>
+			<Port Id="24" Dir="OUT"/>
+			<Port Id="23" Dir="OUT"/>
+			<Port Id="22" Dir="OUT"/>
+			<Port Id="21" Dir="OUT"/>
+			<Port Id="20" Dir="OUT"/>
+			<Port Id="19" Dir="OUT"/>
+			<Port Id="18" Dir="OUT"/>
+			<Port Id="17" Dir="OUT"/>
+			<Port Id="16" Dir="OUT"/>
+			<Port Id="15" Dir="OUT"/>
+			<Port Id="14" Dir="OUT"/>
+			<Port Id="13" Dir="OUT"/>
+			<Port Id="12" Dir="OUT"/>
+			<Port Id="11" Dir="OUT"/>
+			<Port Id="10" Dir="OUT"/>
+			<Port Id="9" Dir="OUT"/>
+			<Port Id="8" Dir="OUT"/>
+			<Port Id="7" Dir="OUT"/>
+			<Port Id="6" Dir="OUT"/>
+			<Port Id="5" Dir="OUT"/>
+			<Port Id="4" Dir="OUT"/>
+			<Port Id="3" Dir="OUT"/>
+			<Port Id="2" Dir="OUT"/>
+			<Port Id="1" Dir="OUT"/>
+			<Port Id="0" Dir="OUT"/>
+		</Bus>
+		<Port Id="RESET" Dir="IN"/>
+		<Port Id="SYSCLK_P" Dir="IN"/>
+		<Port Id="SYSCLK_N" Dir="IN"/>
+		<Port Id="IIC_SDA" Dir="OUT"/>
+		<Port Id="IIC_SCL" Dir="OUT"/>
+		<Port Id="IIC_RST" Dir="OUT"/>
+		<Port Id="HDMI_PXL_CLK" Dir="OUT"/>
+		<Port Id="HDMI_SPDIF" Dir="OUT"/>
+		<Port Id="HDMI_DE" Dir="OUT"/>
+		<Port Id="HDMI_HSYNC" Dir="OUT"/>
+		<Port Id="HDMI_VSYNC" Dir="OUT"/>
+		<Port Id="GPIO_LED_0_LS" Dir="OUT"/>
+		<Port Id="GPIO_LED_1_LS" Dir="OUT"/>
+		<Port Id="GPIO_LED_6_LS" Dir="OUT"/>
+		<Port Id="GPIO_LED_7_LS" Dir="OUT"/>
+		<DiffPair Pos="SYSCLK_P" Neg="SYSCLK_N"/>
+	</Ifc>
+</Interface>
+

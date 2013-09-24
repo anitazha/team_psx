@@ -1,0 +1,224 @@
+
+*** Running vivado
+    with args -log top_test.rdi -applog -m32 -messageDb vivado.pb -mode batch -source top_test.tcl -notrace
+
+
+****** Vivado v2012.3
+  **** Build 209282 by xbuild on Thu Oct 18 20:54:02 MDT 2012
+    ** Copyright 1986-1999, 2001-2012 Xilinx, Inc. All Rights Reserved.
+
+INFO: [Common 17-81] Feature available: Implementation
+INFO: [Common 17-81] Feature available: Synthesis
+INFO: [Device 21-36] Loading parts and site information from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/arch.xml
+Parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+Finished parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+source top_test.tcl -notrace
+INFO: [Netlist 29-17] Analyzing 258 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+Loading clock regions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockRegion.xml
+Loading clock buffers from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockBuffers.xml
+Loading clock placement rules from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/virtex7/ClockPlacerRules.xml
+Loading package pin functions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/PinFunctions.xml...
+Loading package from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ffg1761/Package.xml
+Loading io standards from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/IOStandards.xml
+Loading device configuration modes from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/ConfigModes.xml
+Loading list of drcs for the architecture : C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/drc.xml
+Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.runs/impl_1/.Xil/Vivado-9048-TomatoBiscuit/dcp/top_test.xdc]
+Finished Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.runs/impl_1/.Xil/Vivado-9048-TomatoBiscuit/dcp/top_test.xdc]
+Reading XDEF placement.
+Reading XDEF routing.
+Read XDEF File: Time (s): elapsed = 00:00:00.186ÕI∫Ù⁄¨ê. . Memory (MB): peak = 640.402 ; gain = 0.301
+Restoring placement.
+Restored 51 out of 51 XDEF sites from archive | CPU: 0.000000 secs | Memory: 0.000000 MB |
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 964 instances were transformed.
+  (MUXCY,XORCY) => CARRY4: 31 instances
+  FD => FDCE: 321 instances
+  FDC => FDCE: 41 instances
+  FDE => FDCE: 32 instances
+  FDP => FDPE: 72 instances
+  FDR => FDRE: 60 instances
+  FDS => FDSE: 10 instances
+  INV => LUT1: 6 instances
+  LDC => LDCE: 1 instances
+  MUXF5 => LUT3: 2 instances
+  MUXF6 => LUT3: 1 instances
+  RAMB36 => RAMB36E1: 258 instances
+  SRL16 => SRL16E: 128 instances
+  SRLC16E => SRL16E: 1 instances
+
+Phase 0 | Netlist Checksum: a9a6f281
+read_checkpoint: Time (s): elapsed = 00:00:32 . Memory (MB): peak = 640.402 ; gain = 448.063
+INFO: [Common 17-347] Attempting to get a license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+
+Starting Logic Optimization Task
+Logic Optimization | Checksum: 2abb24f5
+Netlist sorting complete. Time (s): elapsed = 00:00:00.6259A∫†·¨ê. . Memory (MB): peak = 740.277 ; gain = 0.000
+
+Phase 1 Retarget
+
+INFO: [Opt 31-49] Retargeted 0 cell(s).
+Phase 1 Retarget | Checksum: af4d87e2
+
+Time (s): elapsed = 00:00:02 . Memory (MB): peak = 740.277 ; gain = 0.000
+
+Phase 2 Constant Propagation
+INFO: [Opt 31-10] Eliminated 134 cells.
+Phase 2 Constant Propagation | Checksum: 7bcb6440
+
+Time (s): elapsed = 00:00:27 . Memory (MB): peak = 812.406 ; gain = 72.129
+
+Phase 3 Sweep
+WARNING: [Opt 31-6] Deleting driverless net: n_28232_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28233_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28234_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28235_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28236_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28237_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28238_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28239_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28240_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28241_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28246_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28247_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28248_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28249_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28286_ila.
+WARNING: [Opt 31-6] Deleting driverless net: n_28287_ila.
+WARNING: [Opt 31-6] Deleting driverless net: ila/TRIG0[59].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[100].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[101].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[102].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[103].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[104].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[105].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[110].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[106].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[111].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[107].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[112].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[108].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[113].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[109].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[114].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[115].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[120].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[116].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[121].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[117].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[122].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[118].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[123].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[119].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[124].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[125].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[126].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[127].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[8].
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[9].
+WARNING: [Opt 31-6] Deleting driverless net: ila/TRIG0[8].
+WARNING: [Opt 31-6] Deleting driverless net: ila/TRIG0[9].
+INFO: [Common 17-14] Message 'Opt 31-6' appears 50 times and further instances of the messages will be disabled. Use the Tcl command set_msg_limit to change the current settings.
+WARNING: [Opt 31-6] Deleting driverless net: ila/DATA[46].
+INFO: [Opt 31-12] Eliminated 128 unconnected nets.
+INFO: [Opt 31-11] Eliminated 52 unconnected cells.
+Phase 3 Sweep | Checksum: d7466ffd
+
+Time (s): elapsed = 00:00:29 . Memory (MB): peak = 812.406 ; gain = 72.129
+Ending Logic Optimization Task | Checksum: d7466ffd
+
+Time (s): elapsed = 00:00:29 . Memory (MB): peak = 812.406 ; gain = 72.129
+Netlist sorting complete. Time (s): elapsed = 00:00:00.3529A∫†·¨ê. . Memory (MB): peak = 812.406 ; gain = 0.000
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [Common 17-83] Releasing license: Implementation
+opt_design: Time (s): elapsed = 00:00:45 . Memory (MB): peak = 863.938 ; gain = 223.535
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): elapsed = 00:00:01 . Memory (MB): peak = 866.672 ; gain = 0.000
+write_checkpoint: Time (s): elapsed = 00:00:06 . Memory (MB): peak = 866.672 ; gain = 2.734
+INFO: [Common 17-347] Attempting to get a license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7vx485t'
+Running DRC as a precondition to command place_design
+INFO: [Drc 23-27] Running DRC with 2 threads
+
+Starting Placer Task
+Effort Level for place_design : MEDIUM (Default)
+INFO: [Place 30-611] Multithreading enabled for place_design using a maximum of 2 CPUs
+
+Phase 1 Mandatory Logic Optimization
+Netlist sorting complete. Time (s): elapsed = 00:00:00.361±G∫‹¨ê. . Memory (MB): peak = 872.203 ; gain = 1.184
+Phase 1 Mandatory Logic Optimization | Checksum: e32d42f0
+
+Time (s): elapsed = 00:00:02 . Memory (MB): peak = 872.203 ; gain = 5.531
+
+Phase 2 Build SLR Info
+Phase 2 Build SLR Info | Checksum: e32d42f0
+
+Time (s): elapsed = 00:00:02 . Memory (MB): peak = 872.719 ; gain = 6.047
+
+Phase 3 Add Constraints
+Phase 3 Add Constraints | Checksum: e32d42f0
+
+Time (s): elapsed = 00:00:02 . Memory (MB): peak = 872.719 ; gain = 6.047
+
+Phase 4 Build Shapes
+Phase 4 Build Shapes | Checksum: d40d511a
+
+Time (s): elapsed = 00:00:05 . Memory (MB): peak = 874.043 ; gain = 7.371
+
+Phase 5 Implementation Feasibility check
+WARNING: [Place 30-568] A LUT 'icon/U0/U_ICON/U_CTRL_OUT/F_NCP[0].F_CMD[9].U_LCE' is driving clock pin of 1 registers. This could lead to large hold time violations. First few involved registers are:
+	ila/U0/I_YES_D.U_ILA/U_STAT/U_DIRTY_LDC {LDCE}
+Phase 5 Implementation Feasibility check | Checksum: d40d511a
+
+Time (s): elapsed = 00:00:07 . Memory (MB): peak = 874.855 ; gain = 8.184
+
+Phase 6 PrePlace Elements
+Phase 6 PrePlace Elements | Checksum: 82893c32
+
+Time (s): elapsed = 00:00:07 . Memory (MB): peak = 874.855 ; gain = 8.184
+
+Phase 7 Placer Initialization
+
+Phase 7.1 IO & Clk Placer & Init
+
+Phase 7.1.1 IO / Clock Placer
+
+Phase 7.1.2 Build Placer Device
+
+Phase 7.1.2.1 Place Init Device
+Phase 7.1.2.1 Place Init Device | Checksum: 82893c32
+
+Time (s): elapsed = 00:00:09 . Memory (MB): peak = 874.879 ; gain = 8.207
+Phase 7.1.2 Build Placer Device | Checksum: 82893c32
+
+Time (s): elapsed = 00:00:09 . Memory (MB): peak = 874.879 ; gain = 8.207
+Phase 7.1.1 IO / Clock Placer | Checksum: 82893c32
+
+Time (s): elapsed = 00:00:09 . Memory (MB): peak = 874.879 ; gain = 8.207
+Phase 7.1 IO & Clk Placer & Init | Checksum: 82893c32
+
+Time (s): elapsed = 00:00:10 . Memory (MB): peak = 874.879 ; gain = 8.207
+
+Phase 7.2 Build Placer Netlist
+
+Phase 7.2.1 Place Init Design
+Phase 7.2.1 Place Init Design | Checksum: 97d6445e
+
+Time (s): elapsed = 00:00:15 . Memory (MB): peak = 881.695 ; gain = 15.023
+Phase 7.2 Build Placer Netlist | Checksum: 97d6445e
+
+Time (s): elapsed = 00:00:15 . Memory (MB): peak = 881.695 ; gain = 15.023
+
+Phase 7.3 Constrain Clocks
+Phase 7.3 Constrain Clocks | Checksum: 97d6445e
+
+Time (s): elapsed = 00:00:15 . Memory (MB): peak = 881.695 ; gain = 15.023
+Phase 7 Placer Initialization | Checksum: 97d6445e
+
+Time (s): elapsed = 00:00:15 . Memory (MB): peak = 881.695 ; gain = 15.023
+
+Phase 8 Global Placement

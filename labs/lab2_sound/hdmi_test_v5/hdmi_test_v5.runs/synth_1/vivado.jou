@@ -1,0 +1,9 @@
+#-----------------------------------------------------------
+# Vivado v2012.3
+# Build 209282 by xbuild on Thu Oct 18 20:54:02 MDT 2012
+# Start of session at: Tue Sep 24 17:51:10 2013
+# Process ID: 8512
+# Log file: C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.runs/synth_1/top_test.rds
+# Journal file: C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source top_test.tcl

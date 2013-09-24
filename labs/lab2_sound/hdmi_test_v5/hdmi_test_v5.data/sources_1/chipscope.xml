@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<ChipScope Version="1" Minor="3">
+	<Core Id="ila" Type="chipscope_ila_v1">
+		<CoreStatus isImpl="1" isFromHDL="1"/>
+		<CoreParams Id="DebugCoreParams">
+		</CoreParams>
+		<Port Type="CLK" Index="0" Width="1">
+			<PortParams Id="DebugPortParams">
+			</PortParams>
+		</Port>
+		<Port Type="DATA" Index="0" Width="128">
+			<PortParams Id="DebugPortParams">
+			</PortParams>
+		</Port>
+		<Port Type="TRIG" Index="0" Width="64">
+			<PortParams Id="DebugPortParams">
+			</PortParams>
+		</Port>
+	</Core>
+	<Core Id="icon" Type="chipscope_icon_v1">
+		<CoreStatus isImpl="1" isFromHDL="0"/>
+		<CoreParams Id="DebugCoreParams">
+		</CoreParams>
+	</Core>
+	<UnassignedNets>
+	</UnassignedNets>
+</ChipScope>
+
