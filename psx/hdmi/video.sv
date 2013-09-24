@@ -77,6 +77,7 @@ module video_fsm(
     enum logic [1:0] {
         INIT,
         SEND_BLANK,
+        SEND_VSYNC,
         SEND_DATA
     } curr_vstate, next_vstate, curr_hstate, next_hstate;
 
@@ -110,9 +111,24 @@ module video_fsm(
             end
             SEND_BLANK: begin
                 hb_cnt_en = 'b1;
-                hp_cnt_clr = 'b1;
-                if ((hb_sum > 'd16) && (hb_sum <= 'd78)) HDMI_HSYNC = 'b0;
-                else if (hb_sum == 'd121) next_hstate = SEND_DATA;
+                if ((hb_sum > 'd16) && (hb_sum <= 'd78)) begin
+                    HDMI_HSYNC = 'b0;
+                end
+                else if ((hb_sum == 'd121) && (vb_sum == 'd36)) begin
+                    hp_cnt_clr = 'b1;
+                    next_hstate = SEND_DATA;
+                end
+                else if (hb_sum == 'd121) begin
+                    hp_cnt_clr = 'b1;
+                    next_hstate = SEND_VSYNC;
+                end
+            end
+            SEND_VSYNC: begin
+                hp_cnt_en = 'b1;
+                if (hp_sum == 'd720) begin
+                    hb_cnt_clr = 'b1;
+                    next_hstate = SEND_BLANK;
+                end
             end
             SEND_DATA: begin
                 if (pixel_rdy) begin
@@ -122,6 +138,7 @@ module video_fsm(
                 end
                 if (hp_sum == 'd720) begin
                     hb_cnt_clr = 'b1;
+                    hp_cnt_clr = 'b1;
                     next_hstate = SEND_BLANK;
                 end
             end
@@ -145,15 +162,26 @@ module video_fsm(
                 if (pixel_rdy) next_vstate = SEND_BLANK;
             end
             SEND_BLANK: begin
-                vp_cnt_clr = 'b1;
-                if (hb_sum == 'd0) vb_cnt_en = 'b1;
-                if ((vb_sum > 'd9) && (vb_sum <= 'd15)) HDMI_VSYNC = 'b0;
-                else if (vb_sum == 'd36) next_vstate = SEND_DATA;
+                // synchronize vertical blanking count with line count
+                if (hp_sum == 'd720) begin
+                    vb_cnt_en = 'b1;
+                end
+                if ((vb_sum > 'd9) && (vb_sum <= 'd15)) begin
+                    HDMI_VSYNC = 'b0;
+                end
+                else if (vb_sum == 'd36) begin
+                    vp_cnt_clr = 'b1;
+                    next_vstate = SEND_DATA;
+                end
             end
-            SEND_DATA: begin // in vertical, used to hold vblank/vsync
-                vb_cnt_clr = 'b1;
-                if (hp_sum == 'd720) vp_cnt_en = 'b1;
-                if (vp_sum == 'd480) next_vstate = SEND_BLANK;
+            SEND_DATA: begin
+                if (hp_sum == 'd720) begin
+                    vp_cnt_en = 'b1;
+                end
+                if (vp_sum == 'd480) begin
+                    vb_cnt_clr = 'b1;
+                    next_vstate = SEND_BLANK;
+                end
             end
         endcase
     end
