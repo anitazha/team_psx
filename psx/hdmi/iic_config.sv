@@ -15,8 +15,14 @@
  *
  */
 
-typedef enum reg [2:0] {IDLE, INIT, START, CLK_FALL,
-                        SETUP, CLK_RISE, WAIT} iic_fsm_t;
+typedef enum reg [2:0] {IDLE, 
+			INIT, 
+			RESET,
+			START, 
+			CLK_FALL,
+                        SETUP, 
+			CLK_RISE, 
+			WAIT} iic_fsm_t;
 
 
 
@@ -28,6 +34,7 @@ module iic_config (input  logic clk,
 		   input  logic rst,
 		   output logic SDA,
 		   output logic SCL,
+		   output logic IIC_RST,
 		   output logic done);
 
    /* Parameters */
@@ -187,29 +194,29 @@ module iic_config (input  logic clk,
    /* internal lines */
    reg 	                        SDA_out;
    reg 	                        SCL_out;
+   reg 				IIC_RST_out;				
    reg 	                        done_out;
    reg [TRANSITION_CYCLE_MSB:0] cycle_count;
    reg [5:0] 			write_count;
    reg [31:0] 			bit_count;
-   reg 				switch_config;				
+   reg 				switch_config;
+   reg 				switch_reset;
    reg [SDA_BUFFER_MSB:0] 	SDA_BUFFER;
    iic_fsm_t                    curr_state, next_state;
    wire 			next_reg;
    
    /* push MSB of serial data & set output lines for different states */   
    always @ (posedge clk, posedge rst) begin
-      if (rst || curr_state == IDLE || curr_state == WAIT) begin
+      if (rst || curr_state == RESET || curr_state == WAIT) begin
 	 SDA_out <= 1'b1;
 	 SCL_out <= 1'b1;
       end
-      /* send START sequence for IIC */
       else if (curr_state == INIT && next_reg) begin
 	 SDA_out <= 1'b0;
       end
       else if (curr_state == SETUP) begin
 	 SDA_out <= SDA_BUFFER[SDA_BUFFER_MSB];
       end
-      /* send STOP sequence for IIC */
       else if (curr_state == CLK_RISE && 
 	       cycle_count == TRANSITION_CYCLE/2 &&
 	       bit_count == SDA_BUFFER_MSB) begin
@@ -224,14 +231,16 @@ module iic_config (input  logic clk,
       end
    end // always @ (posedge clk)
 
-   assign SDA = SDA_out;
-   assign SCL = SCL_out;
-   assign done = done_out;
+   assign SDA     = SDA_out;
+   assign SCL     = SCL_out;
+   assign IIC_RST = IIC_RST_out;
+   assign done    = done_out;
 
    always @ (posedge clk, posedge rst) begin
       // reset-end condition
       if (rst) begin
-	 SDA_BUFFER <= {SWITCH_ADDR, WRITE, ACK, SWITCH_DATA, ACK, STOP_BIT};
+	 SDA_BUFFER <= {SWITCH_ADDR, WRITE, ACK, 
+			SWITCH_DATA, ACK, STOP_BIT, 9'd0};
 	 cycle_count <= 0;
       end
       // setup SDA dor SCK rise
@@ -408,15 +417,27 @@ module iic_config (input  logic clk,
       if (rst) begin
 	 switch_config <= 1'b1;
       end
-      else if (bit_count == SDA_BUFFER_SW + 1) begin
+      else if (curr_state == WAIT) begin
 	 switch_config <= 1'b0;
+      end
+   end
+
+   /* pull IIC_RST low for one clock to reset the IIC switch */
+   always @ (posedge clk, posedge rst) begin
+      if (rst) begin
+	 switch_reset <= 1'b0;
+	 IIC_RST_out <= 1'b0;
+      end
+      else begin
+	 IIC_RST_out <= 1'b1;
+	 if (~switch_reset) switch_reset <= 1'b1;
       end
    end
 
    /* FSM next state logic */
    always @ (posedge clk, posedge rst) begin
       if (rst)
-	curr_state <= INIT;
+	curr_state <= RESET;
       else 
 	curr_state <= next_state;
    end
@@ -432,6 +453,14 @@ module iic_config (input  logic clk,
 	// completion state - remain IDLE after configuration complete
 	IDLE: begin
 	   next_state = IDLE;
+	end
+	RESET: begin
+	   if (switch_reset) begin
+	      next_state = INIT;
+	   end
+	   else begin
+	      next_state = RESET;
+	   end
 	end
 	INIT: begin
 	   if (next_reg) begin
@@ -467,7 +496,8 @@ module iic_config (input  logic clk,
 	end
 	CLK_RISE: begin
 	   if ((next_reg && bit_count == SDA_BUFFER_MSB) ||
-	       (switch_config && bit_count == SDA_BUFFER_SW)) begin
+	       (next_reg && switch_config && bit_count == SDA_BUFFER_SW)) 
+	   begin
 	      next_state = WAIT;
 	   end
 	   else if (next_reg) begin
