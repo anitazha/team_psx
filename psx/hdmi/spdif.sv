@@ -43,7 +43,7 @@ module spdif(
    bit 					  capture_valid, clr_capture;
    bit [15:0] 			  capture_data;
    
-   bit [37:0] 		      stored_data;
+   bit [35:0] 		      stored_data;
    bit [5:0] 		      stored_bits;
    bit 					  second_part, parity;
    
@@ -107,8 +107,8 @@ module spdif(
       end
       else begin
 	 if (capture_valid) begin
-	    stored_data <= {preamble_bits, 10'b0, capture_data, 3'b0, ^capture_data};
-	    stored_bits <= 6'd37;
+	    stored_data <= {preamble_bits, 8'b0, capture_data, 3'b0, ^capture_data};
+	    stored_bits <= 6'd36;
 	    parity <= ^capture_data;
 		preamble <= 1'b1;
 		right_channel <= ~right_channel;
@@ -118,11 +118,11 @@ module spdif(
 	    second_part <= ~second_part;
 		
 	    if (preamble | second_part) begin
-	       stored_data <= {stored_data[36:0], 1'b0};
+	       stored_data <= {stored_data[34:0], 1'b0};
 	       stored_bits <= stored_bits - 5'd1;
 	    end
 
-		if (stored_bits == 6'd30) begin
+		if (stored_bits == 6'd29) begin
 		   preamble <= 1'b0;
 		   clr_capture <= 1'b0;
 		end
@@ -179,12 +179,13 @@ module spdif(
    end // always @ (posedge clk, posedge rst)
    
    /* Performs BCM (Biphase Mark Code) on the data before transmission */
-   bmc bmc0(.data(stored_data[37]),
+   bmc bmc0(.data(stored_data[35]),
 	    .valid(~preamble & (stored_bits > 6'd0)),
-			.start((stored_bits == 6'd30)),
+			.start((stored_bits == 6'd29)),
 	    .*);
 
-   assign SPDIF_OUT = (preamble) ? stored_data[37] : bcm_out;
+   assign SPDIF_OUT = ((stored_bits == 6'd0) ? 1'b0 : 
+					   ((preamble) ? stored_data[35] : bcm_out));
    
 endmodule // spdif
 
