@@ -26,10 +26,10 @@ module hdmi(
 	    input bit 	      video_valid,
 	    input bit [15:0]  audio_in,
 	    input bit 	      audio_valid,
-	    output bit 	      IIC_SDA,
-	    output bit        IIC_RST,
 	    output bit 	      audio_rdy, video_rdy,
 	    output bit 	      IIC_SCL,
+	    output bit 	      IIC_RST,
+	    output bit 	      IIC_SDA, 
 	    output bit [35:0] HDMI_D,
 	    output bit 	      HDMI_HSYNC, HDMI_VSYNC, HDMI_DE, HDMI_PXL_CLK,
 	    output bit 	      HDMI_SPDIF);

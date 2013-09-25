@@ -8,10 +8,11 @@ module top_test(
 		output bit    IIC_RST,
 		output bit 	  IIC_SDA,
 		output bit 	  IIC_SCL,
+		output bit 	  IIC_RST, 
 		output bit 	  HDMI_PXL_CLK,
 		output bit 	  HDMI_SPDIF, HDMI_DE, HDMI_HSYNC, HDMI_VSYNC,
 		output bit [35:0] HDMI_D,
-                output bit    GPIO_LED_0_LS, GPIO_LED_1_LS);
+                output bit 	  GPIO_LED_0_LS, GPIO_LED_1_LS);
 
 
    /* Internal Lines */
