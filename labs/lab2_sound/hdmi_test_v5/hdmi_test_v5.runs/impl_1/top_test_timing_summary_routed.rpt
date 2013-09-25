@@ -1,0 +1,132 @@
+Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2013.2 (lin64) Build 272601 Sat Jun 15 11:11:11 MDT 2013
+| Date         : Tue Sep 24 19:56:57 2013
+| Host         : liberty.ece.cmu.edu running 64-bit Red Hat Enterprise Linux Server release 6.4 (Santiago)
+| Command      : report_timing_summary -file top_test_timing_summary_routed.rpt -pb top_test_timing_summary_routed.pb
+| Design       : top_test
+| Device       : 7vx485t-ffg1761
+| Speed File   : -2  PRODUCTION 1.09 2013-03-11
+----------------------------------------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+------------------------------------------------------------------------------------------------
+| Check Timing
+| ------------
+------------------------------------------------------------------------------------------------
+
+
+Checking 'no_clock'.
+ There are 0 register/latch pins with constant_clock.
+ There are 40 register/latch pins with no clock driven by: HDMI_PXL_CLK_OBUF_inst_i_1/O and possible clock pin by: hdmi0/video0/pclk/clk_pix_reg/Q 
+ There are 1392 register/latch pins with no clock driven by: clk_BUFG_inst/O and possible clock pin by: SYSCLK_N SYSCLK_P 
+ There are 403 register/latch pins with no clock driven by: icon/U0/U_ICON/I_YES_BSCAN.U_BS/I_USE_SOFTBSCAN_EQ0.I_USE_XST_TCK_WORKAROUND_EQ1.U_ICON_BSCAN_BUFG/U_BUFG/O and possible clock pin by: icon/U0/U_ICON/I_YES_BSCAN.U_BS/I_V7.ISYN.I_USE_SOFTBSCAN_EQ0.U_BS/DRCK 
+ There is 1 register/latch pin with no clock driven by: icon/U0/U_ICON/I_YES_BSCAN.U_BS/I_V7.ISYN.I_USE_SOFTBSCAN_EQ0.U_BS/UPDATE and possible clock pin by: icon/U0/U_ICON/I_YES_BSCAN.U_BS/I_V7.ISYN.I_USE_SOFTBSCAN_EQ0.U_BS/UPDATE 
+ There is 1 register/latch pin with no clock driven by: icon/U0/U_ICON/U_CTRL_OUT/F_NCP[0].F_CMD[9].U_LCE/O and possible clock pin by: icon/U0/U_ICON/I_YES_BSCAN.U_BS/I_V7.ISYN.I_USE_SOFTBSCAN_EQ0.U_BS/SHIFT icon/U0/U_ICON/U_CMD/G_TARGET[10].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[11].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[12].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[13].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[14].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[15].I_EQ0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[6].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[7].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[8].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_CMD/G_TARGET[9].I_NE0.U_TARGET/Q icon/U0/U_ICON/U_SYNC/U_SYNC/Q 
+ There are 59 register/latch pins with no clock driven by: stored_data_reg[37]_i_3/O and possible clock pin by: hdmi0/spdif0/clk_5_6MHz_reg/Q 
+
+Checking 'unconstrained_internal_endpoints'.
+ There are 11681 pins that are not constrained for maximum delay.
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+Checking 'no_input_delay'.
+ There are 2 input ports with no input delay specified.
+
+Checking 'no_output_delay'.
+ There are 18 ports with no output delay specified.
+
+Checking 'multiple_clock'.
+ There are 0 register/latch pins with related clocks.
+ There are 0 register/latch pins with exclusive clocks.
+
+Checking 'generated_clocks'.
+ There are 0 generated clocks that are not connected to a clock source.
+
+Checking 'loops'.
+ There are 0 combinational loops in the design.
+
+Checking 'partial_input_delay'.
+ There are 0 input ports with partial input delay specified.
+
+Checking 'partial_output_delay'.
+ There are 0 ports with partial output delay specified.
+
+Checking 'unexpandable_clocks'.
+ There are 0 related clock pairs.
+ There are 0 User Ignored clock pairs.
+
+Checking 'latch_loops'.
+ There are 0 combinational latch loops in the design through latch input
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+         NA           NA                     NA                   NA           NA           NA                     NA                   NA           NA           NA                      NA                    NA  
+
+
+All user specified timing constraints are met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock             WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----             -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Path Group Table
+| ----------------
+------------------------------------------------------------------------------------------------
+
+Path Group    From Clock    To Clock          WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------    ----------    --------          -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+
+
+------------------------------------------------------------------------------------------------
+| Timing Details
+| --------------
+------------------------------------------------------------------------------------------------
+
+

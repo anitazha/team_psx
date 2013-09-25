@@ -1,0 +1,53 @@
+/*
+
+Vivado v2013.2 (64-bit)
+Build 272601 by xbuild on Sat Jun 15 11:11:11 MDT 2013
+Process ID: 5830
+
+Current time: 9/24/13 7:20:18 PM
+Time zone: Eastern Standard Time (US/Eastern)
+
+OS: Linux
+Version: 2.6.32-358.18.1.el6.x86_64
+Architecture: amd64
+Available processors (cores): 8
+
+DISPLAY: :0.0
+Screen size: 1600x1200
+Screen resolution (DPI): 96
+Available screens: 1
+
+Java version: 1.7.0_17 64-bit
+Java home: /opt/Xilinx/Vivado/2013.2/tps/lnx64/jre
+
+User name: root
+User directory: /work/team_psx/labs/lab2_sound/hdmi_test_v5
+User country: US
+User language: en
+User locale: en_US
+
+GUI Allocated memory:	122 mb
+GUI Max memory:		3,066 mb
+
+*/
+
+minimizeFrame (PAResourceItoP.PAViews_TCL_CONSOLE, "Tcl Console"); // av:DockableFrame (FrameContainer:JideTabbedPane, bG:JFrame)
+selectButton (PAResourceAtoH.GettingStartedView_OPEN_PROJECT, "Open Project"); // h:i (JPanel:JComponent, bG:JFrame)
+selectMenuItem ((HResource) null, "/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.xpr"); // af:JMenuItem (aj:JPopupMenu, bG:JFrame)
+// bU:I (bG:JFrame):  Open Project : addNotify
+// Tcl: open_project /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.xpr
+dismissDialog ("Open Project"); // bU:I (bG:JFrame)
+// Tcl: update_compile_order -fileset sources_1
+selectTree (PAResourceAtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources]", 0); // m:c (q:JPanel, bG:JFrame)
+selectTree (PAResourceAtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources]", 0, false, false, false, true, false); // m:c (q:JPanel, bG:JFrame) - POPUP TRIGGER
+selectMenu (PAResourceCommand.PACommandNames_AUTO_UPDATE_HIER, "Hierarchy Update"); // ac:JMenu (aj:JPopupMenu, bG:JFrame)
+selectMenuItem (PAResourceCommand.PACommandNames_ADD_SOURCES, "Add Sources..."); // af:JMenuItem (aj:JPopupMenu, bG:JFrame)
+// f:aD (bG:JFrame): Add Sources: addNotify
+selectButton ((HResource) null, "Next >"); // JButton:AbstractButton (ButtonPanel:JPanel, f:aD)
+selectButton (PAResourceQtoZ.SrcChooserPanel_ADD_HDL_AND_NETLIST_FILES_TO_YOUR_PROJECT, "Add Files..."); // a:JButton (JPanel:JComponent, f:aD)
+String[] filenames31467 = {"/work/team_psx/psx/hdmi/feed.sv", "/work/team_psx/psx/hdmi/hdmi.sv", "/work/team_psx/psx/hdmi/iic_config.sv", "/work/team_psx/psx/hdmi/spdif.sv", "/work/team_psx/psx/hdmi/top_test.sv", "/work/team_psx/psx/hdmi/video.sv"};
+setFileChooser (filenames31467);
+selectButton ((HResource) null, "Finish"); // JButton:AbstractButton (ButtonPanel:JPanel, f:aD)
+// f:aD (bG:JFrame): Add Sources: addNotify
+// bH:I (f:aD): Import Source Conflicts: addNotify
+selectButton (RDIResource.BaseDialog_OK, "OK"); // a:JButton (JPanel:JComponent, bH:I)

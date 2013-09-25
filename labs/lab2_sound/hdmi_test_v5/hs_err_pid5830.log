@@ -1,0 +1,10 @@
+#
+# An unexpected error has occurred (11)
+#
+Stack:
+/opt/Xilinx/Vivado/2013.2/tps/lnx64/jre/lib/amd64/server/libjvm.so(+0x744749) [0x7fe025048749]
+/opt/Xilinx/Vivado/2013.2/tps/lnx64/jre/lib/amd64/server/libjvm.so(JVM_handle_linux_signal+0xa7) [0x7fe02504cfb7]
+/lib64/libpthread.so.0() [0x32d0e0f500]
+/opt/Xilinx/Vivado/2013.2/lib/lnx64.o/librdi_common.so(HI18N::convert(stlp_std::basic_string<char, stlp_std::char_traits<char>, stlp_std::allocator<char> > const&, stlp_std::basic_string<wchar_t, stlp_std::char_traits<wchar_t>, stlp_std::allocator<wchar_t> >&)+0x19) [0x7fe04e7b2d69]
+/opt/Xilinx/Vivado/2013.2/lib/lnx64.o/librdi_filemgmt.so(Java_ui_data_design_dai_HDDASrcFileType_1getPrettyName+0x46) [0x7fe036b6cb56]
+[0x7fe01e6ac691]

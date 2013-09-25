@@ -1,0 +1,9 @@
+#-----------------------------------------------------------
+# Vivado v2013.2 (64-bit)
+# Build 272601 by xbuild on Sat Jun 15 11:11:11 MDT 2013
+# Start of session at: Tue Sep 24 19:48:15 2013
+# Process ID: 7357
+# Log file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.rdi
+# Journal file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/vivado.jou
+#-----------------------------------------------------------
+source top_test.tcl -notrace

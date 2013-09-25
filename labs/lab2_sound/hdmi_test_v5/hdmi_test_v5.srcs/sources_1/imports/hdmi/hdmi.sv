@@ -27,7 +27,7 @@ module hdmi(
 	    input bit [15:0]  audio_in,
 	    input bit 	      audio_valid,
 	    output bit 	      IIC_SDA,
-	    output bit 	      IIC_RST, 
+	    output bit        IIC_RST,
 	    output bit 	      audio_rdy, video_rdy,
 	    output bit 	      IIC_SCL,
 	    output bit [35:0] HDMI_D,

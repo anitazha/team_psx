@@ -1,0 +1,167 @@
+#-----------------------------------------------------------
+# Vivado v2013.2 (64-bit)
+# Build 272601 by xbuild on Sat Jun 15 11:11:11 MDT 2013
+# Start of session at: Tue Sep 24 19:20:50 2013
+# Process ID: 6038
+# Log file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/vivado.log
+# Journal file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/vivado.jou
+#-----------------------------------------------------------
+INFO: [Common 17-78] Attempting to get a license: Implementation
+INFO: [Common 17-81] Feature available: Implementation
+INFO: [Common 17-78] Attempting to get a license: Synthesis
+INFO: [Common 17-81] Feature available: Synthesis
+INFO: [Device 21-36] Loading parts and site information from /opt/Xilinx/Vivado/2013.2/data/parts/arch.xml
+Parsing RTL primitives file [/opt/Xilinx/Vivado/2013.2/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+Finished parsing RTL primitives file [/opt/Xilinx/Vivado/2013.2/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+INFO: [Common 17-362] Using Tcl App repository from '/opt/Xilinx/Vivado/2013.2/data/XilinxTclStore'.
+INFO: [Common 17-364] Updating Tcl app persistent manifest '/root/.Xilinx/Vivado/tclapp/manifest.tcl'
+start_gui
+open_project /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.xpr
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/audio_mem.hex: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/audio_mem.hex'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv.back: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv.back'.
+Scanning sources...
+Finished scanning sources
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/audio_mem.hex: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/audio_mem.hex'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv.back: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv.back'.
+import_files -force -norecurse {/work/team_psx/psx/hdmi/video.sv /work/team_psx/psx/hdmi/hdmi.sv /work/team_psx/psx/hdmi/top_test.sv /work/team_psx/psx/hdmi/spdif.sv /work/team_psx/psx/hdmi/feed.sv /work/team_psx/psx/hdmi/iic_config.sv}
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1
+[Tue Sep 24 19:21:47 2013] Launched synth_1...
+Run output will be captured here: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/synth_1/runme.log
+reset_run synth_1
+launch_runs synth_1
+[Tue Sep 24 19:22:55 2013] Launched synth_1...
+Run output will be captured here: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/synth_1/runme.log
+reset_run synth_1
+launch_runs synth_1
+[Tue Sep 24 19:23:31 2013] Launched synth_1...
+Run output will be captured here: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/synth_1/runme.log
+reset_run synth_1
+launch_runs synth_1
+[Tue Sep 24 19:36:07 2013] Launched synth_1...
+Run output will be captured here: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/synth_1/runme.log
+launch_runs impl_1
+INFO: [Netlist 29-17] Analyzing 260 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2013.2
+Loading clock regions from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/virtex7/xc7vx485t/ClockRegion.xml
+Loading clock buffers from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/virtex7/xc7vx485t/ClockBuffers.xml
+Loading clock placement rules from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/ClockPlacerRules.xml
+Loading package pin functions from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/PinFunctions.xml...
+Loading package from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/virtex7/xc7vx485t/ffg1761/Package.xml
+Loading io standards from /opt/Xilinx/Vivado/2013.2/data/./parts/xilinx/virtex7/IOStandards.xml
+Loading device configuration modes from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/ConfigModes.xml
+INFO: [Opt 31-138] Pushed 0 inverter(s).
+INFO: [Common 17-78] Attempting to get a license: Internal_bitstream
+WARNING: [Common 17-301] Failed to get a license: Internal_bitstream
+Parsing XDC File [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
+WARNING: [Vivado 12-584] No ports matched 'GPIO_LED_6_LS'. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:96]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:96]
+WARNING: [Vivado 12-584] No ports matched 'GPIO_LED_7_LS'. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:97]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:97]
+WARNING: [Vivado 12-584] No ports matched 'GPIO_LED_6_LS'. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:100]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:100]
+WARNING: [Vivado 12-584] No ports matched 'GPIO_LED_7_LS'. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:101]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc:101]
+Finished Parsing XDC File [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
+INFO: [Chipscope 16-158] Did not write any debug probes to file '/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/debug_nets.ltx' because no debug cores were found in the design.
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): cpu = 00:00:00.88 ; elapsed = 00:00:00.88 . Memory (MB): peak = 4698.727 ; gain = 0.000
+[Tue Sep 24 19:48:15 2013] Launched impl_1...
+Run output will be captured here: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/runme.log
+launch_runs: Time (s): cpu = 00:00:37 ; elapsed = 00:00:36 . Memory (MB): peak = 4702.758 ; gain = 904.867
+launch_runs impl_1 -to_step write_bitstream
+[Tue Sep 24 19:57:16 2013] Launched impl_1...
+Run output will be captured here: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/runme.log
+open_hw
+INFO: [Labtools 27-109] Started Vivado Cse Server instance on port: 60001
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+INFO: [Labtools 27-147] vcse_server: Attempting to launch hw_server...
+INFO: [Labtools 27-147] vcse_server: 
+****** Xilinx hw_server v2013.2
+  **** Build date : Jun  3 2013-13:13:02
+    ** Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
+
+INFO: hw_server application started
+INFO: Use Ctrl-C to exit hw_server application
+
+INFO: Set the HW_SERVER_ALLOW_PL_ACCESS environment variable to 1 to access any PL address memory in the TCF debugger memory window.
+
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+connect_hw_server -host localhost -port 60001
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+current_hw_target [get_hw_targets */xilinx_tcf/Digilent/210203339417A]
+open_hw_target
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+set_property PROBES.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/debug_nets.ltx} [lindex [get_hw_devices] 0]
+current_hw_device [lindex [get_hw_devices] 0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-1434] Device XC7VX485T (JTAG device index = 0) is programmed with a design that has no supported debug core(s) in it.
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-147] vcse_server: Creating XC7VX485T device.
+INFO: [Hwserver 48-1122]  Programming device at position 0 ...
+INFO: [Hwserver 48-1139]  Status register values:
+INFO: [Hwserver 48-1889] Status: 0011 1111 0101 1110 0000 1000 0100 0000 
+INFO: [Hwserver 48-1033]  '0': Programming completed successfully.
+INFO: [Labtools 27-32] Done pin status: HIGH
+program_hw_devices: Time (s): cpu = 00:00:00.76 ; elapsed = 00:00:16 . Memory (MB): peak = 4754.535 ; gain = 41.738
+refresh_hw_device [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-1434] Device XC7VX485T (JTAG device index = 0) is programmed with a design that has no supported debug core(s) in it.
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-147] vcse_server: Creating XC7VX485T device.
+INFO: [Hwserver 48-1122]  Programming device at position 0 ...
+INFO: [Hwserver 48-1080]  Error shows in the status register, release done bit is NOT 1.
+INFO: [Hwserver 48-1139]  Status register values:
+INFO: [Hwserver 48-1889] Status: 0000 0000 0000 0000 0000 0000 0000 0000 
+INFO: [Hwserver 48-1033]  '0': Programming completed successfully.
+ERROR: [Labtools 27-1829] vcse_server failed during internal command 'CseFpga_getDeviceReg'. See previous error messages.
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-147] vcse_server: Creating XC7VX485T device.
+INFO: [Hwserver 48-1122]  Programming device at position 0 ...
+INFO: [Hwserver 48-1080]  Error shows in the status register, release done bit is NOT 1.
+INFO: [Hwserver 48-1139]  Status register values:
+INFO: [Hwserver 48-1889] Status: 0000 0000 0000 0000 0000 0000 0000 0000 
+INFO: [Hwserver 48-1033]  '0': Programming completed successfully.
+ERROR: [Labtools 27-1829] vcse_server failed during internal command 'CseFpga_getDeviceReg'. See previous error messages.
+disconnect_hw_server localhost
+connect_hw_server -host localhost -port 60001
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+current_hw_target [get_hw_targets */xilinx_tcf/Digilent/210203339417A]
+open_hw_target
+INFO: [Labtools 27-147] vcse_server: Connecting to TCF agent...
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+set_property PROBES.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/debug_nets.ltx} [lindex [get_hw_devices] 0]
+current_hw_device [lindex [get_hw_devices] 0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-1434] Device XC7VX485T (JTAG device index = 0) is programmed with a design that has no supported debug core(s) in it.
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-147] vcse_server: Creating XC7VX485T device.
+INFO: [Hwserver 48-1122]  Programming device at position 0 ...
+INFO: [Hwserver 48-1139]  Status register values:
+INFO: [Hwserver 48-1889] Status: 0011 1111 0101 1110 0000 1000 0100 0000 
+INFO: [Hwserver 48-1033]  '0': Programming completed successfully.
+INFO: [Labtools 27-32] Done pin status: HIGH
+program_hw_devices: Time (s): cpu = 00:00:00.36 ; elapsed = 00:00:16 . Memory (MB): peak = 4760.543 ; gain = 3.004
+refresh_hw_device [lindex [get_hw_devices] 0]
+INFO: [Labtools 27-1434] Device XC7VX485T (JTAG device index = 0) is programmed with a design that has no supported debug core(s) in it.
+exit
+INFO: [Common 17-206] Exiting Vivado at Tue Sep 24 21:25:10 2013...

@@ -5,13 +5,13 @@
 
 module top_test(
 		input wire 	  RESET, SYSCLK_P, SYSCLK_N,
+		output bit    IIC_RST,
 		output bit 	  IIC_SDA,
 		output bit 	  IIC_SCL,
-		output bit 	  IIC_RST,
 		output bit 	  HDMI_PXL_CLK,
 		output bit 	  HDMI_SPDIF, HDMI_DE, HDMI_HSYNC, HDMI_VSYNC,
 		output bit [35:0] HDMI_D,
-		output bit 	  GPIO_LED_0_LS, GPIO_LED_1_LS, GPIO_LED_6_LS, GPIO_LED_7_LS);
+                output bit    GPIO_LED_0_LS, GPIO_LED_1_LS);
 
 
    /* Internal Lines */
@@ -30,13 +30,11 @@ module top_test(
 	       .I(SYSCLK_P),
 	       .IB(SYSCLK_N));
 
-   assign RESET = rst;
+   assign rst = RESET;
 `endif
    
    assign GPIO_LED_0_LS = video_valid;
-   assign GPIO_LED_1_LS = video_rdy;
-   assign GPIO_LED_6_LS = ~HDMI_VSYNC;
-   assign GPIO_LED_7_LS = ~HDMI_HSYNC;
+   assign GPIO_LED_1_LS = video_rdy;  
 
    /* HDMI Module */
    hdmi hdmi0(.r(video_data[23:16]),
@@ -57,10 +55,10 @@ module top_test(
 			    .audio_rdy(audio_rdy),
 			    .audio_valid(audio_valid),
 			    .*);
-
+				
    wire [127:0] 		  ila_data;
    wire [63:0] 			  ila_trig;
-
+   
    assign ila_data[0] = RESET;
    assign ila_data[1] = IIC_SDA;
    assign ila_data[2] = IIC_SCL;
@@ -74,19 +72,19 @@ module top_test(
    assign ila_data[51] = audio_valid;
    assign ila_data[52] = video_rdy;
    assign ila_data[53] = video_valid;
-
+   
    assign ila_trig = ila_data[63:0];
-
+   
 
    wire [35:0] 			  control;
    
    
    hdmi_icon icon(.CONTROL0(control));
+   
    chipscope_ila ila(.CONTROL(control),
 		     .CLK(clk),
 		     .DATA(ila_data),
 		     .TRIG0(ila_trig));
-   
    
 `ifdef sim
    initial begin

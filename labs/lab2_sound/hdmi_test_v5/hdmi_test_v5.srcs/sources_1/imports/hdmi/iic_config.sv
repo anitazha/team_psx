@@ -239,7 +239,8 @@ module iic_config (input  logic clk,
    always @ (posedge clk, posedge rst) begin
       // reset-end condition
       if (rst) begin
-	 SDA_BUFFER <= {SWITCH_ADDR, WRITE, ACK, SWITCH_DATA, ACK, STOP_BIT, 9'd0};
+	 SDA_BUFFER <= {SWITCH_ADDR, WRITE, ACK, 
+			SWITCH_DATA, ACK, STOP_BIT, 9'd0};
 	 cycle_count <= 0;
       end
       // setup SDA dor SCK rise
@@ -416,7 +417,7 @@ module iic_config (input  logic clk,
       if (rst) begin
 	 switch_config <= 1'b1;
       end
-      else if (bit_count == SDA_BUFFER_SW + 1) begin
+      else if (curr_state == WAIT) begin
 	 switch_config <= 1'b0;
       end
    end
@@ -495,7 +496,8 @@ module iic_config (input  logic clk,
 	end
 	CLK_RISE: begin
 	   if ((next_reg && bit_count == SDA_BUFFER_MSB) ||
-	       (switch_config && bit_count == SDA_BUFFER_SW)) begin
+	       (next_reg && switch_config && bit_count == SDA_BUFFER_SW)) 
+	   begin
 	      next_state = WAIT;
 	   end
 	   else if (next_reg) begin

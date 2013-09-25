@@ -1,0 +1,54 @@
+#-----------------------------------------------------------
+# Vivado v2013.2 (64-bit)
+# Build 272601 by xbuild on Sat Jun 15 11:11:11 MDT 2013
+# Start of session at: Tue Sep 24 19:20:50 2013
+# Process ID: 6038
+# Log file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/vivado.log
+# Journal file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.xpr
+import_files -force -norecurse {/work/team_psx/psx/hdmi/video.sv /work/team_psx/psx/hdmi/hdmi.sv /work/team_psx/psx/hdmi/top_test.sv /work/team_psx/psx/hdmi/spdif.sv /work/team_psx/psx/hdmi/feed.sv /work/team_psx/psx/hdmi/iic_config.sv}
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1
+wait_on_run synth_1
+reset_run synth_1
+launch_runs synth_1
+wait_on_run synth_1
+launch_runs impl_1
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream
+wait_on_run impl_1
+open_hw
+connect_hw_server -host localhost -port 60001
+current_hw_target [get_hw_targets */xilinx_tcf/Digilent/210203339417A]
+open_hw_target
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+set_property PROBES.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/debug_nets.ltx} [lindex [get_hw_devices] 0]
+current_hw_device [lindex [get_hw_devices] 0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+disconnect_hw_server localhost
+connect_hw_server -host localhost -port 60001
+current_hw_target [get_hw_targets */xilinx_tcf/Digilent/210203339417A]
+open_hw_target
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+set_property PROBES.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/debug_nets.ltx} [lindex [get_hw_devices] 0]
+current_hw_device [lindex [get_hw_devices] 0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 0]
+set_property PROGRAM.FILE {/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/impl_1/top_test.bit} [lindex [get_hw_devices] 0]
+program_hw_devices [lindex [get_hw_devices] 0]
+refresh_hw_device [lindex [get_hw_devices] 0]

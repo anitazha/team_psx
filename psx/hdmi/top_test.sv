@@ -5,6 +5,7 @@
 
 module top_test(
 		input wire 	  RESET, SYSCLK_P, SYSCLK_N,
+		output bit    IIC_RST,
 		output bit 	  IIC_SDA,
 		output bit 	  IIC_SCL,
 		output bit 	  HDMI_PXL_CLK,
@@ -29,7 +30,7 @@ module top_test(
 	       .I(SYSCLK_P),
 	       .IB(SYSCLK_N));
 
-   assign RESET = rst;
+   assign rst = RESET;
 `endif
    
    assign GPIO_LED_0_LS = video_valid;

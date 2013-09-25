@@ -3,24 +3,20 @@
 # 
 # Vivado(TM)
 # runme.sh: a Vivado-generated Runs Script for UNIX
-# Copyright 1986-1999, 2001-2012 Xilinx, Inc. All Rights Reserved.
+# Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
 # 
 
-echo "This script was generated under a different operating system."
-echo "Please update the PATH and LD_LIBRARY_PATH variables below, before executing this script"
-exit
-
 if [ -z "$PATH" ]; then
-  PATH=C:/Xilinx/14.3/ISE_DS/EDK/bin/nt;C:/Xilinx/14.3/ISE_DS/EDK/lib/nt;C:/Xilinx/14.3/ISE_DS/ISE/bin/nt;C:/Xilinx/14.3/ISE_DS/ISE/lib/nt;C:/Xilinx/14.3/ISE_DS/common/bin/nt;C:/Xilinx/14.3/ISE_DS/common/lib/nt:C:/Xilinx/Vivado/2012.3/bin
+  PATH=/opt/Xilinx/SDK/2013.2/bin/lin64:/opt/Xilinx/Vivado/2013.2/ids_lite/EDK/bin/lin64:/opt/Xilinx/Vivado/2013.2/ids_lite/ISE/bin/lin64:/opt/Xilinx/Vivado/2013.2/bin
 else
-  PATH=C:/Xilinx/14.3/ISE_DS/EDK/bin/nt;C:/Xilinx/14.3/ISE_DS/EDK/lib/nt;C:/Xilinx/14.3/ISE_DS/ISE/bin/nt;C:/Xilinx/14.3/ISE_DS/ISE/lib/nt;C:/Xilinx/14.3/ISE_DS/common/bin/nt;C:/Xilinx/14.3/ISE_DS/common/lib/nt:C:/Xilinx/Vivado/2012.3/bin:$PATH
+  PATH=/opt/Xilinx/SDK/2013.2/bin/lin64:/opt/Xilinx/Vivado/2013.2/ids_lite/EDK/bin/lin64:/opt/Xilinx/Vivado/2013.2/ids_lite/ISE/bin/lin64:/opt/Xilinx/Vivado/2013.2/bin:$PATH
 fi
 export PATH
 
 if [ -z "$LD_LIBRARY_PATH" ]; then
-  LD_LIBRARY_PATH=
+  LD_LIBRARY_PATH=/opt/Xilinx/Vivado/2013.2/ids_lite/EDK/lib/lin64:/opt/Xilinx/Vivado/2013.2/ids_lite/ISE/lib/lin64
 else
-  LD_LIBRARY_PATH=:$LD_LIBRARY_PATH
+  LD_LIBRARY_PATH=/opt/Xilinx/Vivado/2013.2/ids_lite/EDK/lib/lin64:/opt/Xilinx/Vivado/2013.2/ids_lite/ISE/lib/lin64:$LD_LIBRARY_PATH
 fi
 export LD_LIBRARY_PATH
 
@@ -40,4 +36,4 @@ EAStep()
      fi
 }
 
-EAStep vivado -log top_test.rds -m32 -mode batch -messageDb vivado.pb -source top_test.tcl
+EAStep vivado -log top_test.rds -m64 -mode batch -messageDb vivado.pb -source top_test.tcl

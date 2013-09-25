@@ -1,50 +1,56 @@
 #-----------------------------------------------------------
-# Vivado v2012.3
-# Build 209282 by xbuild on Thu Oct 18 20:54:02 MDT 2012
-# Start of session at: Tue Sep 24 17:51:10 2013
-# Process ID: 8512
-# Log file: C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.runs/synth_1/top_test.rds
-# Journal file: C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.runs/synth_1\vivado.jou
+# Vivado v2013.2 (64-bit)
+# Build 272601 by xbuild on Sat Jun 15 11:11:11 MDT 2013
+# Start of session at: Tue Sep 24 19:36:07 2013
+# Process ID: 6903
+# Log file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/synth_1/top_test.rds
+# Journal file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.runs/synth_1/vivado.jou
 #-----------------------------------------------------------
+INFO: [Common 17-78] Attempting to get a license: Implementation
 INFO: [Common 17-81] Feature available: Implementation
+INFO: [Common 17-78] Attempting to get a license: Synthesis
 INFO: [Common 17-81] Feature available: Synthesis
-INFO: [Device 21-36] Loading parts and site information from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/arch.xml
-Parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
-Finished parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+INFO: [Device 21-36] Loading parts and site information from /opt/Xilinx/Vivado/2013.2/data/parts/arch.xml
+Parsing RTL primitives file [/opt/Xilinx/Vivado/2013.2/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+Finished parsing RTL primitives file [/opt/Xilinx/Vivado/2013.2/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+INFO: [Common 17-362] Using Tcl App repository from '/opt/Xilinx/Vivado/2013.2/data/XilinxTclStore'.
+INFO: [Common 17-364] Updating Tcl app persistent manifest '/root/.Xilinx/Vivado/tclapp/manifest.tcl'
 source top_test.tcl
-# create_project -in_memory
-# set_property part xc7vx485tffg1761-2 [current_project]
+# set_param gui.test TreeTableDev
+# create_project -in_memory -part xc7vx485tffg1761-2
+# set_property board xilinx.com:virtex7:vc707:a [current_project]
 # set_param project.compositeFile.enableAutoGeneration 0
 # read_verilog -sv {
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv
 # }
 # read_verilog {
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v
-#   C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v
+#   /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v
 # }
-# read_edif C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc
-# read_edif C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc
-# read_xdc C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc
-# set_property used_in_implementation false [get_files C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
+# read_edif /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc
+# read_edif /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc
+# read_xdc /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc
+# set_property used_in_implementation false [get_files /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
 # set_param synth.vivado.isSynthRun true
-# set_property webtalk.parent_dir C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.data/wt [current_project]
-# set_property parent.project_dir C:/work/psx_synthesis/hdmi_test_v5 [current_project]
+# set_property webtalk.parent_dir /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.data/wt [current_project]
+# set_property parent.project_dir /work/team_psx/labs/lab2_sound/hdmi_test_v5 [current_project]
 # synth_design -top top_test -part xc7vx485tffg1761-2
+Command: synth_design -top top_test -part xc7vx485tffg1761-2
 
 Starting synthesis...
 
 INFO: [Common 17-347] Attempting to get a license for feature 'Synthesis' and/or device 'xc7vx485t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7vx485t'
-Using Xilinx IP in: C:/Xilinx/14.3/ISE_DS/ISE/coregen/ip/xilinx/primary/com/xilinx/ip
-WARNING: [Synth 8-1630] assignment to input RESET [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:33]
-starting Rtl Elaboration : Time (s): elapsed = 00:00:06 . Memory (MB): peak = 215.770 ; gain = 66.125
-INFO: [Synth 8-638] synthesizing module 'top_test' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:6]
-INFO: [Synth 8-638] synthesizing module 'IBUFDS' [C:/Xilinx/14.3/ISE_DS/PlanAhead/scripts/rt/data/unisim_comp.v:10834]
+Xilinx IP preload is disabled
+WARNING: [Synth 8-1630] assignment to input RESET [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:33]
+starting Rtl Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 188.785 ; gain = 72.312
+INFO: [Synth 8-638] synthesizing module 'top_test' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:6]
+INFO: [Synth 8-638] synthesizing module 'IBUFDS' [/opt/Xilinx/Vivado/2013.2/scripts/rt/data/unisim_comp.v:6074]
 	Parameter CAPACITANCE bound to: DONT_CARE - type: string 
 	Parameter DIFF_TERM bound to: TRUE - type: string 
 	Parameter DQS_BIAS bound to: FALSE - type: string 
@@ -52,179 +58,275 @@ INFO: [Synth 8-638] synthesizing module 'IBUFDS' [C:/Xilinx/14.3/ISE_DS/PlanAhea
 	Parameter IBUF_LOW_PWR bound to: TRUE - type: string 
 	Parameter IFD_DELAY_VALUE bound to: AUTO - type: string 
 	Parameter IOSTANDARD bound to: DEFAULT - type: string 
-INFO: [Synth 8-256] done synthesizing module 'IBUFDS' (1#15) [C:/Xilinx/14.3/ISE_DS/PlanAhead/scripts/rt/data/unisim_comp.v:10834]
-INFO: [Synth 8-638] synthesizing module 'hdmi' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv:23]
-INFO: [Synth 8-638] synthesizing module 'iic_config' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:33]
+INFO: [Synth 8-256] done synthesizing module 'IBUFDS' (1#15) [/opt/Xilinx/Vivado/2013.2/scripts/rt/data/unisim_comp.v:6074]
+INFO: [Synth 8-638] synthesizing module 'hdmi' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv:23]
+INFO: [Synth 8-638] synthesizing module 'iic_config' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:33]
 	Parameter CLK_RATE_MHZ bound to: 200 - type: integer 
 	Parameter SCK_PERIOD_US bound to: 30 - type: integer 
 	Parameter TRANSITION_CYCLE bound to: 3000 - type: integer 
 	Parameter TRANSITION_CYCLE_MSB bound to: 11 - type: integer 
-INFO: [Synth 8-226] default block is never used [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:451]
-INFO: [Synth 8-256] done synthesizing module 'iic_config' (2#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:33]
-INFO: [Synth 8-638] synthesizing module 'video' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:1]
-INFO: [Synth 8-638] synthesizing module 'counter' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
+	Parameter SWITCH_ADDR bound to: 7'b1110100 
+	Parameter SWITCH_DATA bound to: 8'b00100000 
+	Parameter SLAVE_ADDR bound to: 7'b0111001 
+	Parameter START_BIT bound to: 1'b1 
+	Parameter ACK bound to: 1'b1 
+	Parameter WRITE bound to: 1'b0 
+	Parameter STOP_BIT bound to: 1'b0 
+	Parameter SDA_BUFFER_MSB bound to: 27 - type: integer 
+	Parameter SDA_BUFFER_SW bound to: 18 - type: integer 
+	Parameter ADDR_00 bound to: 8'b01000001 
+	Parameter ADDR_01 bound to: 8'b00001011 
+	Parameter ADDR_02 bound to: 8'b00010100 
+	Parameter ADDR_03 bound to: 8'b00010101 
+	Parameter ADDR_04 bound to: 8'b00010110 
+	Parameter ADDR_05 bound to: 8'b00010111 
+	Parameter ADDR_06 bound to: 8'b00111100 
+	Parameter ADDR_07 bound to: 8'b00001010 
+	Parameter ADDR_08 bound to: 8'b01010101 
+	Parameter ADDR_09 bound to: 8'b01110011 
+	Parameter ADDR_10 bound to: 8'b10011101 
+	Parameter ADDR_11 bound to: 8'b10101111 
+	Parameter ADDR_12 bound to: 8'b11010111 
+	Parameter ADDR_13 bound to: 8'b11011000 
+	Parameter ADDR_14 bound to: 8'b11011001 
+	Parameter ADDR_15 bound to: 8'b11011010 
+	Parameter ADDR_16 bound to: 8'b11011011 
+	Parameter ADDR_17 bound to: 8'b11111001 
+	Parameter DATA_00 bound to: 8'b00010000 
+	Parameter DATA_01 bound to: 8'b11000111 
+	Parameter DATA_02 bound to: 8'b00000010 
+	Parameter DATA_03 bound to: 8'b00000000 
+	Parameter DATA_04 bound to: 8'b00110010 
+	Parameter DATA_05 bound to: 8'b01100000 
+	Parameter DATA_06 bound to: 8'b00000010 
+	Parameter DATA_07 bound to: 8'b00010000 
+	Parameter DATA_08 bound to: 8'b00000000 
+	Parameter DATA_09 bound to: 8'b00000001 
+	Parameter DATA_10 bound to: 8'b01100000 
+	Parameter DATA_11 bound to: 8'b00000110 
+	Parameter DATA_12 bound to: 8'b00000100 
+	Parameter DATA_13 bound to: 8'b00000011 
+	Parameter DATA_14 bound to: 8'b11100000 
+	Parameter DATA_15 bound to: 8'b00100100 
+	Parameter DATA_16 bound to: 8'b00000110 
+	Parameter DATA_17 bound to: 8'b00000000 
+	Parameter ADDR_18 bound to: 8'b00111011 
+	Parameter ADDR_19 bound to: 8'b01000100 
+	Parameter ADDR_20 bound to: 8'b01001000 
+	Parameter ADDR_21 bound to: 8'b10010100 
+	Parameter ADDR_22 bound to: 8'b10010110 
+	Parameter ADDR_23 bound to: 8'b10011000 
+	Parameter ADDR_24 bound to: 8'b10011001 
+	Parameter ADDR_25 bound to: 8'b10011010 
+	Parameter ADDR_26 bound to: 8'b10011011 
+	Parameter ADDR_27 bound to: 8'b10011100 
+	Parameter ADDR_28 bound to: 8'b10011111 
+	Parameter ADDR_29 bound to: 8'b10100001 
+	Parameter ADDR_30 bound to: 8'b10100010 
+	Parameter ADDR_31 bound to: 8'b10100011 
+	Parameter ADDR_32 bound to: 8'b10100100 
+	Parameter ADDR_33 bound to: 8'b10100101 
+	Parameter ADDR_34 bound to: 8'b10100110 
+	Parameter ADDR_35 bound to: 8'b10100111 
+	Parameter ADDR_36 bound to: 8'b10101000 
+	Parameter ADDR_37 bound to: 8'b10101001 
+	Parameter ADDR_38 bound to: 8'b10101010 
+	Parameter ADDR_39 bound to: 8'b10101011 
+	Parameter ADDR_40 bound to: 8'b10111001 
+	Parameter ADDR_41 bound to: 8'b10111010 
+	Parameter ADDR_42 bound to: 8'b10111011 
+	Parameter ADDR_43 bound to: 8'b11000111 
+	Parameter ADDR_44 bound to: 8'b11001101 
+	Parameter ADDR_45 bound to: 8'b11001110 
+	Parameter ADDR_46 bound to: 8'b11001111 
+	Parameter ADDR_47 bound to: 8'b11010000 
+	Parameter ADDR_48 bound to: 8'b11010001 
+	Parameter ADDR_49 bound to: 8'b11010010 
+	Parameter ADDR_50 bound to: 8'b11010011 
+	Parameter ADDR_51 bound to: 8'b11010100 
+	Parameter ADDR_52 bound to: 8'b11010101 
+	Parameter ADDR_53 bound to: 8'b11010110 
+	Parameter ADDR_54 bound to: 8'b11011100 
+	Parameter ADDR_55 bound to: 8'b11011101 
+	Parameter ADDR_56 bound to: 8'b11011110 
+	Parameter ADDR_57 bound to: 8'b11011111 
+	Parameter ADDR_58 bound to: 8'b11100000 
+	Parameter ADDR_59 bound to: 8'b11100010 
+	Parameter ADDR_60 bound to: 8'b11100011 
+	Parameter ADDR_61 bound to: 8'b11100100 
+	Parameter ADDR_62 bound to: 8'b11111010 
+	Parameter DATA_18 bound to: 8'b11100000 
+	Parameter DATA_19 bound to: 8'b00000000 
+	Parameter DATA_20 bound to: 8'b00000000 
+	Parameter DATA_21 bound to: 8'b11000000 
+	Parameter DATA_22 bound to: 8'b00000000 
+	Parameter DATA_23 bound to: 8'b00000011 
+	Parameter DATA_24 bound to: 8'b00000010 
+	Parameter DATA_25 bound to: 8'b11100000 
+	Parameter DATA_26 bound to: 8'b00011000 
+	Parameter DATA_27 bound to: 8'b00110000 
+	Parameter DATA_28 bound to: 8'b00000000 
+	Parameter DATA_29 bound to: 8'b00000000 
+	Parameter DATA_30 bound to: 8'b10100100 
+	Parameter DATA_31 bound to: 8'b10100100 
+	Parameter DATA_32 bound to: 8'b00001000 
+	Parameter DATA_33 bound to: 8'b00000100 
+	Parameter DATA_34 bound to: 8'b00000000 
+	Parameter DATA_35 bound to: 8'b00000000 
+	Parameter DATA_36 bound to: 8'b00000000 
+	Parameter DATA_37 bound to: 8'b00000000 
+	Parameter DATA_38 bound to: 8'b00000000 
+	Parameter DATA_39 bound to: 8'b01000000 
+	Parameter DATA_40 bound to: 8'b00000000 
+	Parameter DATA_41 bound to: 8'b00010000 
+	Parameter DATA_42 bound to: 8'b00000000 
+	Parameter DATA_43 bound to: 8'b00000000 
+	Parameter DATA_44 bound to: 8'b00000000 
+	Parameter DATA_45 bound to: 8'b00000001 
+	Parameter DATA_46 bound to: 8'b00000100 
+	Parameter DATA_47 bound to: 8'b00111100 
+	Parameter DATA_48 bound to: 8'b11111111 
+	Parameter DATA_49 bound to: 8'b10000000 
+	Parameter DATA_50 bound to: 8'b10000000 
+	Parameter DATA_51 bound to: 8'b10000000 
+	Parameter DATA_52 bound to: 8'b00000000 
+	Parameter DATA_53 bound to: 8'b00000000 
+	Parameter DATA_54 bound to: 8'b00000000 
+	Parameter DATA_55 bound to: 8'b00000000 
+	Parameter DATA_56 bound to: 8'b00010000 
+	Parameter DATA_57 bound to: 8'b00000001 
+	Parameter DATA_58 bound to: 8'b00111100 
+	Parameter DATA_59 bound to: 8'b00000000 
+	Parameter DATA_60 bound to: 8'b00000000 
+	Parameter DATA_61 bound to: 8'b01100000 
+	Parameter DATA_62 bound to: 8'b00000000 
+INFO: [Synth 8-226] default block is never used [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:452]
+INFO: [Synth 8-2943] unable to generate logic for unpartitioned construct node [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:210]
+INFO: [Synth 8-2943] unable to generate logic for unpartitioned construct node [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:221]
+INFO: [Synth 8-256] done synthesizing module 'iic_config' (2#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:33]
+INFO: [Synth 8-638] synthesizing module 'video' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:1]
+INFO: [Synth 8-638] synthesizing module 'counter' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
 	Parameter WIDTH bound to: 121 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'counter__parameterized0' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
+INFO: [Synth 8-256] done synthesizing module 'counter' (3#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
+INFO: [Synth 8-638] synthesizing module 'counter__parameterized0' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
 	Parameter WIDTH bound to: 36 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter__parameterized0' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'counter__parameterized1' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
+INFO: [Synth 8-256] done synthesizing module 'counter__parameterized0' (3#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
+INFO: [Synth 8-638] synthesizing module 'counter__parameterized1' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
 	Parameter WIDTH bound to: 720 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter__parameterized1' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'counter__parameterized2' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
+INFO: [Synth 8-256] done synthesizing module 'counter__parameterized1' (3#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
+INFO: [Synth 8-638] synthesizing module 'counter__parameterized2' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
 	Parameter WIDTH bound to: 480 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter__parameterized2' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'register' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:203]
+INFO: [Synth 8-256] done synthesizing module 'counter__parameterized2' (3#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:191]
+INFO: [Synth 8-638] synthesizing module 'register' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:231]
 	Parameter WIDTH bound to: 36 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'register' (4#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:203]
-INFO: [Synth 8-638] synthesizing module 'video_fsm' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:66]
-INFO: [Synth 8-155] case statement is not full and has no default [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:105]
-INFO: [Synth 8-155] case statement is not full and has no default [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:141]
-INFO: [Synth 8-256] done synthesizing module 'video_fsm' (5#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:66]
-INFO: [Synth 8-638] synthesizing module 'pixel_clock' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:181]
-INFO: [Synth 8-256] done synthesizing module 'pixel_clock' (6#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:181]
-INFO: [Synth 8-256] done synthesizing module 'video' (7#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:1]
-INFO: [Synth 8-638] synthesizing module 'spdif' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:25]
+INFO: [Synth 8-256] done synthesizing module 'register' (4#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:231]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:42]
+INFO: [Synth 8-638] synthesizing module 'video_fsm' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:66]
+INFO: [Synth 8-155] case statement is not full and has no default [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:158]
+INFO: [Synth 8-256] done synthesizing module 'video_fsm' (5#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:66]
+INFO: [Synth 8-638] synthesizing module 'pixel_clock' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:209]
+INFO: [Synth 8-256] done synthesizing module 'pixel_clock' (6#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:209]
+INFO: [Synth 8-256] done synthesizing module 'video' (7#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:1]
+INFO: [Synth 8-638] synthesizing module 'spdif' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:25]
 	Parameter PREAMBLE_B_0 bound to: 8'b11101000 
 	Parameter PREAMBLE_B_1 bound to: 8'b00010111 
 	Parameter PREAMBLE_M_0 bound to: 8'b11100010 
 	Parameter PREAMBLE_M_1 bound to: 8'b00011101 
 	Parameter PREAMBLE_W_0 bound to: 8'b11100100 
 	Parameter PREAMBLE_W_1 bound to: 8'b00011011 
-INFO: [Synth 8-638] synthesizing module 'bmc' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:196]
-INFO: [Synth 8-256] done synthesizing module 'bmc' (8#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:196]
-INFO: [Synth 8-256] done synthesizing module 'spdif' (9#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:25]
-INFO: [Synth 8-256] done synthesizing module 'hdmi' (10#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv:23]
-INFO: [Synth 8-638] synthesizing module 'hdmi_test_feeder' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:24]
-INFO: [Synth 8-638] synthesizing module 'hdmi_test_sender' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:61]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:182]
+INFO: [Synth 8-638] synthesizing module 'bmc' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:196]
+INFO: [Synth 8-256] done synthesizing module 'bmc' (8#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:196]
+INFO: [Synth 8-256] done synthesizing module 'spdif' (9#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:25]
+INFO: [Synth 8-256] done synthesizing module 'hdmi' (10#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv:23]
+INFO: [Synth 8-638] synthesizing module 'hdmi_test_feeder' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:24]
+INFO: [Synth 8-638] synthesizing module 'hdmi_test_sender' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:61]
 	Parameter ADDR_SIZE bound to: 19 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'hdmi_test_sender' (11#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:61]
-INFO: [Synth 8-256] done synthesizing module 'hdmi_test_feeder' (12#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:24]
-INFO: [Synth 8-638] synthesizing module 'hdmi_icon' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v:21]
-INFO: [Synth 8-256] done synthesizing module 'hdmi_icon' (13#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v:21]
-INFO: [Synth 8-638] synthesizing module 'chipscope_ila' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v:21]
-INFO: [Synth 8-256] done synthesizing module 'chipscope_ila' (14#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v:21]
-INFO: [Synth 8-256] done synthesizing module 'top_test' (15#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:6]
-finished Rtl Elaboration : Time (s): elapsed = 00:00:19 . Memory (MB): peak = 499.129 ; gain = 349.484
+INFO: [Synth 8-155] case statement is not full and has no default [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:98]
+INFO: [Synth 8-256] done synthesizing module 'hdmi_test_sender' (11#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:61]
+INFO: [Synth 8-3876] $readmem data file 'audio_mem.hex' is read successfully [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:49]
+INFO: [Synth 8-256] done synthesizing module 'hdmi_test_feeder' (12#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:24]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:82]
+INFO: [Synth 8-638] synthesizing module 'hdmi_icon' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v:21]
+INFO: [Synth 8-256] done synthesizing module 'hdmi_icon' (13#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v:21]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:84]
+INFO: [Synth 8-638] synthesizing module 'chipscope_ila' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v:21]
+INFO: [Synth 8-256] done synthesizing module 'chipscope_ila' (14#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v:21]
+WARNING: [Synth 8-3848] Net rst in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_data[9:8] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_data[49:46] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_data[127:54] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_trig[9:8] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_trig[49:46] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_trig[63:54] in module/entity top_test does not have driver.
+INFO: [Synth 8-256] done synthesizing module 'top_test' (15#15) [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:6]
+finished Rtl Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 508.551 ; gain = 392.078
+Start RTL Optimization : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 508.551 ; gain = 392.078
 Report Check Netlist: 
 -----+-----------------+------+--------+------+-----------------
      |Item             |Errors|Warnings|Status|Description      
 -----+-----------------+------+--------+------+-----------------
 1    |multi_driven_nets|     0|       0|Passed|Multi driven nets
 -----+-----------------+------+--------+------+-----------------
-Reading core file 'C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc' for (cell view 'hdmi_icon', library 'work', file 'NOFILE')
-Parsing EDIF File [./.ngc2edfcache/hdmi_icon_ngc_52517d23.edif]
-Finished Parsing EDIF File [./.ngc2edfcache/hdmi_icon_ngc_52517d23.edif]
-Reading core file 'C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc' for (cell view 'chipscope_ila', library 'work', file 'NOFILE')
-Parsing EDIF File [./.ngc2edfcache/chipscope_ila_ngc_52517d23.edif]
-Finished Parsing EDIF File [./.ngc2edfcache/chipscope_ila_ngc_52517d23.edif]
-INFO: [Netlist 29-17] Analyzing 986 Unisim elements for replacement
+INFO: [Netlist 29-17] Analyzing 1 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
-Loading clock regions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockRegion.xml
-Loading clock buffers from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockBuffers.xml
-Loading clock placement rules from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/virtex7/ClockPlacerRules.xml
-Loading package pin functions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/PinFunctions.xml...
-Loading package from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ffg1761/Package.xml
-Loading io standards from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/IOStandards.xml
-Loading device configuration modes from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/ConfigModes.xml
-Loading list of drcs for the architecture : C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/drc.xml
+Loading clock regions from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/virtex7/xc7vx485t/ClockRegion.xml
+Loading clock buffers from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/virtex7/xc7vx485t/ClockBuffers.xml
+Loading clock placement rules from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/ClockPlacerRules.xml
+Loading package pin functions from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/PinFunctions.xml...
+Loading package from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/virtex7/xc7vx485t/ffg1761/Package.xml
+Loading io standards from /opt/Xilinx/Vivado/2013.2/data/./parts/xilinx/virtex7/IOStandards.xml
+Loading device configuration modes from /opt/Xilinx/Vivado/2013.2/data/parts/xilinx/virtex7/ConfigModes.xml
+INFO: [Common 17-78] Attempting to get a license: Internal_bitstream
+WARNING: [Common 17-301] Failed to get a license: Internal_bitstream
 
 Processing XDC Constraints
-Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
-Finished Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Parsing XDC File [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
+Finished Parsing XDC File [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]
+INFO: [Project 1-258] One or more synthesis constraints were not read correctly while reading constraint file [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc]. These constraints will be passed to synthesis. Check the synthesis log file to verify that they were applied correctly.  
 Completed Processing XDC Constraints
 
 INFO: [Project 1-111] Unisim Transformation Summary:
-  A total of 986 instances were transformed.
-  FD => FDCE: 321 instances
-  FDC => FDCE: 9 instances
-  FDE => FDCE: 32 instances
-  FDP => FDPE: 66 instances
-  FDR => FDRE: 60 instances
-  FDS => FDSE: 10 instances
-  LDC => LDCE: 1 instances
-  MUXCY_L => MUXCY: 98 instances
-  MUXF5 => LUT3: 2 instances
-  MUXF6 => LUT3: 1 instances
-  RAMB36 => RAMB36E1: 258 instances
-  SRL16 => SRL16E: 128 instances
+No Unisim elements were transformed.
 
-Phase 0 | Netlist Checksum: 9d567800
-Using Xilinx IP in: C:/Xilinx/14.3/ISE_DS/ISE/coregen/ip/xilinx/primary/com/xilinx/ip
-WARNING: [Synth 8-1630] assignment to input RESET [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:33]
-starting synthesize : Time (s): elapsed = 00:00:46 . Memory (MB): peak = 644.863 ; gain = 495.219
-INFO: [Synth 8-638] synthesizing module 'top_test' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:6]
-INFO: [Synth 8-638] synthesizing module 'IBUFDS' [C:/Xilinx/14.3/ISE_DS/PlanAhead/scripts/rt/data/unisim_comp.v:10834]
-	Parameter CAPACITANCE bound to: DONT_CARE - type: string 
-	Parameter DIFF_TERM bound to: TRUE - type: string 
-	Parameter DQS_BIAS bound to: FALSE - type: string 
-	Parameter IBUF_DELAY_VALUE bound to: 0 - type: string 
-	Parameter IBUF_LOW_PWR bound to: TRUE - type: string 
-	Parameter IFD_DELAY_VALUE bound to: AUTO - type: string 
-	Parameter IOSTANDARD bound to: DEFAULT - type: string 
-INFO: [Synth 8-256] done synthesizing module 'IBUFDS' (1#15) [C:/Xilinx/14.3/ISE_DS/PlanAhead/scripts/rt/data/unisim_comp.v:10834]
-INFO: [Synth 8-638] synthesizing module 'hdmi' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv:23]
-INFO: [Synth 8-638] synthesizing module 'iic_config' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:33]
-	Parameter CLK_RATE_MHZ bound to: 200 - type: integer 
-	Parameter SCK_PERIOD_US bound to: 30 - type: integer 
-	Parameter TRANSITION_CYCLE bound to: 3000 - type: integer 
-	Parameter TRANSITION_CYCLE_MSB bound to: 11 - type: integer 
-INFO: [Synth 8-226] default block is never used [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:451]
-INFO: [Synth 8-256] done synthesizing module 'iic_config' (2#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv:33]
-INFO: [Synth 8-638] synthesizing module 'video' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:1]
-INFO: [Synth 8-638] synthesizing module 'counter' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-	Parameter WIDTH bound to: 121 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'counter__parameterized0' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-	Parameter WIDTH bound to: 36 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter__parameterized0' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'counter__parameterized1' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-	Parameter WIDTH bound to: 720 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter__parameterized1' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'counter__parameterized2' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-	Parameter WIDTH bound to: 480 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'counter__parameterized2' (3#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:163]
-INFO: [Synth 8-638] synthesizing module 'register' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:203]
-	Parameter WIDTH bound to: 36 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'register' (4#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:203]
-INFO: [Synth 8-638] synthesizing module 'video_fsm' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:66]
-INFO: [Synth 8-155] case statement is not full and has no default [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:105]
-INFO: [Synth 8-155] case statement is not full and has no default [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:141]
-INFO: [Synth 8-256] done synthesizing module 'video_fsm' (5#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:66]
-INFO: [Synth 8-638] synthesizing module 'pixel_clock' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:181]
-INFO: [Synth 8-256] done synthesizing module 'pixel_clock' (6#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:181]
-INFO: [Synth 8-256] done synthesizing module 'video' (7#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv:1]
-INFO: [Synth 8-638] synthesizing module 'spdif' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:25]
-	Parameter PREAMBLE_B_0 bound to: 8'b11101000 
-	Parameter PREAMBLE_B_1 bound to: 8'b00010111 
-	Parameter PREAMBLE_M_0 bound to: 8'b11100010 
-	Parameter PREAMBLE_M_1 bound to: 8'b00011101 
-	Parameter PREAMBLE_W_0 bound to: 8'b11100100 
-	Parameter PREAMBLE_W_1 bound to: 8'b00011011 
-INFO: [Synth 8-638] synthesizing module 'bmc' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:196]
-INFO: [Synth 8-256] done synthesizing module 'bmc' (8#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:196]
-INFO: [Synth 8-3845] merging register 'clr_capture_reg' into 'preamble_reg' in module 'spdif' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:106]
-INFO: [Synth 8-256] done synthesizing module 'spdif' (9#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:25]
-INFO: [Synth 8-256] done synthesizing module 'hdmi' (10#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv:23]
-INFO: [Synth 8-638] synthesizing module 'hdmi_test_feeder' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:24]
-INFO: [Synth 8-638] synthesizing module 'hdmi_test_sender' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:61]
-	Parameter ADDR_SIZE bound to: 19 - type: integer 
-INFO: [Synth 8-256] done synthesizing module 'hdmi_test_sender' (11#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:61]
-INFO: [Synth 8-256] done synthesizing module 'hdmi_test_feeder' (12#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv:24]
-INFO: [Synth 8-638] synthesizing module 'hdmi_icon' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v:21]
-INFO: [Synth 8-256] done synthesizing module 'hdmi_icon' (13#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v:21]
-INFO: [Synth 8-638] synthesizing module 'chipscope_ila' [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v:21]
-INFO: [Synth 8-256] done synthesizing module 'chipscope_ila' (14#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v:21]
-INFO: [Synth 8-256] done synthesizing module 'top_test' (15#15) [C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv:6]
-finished synthesize : Time (s): elapsed = 00:02:56 . Memory (MB): peak = 974.402 ; gain = 824.758
+Phase 0 | Netlist Checksum: adadfcc0
+Xilinx IP preload is disabled
+Start RTL Optimization : Time (s): cpu = 00:00:26 ; elapsed = 00:00:27 . Memory (MB): peak = 1183.293 ; gain = 1066.820
 
 ---------------------------------------------------------------------------------
 Applying 'set_property' XDC Constraints...
 ---------------------------------------------------------------------------------
+WARNING: set_property IOSTANDARD could not find object (constraint file  /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc, line 96).
+WARNING: set_property IOSTANDARD could not find object (constraint file  /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc, line 97).
+WARNING: set_property PACKAGE_PIN could not find object (constraint file  /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc, line 100).
+WARNING: set_property PACKAGE_PIN could not find object (constraint file  /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/constrs_1/new/top_test.xdc, line 101).
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): elapsed = 00:02:56 . Memory (MB): peak = 974.402 ; gain = 824.758
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:27 ; elapsed = 00:00:28 . Memory (MB): peak = 1183.293 ; gain = 1066.820
 ---------------------------------------------------------------------------------
 
+---------------------------------------------------------------------------------
+Finished Compilation : Time (s): cpu = 00:00:27 ; elapsed = 00:00:28 . Memory (MB): peak = 1183.293 ; gain = 1066.820
+---------------------------------------------------------------------------------
+
+INFO: [Synth 8-802] inferred FSM for state register 'curr_state_reg' in module 'iic_config'
+INFO: [Synth 8-3888] merging register 'clr_capture_reg' into 'preamble_reg' in module 'spdif' [/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv:106]
+INFO: [Synth 8-3354] encoded FSM with state register 'curr_state_reg' using encoding 'one-hot' in module 'iic_config'
+WARNING: [Synth 8-3848] Net rst in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_data[9:8] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_data[49:46] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_data[127:54] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_trig[9:8] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_trig[49:46] in module/entity top_test does not have driver.
+WARNING: [Synth 8-3848] Net ila_trig[63:54] in module/entity top_test does not have driver.
+Report RTL Partitions: 
+-----+---------------------+-----------+---------
+     |RTL Partition        |Replication|Instances
+-----+---------------------+-----------+---------
+1    |rom                  |          1|   262128
+2    |hdmi_test_feeder__GB1|          1|      482
+3    |top_test__GC0        |          1|     3417
+-----+---------------------+-----------+---------
 
 ---------------------------------------------------------------------------------
 Loading Part and Timing Information
@@ -234,7 +336,7 @@ Part Resources:
 DSPs: 2800 (col length:140)
 BRAMs: 2060 (col length: RAMB8 0 RAMB16 0 RAMB18 140 RAMB36 70)
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): elapsed = 00:03:12 . Memory (MB): peak = 974.402 ; gain = 824.758
+Finished Loading Part and Timing Information : Time (s): cpu = 00:01:23 ; elapsed = 00:01:24 . Memory (MB): peak = 1478.875 ; gain = 1362.402
 ---------------------------------------------------------------------------------
 
 
@@ -243,15 +345,13 @@ RTL Component Statistics
 ---------------------------------------------------------------------------------
 Detailed RTL Component Info : 
 +---Adders : 
-	   2 Input     32 Bit       Adders := 1     
-	   2 Input     19 Bit       Adders := 2     
 	   2 Input     12 Bit       Adders := 1     
 	   2 Input     11 Bit       Adders := 1     
 	   2 Input     10 Bit       Adders := 1     
 	   2 Input      9 Bit       Adders := 1     
 	   2 Input      8 Bit       Adders := 1     
 	   2 Input      7 Bit       Adders := 1     
-	   2 Input      6 Bit       Adders := 4     
+	   2 Input      6 Bit       Adders := 2     
 	   2 Input      5 Bit       Adders := 1     
 	   2 Input      2 Bit       Adders := 1     
 +---XORs : 
@@ -259,9 +359,8 @@ Detailed RTL Component Info :
 +---Registers : 
 	               38 Bit    Registers := 1     
 	               36 Bit    Registers := 1     
-	               32 Bit    Registers := 3     
+	               32 Bit    Registers := 2     
 	               28 Bit    Registers := 1     
-	               19 Bit    Registers := 2     
 	               16 Bit    Registers := 1     
 	               12 Bit    Registers := 1     
 	               11 Bit    Registers := 1     
@@ -269,101 +368,299 @@ Detailed RTL Component Info :
 	                9 Bit    Registers := 1     
 	                8 Bit    Registers := 1     
 	                7 Bit    Registers := 1     
-	                6 Bit    Registers := 4     
+	                6 Bit    Registers := 2     
 	                5 Bit    Registers := 1     
-	                3 Bit    Registers := 1     
 	                2 Bit    Registers := 3     
 	                1 Bit    Registers := 18    
 +---Muxes : 
 	   2 Input     38 Bit        Muxes := 1     
 	   3 Input     32 Bit        Muxes := 2     
-	  64 Input     28 Bit        Muxes := 1     
 	   2 Input     28 Bit        Muxes := 1     
-	500001 Input     16 Bit        Muxes := 1     
-	   2 Input     12 Bit        Muxes := 1     
+	   2 Input     12 Bit        Muxes := 2     
+	   2 Input      9 Bit        Muxes := 1     
 	   2 Input      8 Bit        Muxes := 5     
-	   2 Input      6 Bit        Muxes := 2     
+	   8 Input      8 Bit        Muxes := 1     
+	   2 Input      6 Bit        Muxes := 1     
 	   2 Input      5 Bit        Muxes := 1     
-	   2 Input      3 Bit        Muxes := 5     
 	   8 Input      3 Bit        Muxes := 1     
+	   9 Input      3 Bit        Muxes := 2     
+	   2 Input      3 Bit        Muxes := 6     
 	   4 Input      2 Bit        Muxes := 2     
-	   2 Input      2 Bit        Muxes := 3     
-	   2 Input      1 Bit        Muxes := 40    
-	   4 Input      1 Bit        Muxes := 12    
+	   2 Input      2 Bit        Muxes := 4     
 	   3 Input      1 Bit        Muxes := 5     
+	   2 Input      1 Bit        Muxes := 40    
+	   4 Input      1 Bit        Muxes := 13    
 
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
 ---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
-Start Cross Boundary Optimization
+RTL Hierarchical Component Statistics 
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[0] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[1] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[2] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[3] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[4] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[5] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[6] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[7] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[8] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[9] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[10] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[11] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[12] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[13] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[14] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[15] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[16] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[17] ) is unused and will be removed from module counter__5.
-INFO: [Synth 8-3332] Sequential element (\video_sender/addr_reg[18] ) is unused and will be removed from module counter__5.
+Hierarchical RTL Component report 
+Module top_test 
+Detailed RTL Component Info : 
+Module hdmi_test_sender__1 
+Detailed RTL Component Info : 
++---Registers : 
+	               32 Bit    Registers := 1     
++---Muxes : 
+	   3 Input     32 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+	   3 Input      1 Bit        Muxes := 2     
+Module iic_config 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     12 Bit       Adders := 1     
+	   2 Input      6 Bit       Adders := 1     
++---Registers : 
+	               28 Bit    Registers := 1     
+	               12 Bit    Registers := 1     
+	                6 Bit    Registers := 1     
+	                1 Bit    Registers := 6     
++---Muxes : 
+	   2 Input     28 Bit        Muxes := 1     
+	   2 Input     12 Bit        Muxes := 2     
+	   8 Input      8 Bit        Muxes := 1     
+	   9 Input      3 Bit        Muxes := 2     
+	   2 Input      3 Bit        Muxes := 6     
+	   8 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 2     
+	   3 Input      1 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 10    
+Module counter__parameterized2 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     10 Bit       Adders := 1     
++---Registers : 
+	               10 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module register 
+Detailed RTL Component Info : 
++---Registers : 
+	               36 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module video 
+Detailed RTL Component Info : 
++---Registers : 
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 2     
+Module hdmi_test_sender 
+Detailed RTL Component Info : 
++---Registers : 
+	               32 Bit    Registers := 1     
++---Muxes : 
+	   3 Input     32 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+	   3 Input      1 Bit        Muxes := 2     
+Module counter 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      8 Bit       Adders := 1     
++---Registers : 
+	                8 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module bmc 
+Detailed RTL Component Info : 
++---Registers : 
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 4     
+Module counter__parameterized1 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     11 Bit       Adders := 1     
++---Registers : 
+	               11 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module hdmi_test_feeder 
+Detailed RTL Component Info : 
+Module counter__parameterized0 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      7 Bit       Adders := 1     
++---Registers : 
+	                7 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 1     
+Module spdif 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      9 Bit       Adders := 1     
+	   2 Input      6 Bit       Adders := 1     
+	   2 Input      5 Bit       Adders := 1     
++---XORs : 
+	               16 Bit    Wide XORs := 1     
++---Registers : 
+	               38 Bit    Registers := 1     
+	               16 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
+	                6 Bit    Registers := 1     
+	                5 Bit    Registers := 1     
+	                1 Bit    Registers := 7     
++---Muxes : 
+	   2 Input     38 Bit        Muxes := 1     
+	   2 Input      9 Bit        Muxes := 1     
+	   2 Input      8 Bit        Muxes := 5     
+	   2 Input      6 Bit        Muxes := 1     
+	   2 Input      5 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 10    
+Module video_fsm 
+Detailed RTL Component Info : 
++---Registers : 
+	                2 Bit    Registers := 2     
++---Muxes : 
+	   4 Input      2 Bit        Muxes := 2     
+	   2 Input      2 Bit        Muxes := 1     
+	   4 Input      1 Bit        Muxes := 13    
+	   2 Input      1 Bit        Muxes := 6     
+Module hdmi 
+Detailed RTL Component Info : 
+Module pixel_clock 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input      2 Bit       Adders := 1     
++---Registers : 
+	                2 Bit    Registers := 1     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+
 ---------------------------------------------------------------------------------
-Finished Cross Boundary Optimization : Time (s): elapsed = 00:03:13 . Memory (MB): peak = 974.402 ; gain = 824.758
+Finished RTL Component Statistics
 ---------------------------------------------------------------------------------
 
+---------------------------------------------------------------------------------
+Start Cross Boundary Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[0] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[1] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[2] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[3] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[4] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[5] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[6] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[7] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[8] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[9] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[10] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[11] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[12] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[13] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[14] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[15] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[16] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[17] ) is unused and will be removed from module counter__5.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/addr_reg[18] ) is unused and will be removed from module counter__5.
+---------------------------------------------------------------------------------
+Finished Cross Boundary Optimization : Time (s): cpu = 00:01:24 ; elapsed = 00:01:25 . Memory (MB): peak = 1478.875 ; gain = 1362.402
+---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Start RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
 Start Area Optimization
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_0/\hdmi0/iic_config0/SDA_BUFFER_reg[0] )
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (i_0/\hdmi0/video0/pixel_reg/out_reg[27] )
-INFO: [Synth 8-3332] Sequential element (\hdmi0/iic_config0/SDA_BUFFER_reg[0] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[34] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[33] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[32] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[31] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[30] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[29] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[28] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[27] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[26] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[25] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[24] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[23] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[22] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[21] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[20] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[19] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[18] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[17] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[16] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[15] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[14] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[13] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[12] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[11] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[10] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[9] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[8] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[7] ) is unused and will be removed from module top_test__GC0.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[6] ) is unused and will be removed from module top_test__GC0.
-INFO: [Common 17-14] Message 'Synth 8-3332' appears 50 times and further instances of the messages will be disabled. Use the Tcl command set_msg_limit to change the current settings.
-INFO: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[5] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/iic_config0/SDA_BUFFER_reg[0] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[34] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[33] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[32] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[31] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[30] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[29] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[28] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[27] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[26] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[25] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[24] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[23] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[22] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[21] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[20] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[19] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[18] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[17] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[16] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[15] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[14] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[13] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[12] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[11] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[10] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[9] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[8] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[7] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[6] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[5] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[4] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[3] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[2] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[1] ) is unused and will be removed from module top_test__GC0.
+WARNING: [Synth 8-3332] Sequential element (\hdmi0/video0/pixel_reg/out_reg[0] ) is unused and will be removed from module top_test__GC0.
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (feeder0i_2/\audio_sender/state_reg[1] )
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (feeder0i_2/\video_sender/state_reg[1] )
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[31] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[30] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[29] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[28] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[27] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[26] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[25] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[24] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[23] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[22] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[21] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[20] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[19] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[18] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[17] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[16] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[15] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[14] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[13] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[12] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[11] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[10] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[9] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[8] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[7] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[6] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[5] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[4] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[3] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[2] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\video_sender/state_reg[1] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[31] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[30] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[29] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[28] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[27] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[26] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[25] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[24] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[23] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[22] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[21] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[20] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[19] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+WARNING: [Synth 8-3332] Sequential element (\audio_sender/state_reg[18] ) is unused and will be removed from module hdmi_test_feeder__GB1.
+INFO: [Common 17-14] Message 'Synth 8-3332' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_limit to change the current settings.
 ---------------------------------------------------------------------------------
-Finished Area Optimization : Time (s): elapsed = 00:04:00 . Memory (MB): peak = 1028.121 ; gain = 878.477
+Finished Area Optimization : Time (s): cpu = 00:07:56 ; elapsed = 00:07:59 . Memory (MB): peak = 2703.520 ; gain = 2587.047
 ---------------------------------------------------------------------------------
 
 
@@ -375,21 +672,24 @@ Start Timing Optimization
 Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): elapsed = 00:04:02 . Memory (MB): peak = 1028.121 ; gain = 878.477
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:07:58 ; elapsed = 00:08:01 . Memory (MB): peak = 2703.520 ; gain = 2587.047
 ---------------------------------------------------------------------------------
 
 info: start optimizing sub-critical range ...
 info: done optimizing sub-critical range.
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): elapsed = 00:04:04 . Memory (MB): peak = 1028.121 ; gain = 878.477
+Finished Timing Optimization : Time (s): cpu = 00:07:58 ; elapsed = 00:08:01 . Memory (MB): peak = 2703.520 ; gain = 2587.047
 ---------------------------------------------------------------------------------
 
 
 ---------------------------------------------------------------------------------
 Start Technology Mapping
 ---------------------------------------------------------------------------------
+Start control sets optimization
+INFO: [Synth 8-4428] Reached the limit for maximum flops that can be modified (20). You can increase this by setting the parameter controlSetsOptMaxFlops
+Finished control sets optimization. Modified 16 flops. Number of control sets: before: 21 after: 14
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): elapsed = 00:04:30 . Memory (MB): peak = 1028.121 ; gain = 878.477
+Finished Technology Mapping : Time (s): cpu = 00:08:20 ; elapsed = 00:08:23 . Memory (MB): peak = 2705.645 ; gain = 2589.172
 ---------------------------------------------------------------------------------
 
 
@@ -412,8 +712,72 @@ Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[127]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[126]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[125]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[124]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[123]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[122]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[121]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[120]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[119]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[118]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[117]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[116]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[115]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[114]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[113]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[112]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[111]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[110]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[109]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[108]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[107]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[106]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[105]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[104]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[103]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[102]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[101]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[100]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[99]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[98]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[97]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[96]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[95]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[94]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[93]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[92]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[91]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[90]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[89]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[88]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[87]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[86]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[85]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[84]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[83]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[82]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[81]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[80]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[79]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[78]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[77]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[76]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[75]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[74]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[73]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[72]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[71]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[70]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[69]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[68]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[67]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[66]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[65]
+WARNING: [Synth 8-4442] BlackBox module ila has unconnected pin DATA[64]
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): elapsed = 00:04:37 . Memory (MB): peak = 1028.121 ; gain = 878.477
+Finished IO Insertion : Time (s): cpu = 00:08:26 ; elapsed = 00:08:29 . Memory (MB): peak = 2705.645 ; gain = 2589.172
 ---------------------------------------------------------------------------------
 
 Report Check Netlist: 
@@ -426,14 +790,24 @@ Report Check Netlist:
 ---------------------------------------------------------------------------------
 Start renaming generated instances
 ---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:08:26 ; elapsed = 00:08:29 . Memory (MB): peak = 2705.645 ; gain = 2589.172
+---------------------------------------------------------------------------------
+
 
 ---------------------------------------------------------------------------------
 Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): elapsed = 00:05:11 . Memory (MB): peak = 1028.121 ; gain = 878.477
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:08:41 ; elapsed = 00:08:44 . Memory (MB): peak = 2705.645 ; gain = 2589.172
 ---------------------------------------------------------------------------------
 
+---------------------------------------------------------------------------------
+Start RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------
 Writing Synthesis Report
@@ -451,66 +825,66 @@ Report Cell Usage:
 -----+-------------+-----
 1    |chipscope_ila|    1
 2    |hdmi_icon    |    1
-3    |BUFG         |    2
-4    |CARRY4       |   17
-5    |LUT1         |   72
-6    |LUT2         |   43
-7    |LUT3         |  103
-8    |LUT4         |  244
-9    |LUT5         | 1476
-10   |LUT6         |76610
-11   |MUXF7        | 7787
-12   |MUXF8        | 2925
-13   |XORCY        |    1
-14   |FDC          |   32
-15   |FDCE         |  581
-16   |FDP          |    6
-17   |FDPE         |    9
-18   |IBUF         |    1
-19   |IBUFDS       |    1
-20   |OBUF         |   48
+3    |BUFG         |    3
+4    |CARRY4       |   20
+5    |LUT1         |   67
+6    |LUT2         |   67
+7    |LUT3         |   68
+8    |LUT4         |  266
+9    |LUT5         | 1328
+10   |LUT6         |67713
+11   |MUXF7        |29785
+12   |MUXF8        | 7960
+13   |FDCE         |  601
+14   |FDPE         |   15
+15   |IBUF         |    1
+16   |IBUFDS       |    1
+17   |OBUF         |   46
 -----+-------------+-----
 Report Instance Areas: 
------+-------------------+-----------------------+-----
-     |Instance           |Module                 |Cells
------+-------------------+-----------------------+-----
-1    |top                |                       |89958
-2    |  hdmi0            |hdmi                   |  527
-3    |    spdif0         |spdif                  |  166
-4    |      bmc0         |bmc                    |    6
-5    |    iic_config0    |iic_config             |  239
-6    |    video0         |video                  |  122
-7    |      vblank_count |counter__parameterized0|   19
-8    |      v_pixel_count|counter__parameterized2|   24
-9    |      h_pixel_count|counter__parameterized1|   27
-10   |      fsm          |video_fsm              |   17
-11   |      hblank_count |counter                |   24
-12   |      pclk         |pixel_clock            |    6
-13   |      pixel_reg    |register               |    1
-14   |  feeder0          |hdmi_test_feeder       |89379
-15   |    video_sender   |hdmi_test_sender       |    2
-16   |    audio_sender   |hdmi_test_sender_0     |28833
------+-------------------+-----------------------+-----
+-----+-------------------+-----------------------+------
+     |Instance           |Module                 |Cells 
+-----+-------------------+-----------------------+------
+1    |top                |                       |107941
+2    |  hdmi0            |hdmi                   |   558
+3    |    spdif0         |spdif                  |   169
+4    |      bmc0         |bmc                    |     7
+5    |    iic_config0    |iic_config             |   266
+6    |    video0         |video                  |   123
+7    |      vblank_count |counter__parameterized0|    18
+8    |      v_pixel_count|counter__parameterized2|    25
+9    |      h_pixel_count|counter__parameterized1|    26
+10   |      fsm          |video_fsm              |    22
+11   |      hblank_count |counter                |    20
+12   |      pclk         |pixel_clock            |     6
+13   |      pixel_reg    |register               |     1
+14   |  feeder0          |hdmi_test_feeder       |107332
+15   |    audio_sender   |hdmi_test_sender       | 46785
+16   |    video_sender   |hdmi_test_sender_0     |     3
+-----+-------------------+-----------------------+------
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): elapsed = 00:05:11 . Memory (MB): peak = 1028.121 ; gain = 878.477
+Finished Writing Synthesis Report : Time (s): cpu = 00:09:19 ; elapsed = 00:09:23 . Memory (MB): peak = 2705.645 ; gain = 2589.172
 ---------------------------------------------------------------------------------
 
-Synthesis Optimization Complete: Time (s): elapsed = 00:05:10 . Memory (MB): peak = 1028.121 ; gain = 835.305
-Reading core file 'C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc' for (cell view 'hdmi_icon', library 'work', file 'NOFILE')
-Parsing EDIF File [./.ngc2edfcache/hdmi_icon_ngc_52517d23.edif]
-Finished Parsing EDIF File [./.ngc2edfcache/hdmi_icon_ngc_52517d23.edif]
-Reading core file 'C:/work/psx_synthesis/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc' for (cell view 'chipscope_ila', library 'work', file 'NOFILE')
-Parsing EDIF File [./.ngc2edfcache/chipscope_ila_ngc_52517d23.edif]
-Finished Parsing EDIF File [./.ngc2edfcache/chipscope_ila_ngc_52517d23.edif]
-INFO: [Netlist 29-17] Analyzing 1024 Unisim elements for replacement
-INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+Synthesis finished with 0 errors, 0 critical warnings and 188 warnings.
+Synthesis Optimization Complete : Time (s): cpu = 00:09:19 ; elapsed = 00:09:23 . Memory (MB): peak = 2705.645 ; gain = 2589.172
+Reading core file '/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc' for (cell view 'hdmi_icon', library 'work')
+Parsing EDIF File [./.ngc2edfcache/hdmi_icon_ngc_700d698.edif]
+Finished Parsing EDIF File [./.ngc2edfcache/hdmi_icon_ngc_700d698.edif]
+Reading core file '/work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc' for (cell view 'chipscope_ila', library 'work')
+Parsing EDIF File [./.ngc2edfcache/chipscope_ila_ngc_700d698.edif]
+Finished Parsing EDIF File [./.ngc2edfcache/chipscope_ila_ngc_700d698.edif]
+INFO: [Netlist 29-17] Analyzing 988 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 1 CPU seconds
+INFO: [Project 1-479] Netlist was created with Xilinx ngc2edif P.68d
+INFO: [Opt 31-138] Pushed 0 inverter(s).
 INFO: [Project 1-111] Unisim Transformation Summary:
-  A total of 964 instances were transformed.
-  (MUXCY,XORCY) => CARRY4: 31 instances
+  A total of 925 instances were transformed.
+  (MUXCY,XORCY) => CARRY4: 30 instances
   FD => FDCE: 321 instances
-  FDC => FDCE: 41 instances
+  FDC => FDCE: 9 instances
   FDE => FDCE: 32 instances
-  FDP => FDPE: 72 instances
+  FDP => FDPE: 66 instances
   FDR => FDRE: 60 instances
   FDS => FDSE: 10 instances
   INV => LUT1: 6 instances
@@ -521,10 +895,11 @@ INFO: [Project 1-111] Unisim Transformation Summary:
   SRL16 => SRL16E: 128 instances
   SRLC16E => SRL16E: 1 instances
 
-Phase 0 | Netlist Checksum: 926262d1
-INFO: [Common 17-83] Releasing license: Synthesis
-synth_design: Time (s): elapsed = 00:05:44 . Memory (MB): peak = 1028.121 ; gain = 835.305
+Phase 0 | Netlist Checksum: c148b6e4
+63 Infos, 184 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:09:45 ; elapsed = 00:09:49 . Memory (MB): peak = 2705.645 ; gain = 2551.945
 # write_checkpoint top_test.dcp
-# report_utilization -file top_test_utilization_synth.rpt
-report_utilization: Time (s): elapsed = 00:00:00.216j½öè§è§àÍòx‘) . Memory (MB): peak = 1028.121 ; gain = 0.000
-INFO: [Common 17-206] Exiting Vivado at Tue Sep 24 17:57:01 2013...
+# report_utilization -file top_test_utilization_synth.rpt -pb top_test_utilization_synth.pb
+report_utilization: Time (s): cpu = 00:00:00.65 ; elapsed = 00:00:00.73 . Memory (MB): peak = 2705.645 ; gain = 0.000
+INFO: [Common 17-206] Exiting Vivado at Tue Sep 24 19:46:04 2013...

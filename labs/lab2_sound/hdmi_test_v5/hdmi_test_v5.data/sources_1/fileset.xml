@@ -1,50 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DARoots Version="1" Minor="26">
+<DARoots Version="1" Minor="30">
   <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/video.sv">
       <FileInfo>
-        <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/video.sv"/>
-        <Attr Name="ImportTime" Val="1379954018"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../../psx/hdmi/video.sv"/>
+        <Attr Name="ImportTime" Val="1380063140"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/spdif.sv">
       <FileInfo>
-        <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv"/>
-        <Attr Name="ImportTime" Val="1379808242"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../../psx/hdmi/spdif.sv"/>
+        <Attr Name="ImportTime" Val="1380063140"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/iic_config.sv">
       <FileInfo>
-        <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/iic_config.sv"/>
-        <Attr Name="ImportTime" Val="1379971159"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../../psx/hdmi/iic_config.sv"/>
+        <Attr Name="ImportTime" Val="1380064788"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/hdmi.sv">
       <FileInfo>
-        <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/hdmi.sv"/>
-        <Attr Name="ImportTime" Val="1379808242"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../../psx/hdmi/hdmi.sv"/>
+        <Attr Name="ImportTime" Val="1380063140"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/feed.sv">
       <FileInfo>
-        <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/feed.sv"/>
-        <Attr Name="ImportTime" Val="1379888945"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../../psx/hdmi/feed.sv"/>
+        <Attr Name="ImportTime" Val="1380063140"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/chipscope_1/hdmi_icon.v">
@@ -54,6 +69,9 @@
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/chipscope_1/hdmi_icon.ngc">
@@ -62,6 +80,9 @@
         <Attr Name="ImportTime" Val="1379898362"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/chipscope_1/chipscope_ila.v">
@@ -71,6 +92,9 @@
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/chipscope_1/chipscope_ila.ngc">
@@ -79,34 +103,54 @@
         <Attr Name="ImportTime" Val="1379898799"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/top_test.sv">
       <FileInfo>
-        <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/top_test.sv"/>
-        <Attr Name="ImportTime" Val="1379888945"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../../psx/hdmi/top_test.sv"/>
+        <Attr Name="ImportTime" Val="1380064788"/>
         <Attr Name="UsedInSynthesis" Val="1"/>
         <Attr Name="UsedInImplementation" Val="1"/>
         <Attr Name="UsedInSimulation" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/audio_mem.hex">
       <FileInfo>
         <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/audio_mem.hex"/>
         <Attr Name="ImportTime" Val="1379704454"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/spdif.sv.back">
       <FileInfo>
         <Attr Name="ImportPath" Val="$PPRDIR/../../../Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv.back"/>
         <Attr Name="ImportTime" Val="1379515707"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
       </FileInfo>
     </File>
     <File Path="$PDATADIR/sources_1/ports.xml">
-      <FileInfo SFType="PortsDb"/>
+      <FileInfo SFType="PortsDb">
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
     </File>
     <File Path="$PDATADIR/sources_1/chipscope.xml">
-      <FileInfo SFType="ChipscopeDb"/>
+      <FileInfo SFType="ChipscopeDb">
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
     </File>
     <Config>
       <Option Name="DesignMode" Val="RTL"/>

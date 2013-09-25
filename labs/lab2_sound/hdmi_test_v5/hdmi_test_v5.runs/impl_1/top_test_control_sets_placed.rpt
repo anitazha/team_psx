@@ -1,0 +1,117 @@
+Copyright 1986-1999, 2001-2013 Xilinx, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2013.2 (lin64) Build 272601 Sat Jun 15 11:11:11 MDT 2013
+| Date         : Tue Sep 24 19:52:55 2013
+| Host         : liberty.ece.cmu.edu running 64-bit Red Hat Enterprise Linux Server release 6.4 (Santiago)
+| Command      : report_control_sets -verbose -file top_test_control_sets_placed.rpt
+| Design       : top_test
+| Device       : xc7vx485t
+-----------------------------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Flip-Flop Distribution
+3. Detailed Control Set Information
+
+1. Summary
+----------
+
++-------------------------------------------------------------------+-------+
+|                               Status                              | Count |
++-------------------------------------------------------------------+-------+
+| Number of unique control sets                                     |    64 |
+| Minimum Number of register sites lost to control set restrictions |   286 |
++-------------------------------------------------------------------+-------+
+
+
+2. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |             322 |           86 |
+| No           | No                    | Yes                    |             117 |           60 |
+| No           | Yes                   | No                     |              86 |           37 |
+| Yes          | No                    | No                     |              17 |           21 |
+| Yes          | No                    | Yes                    |             574 |          374 |
+| Yes          | Yes                   | No                     |              86 |           25 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+3. Detailed Control Set Information
+-----------------------------------
+
++---------------------------------+--------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------+------------------+----------------+
+|           Clock Signal          |                               Enable Signal                              |                                        Set/Reset Signal                                       | Slice Load Count | Bel Load Count |
++---------------------------------+--------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------+------------------+----------------+
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[5]                                                                |                1 |              1 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[2]                                                                |                1 |              1 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_STAT/ACTRESET_pulse                                                    |                1 |              1 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[1]                                                                |                1 |              1 |
+|  icon/CONTROL0[13]              |                                                                          | ila/U0/I_YES_D.U_ILA/iARM                                                                     |                1 |              1 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_RST/U_ARM_XFER/iDIN[1]                                                 |                1 |              1 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_RST/U_HALT_XFER/iDIN[1]                                                |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[13]                                                        | ila/U0/I_YES_D.U_ILA/U_RST/U_HALT_XFER/iCLR                                                   |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[12]                                                        | ila/U0/I_YES_D.U_ILA/U_RST/U_ARM_XFER/iCLR                                                    |                1 |              1 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_STAT/U_DSL1/iDIN[1]                                                    |                1 |              1 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/WCNT_HCMP_CE                      | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/CMP_RESET                                              |                1 |              1 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/WCNT_LCMP_CE                      | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/CMP_RESET                                              |                1 |              1 |
+|  icon/U0/iUPDATE_OUT            |                                                                          | icon/U0/U_ICON/iSEL_n                                                                         |                1 |              1 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_RST/U_ARM_XFER/iDOUT                              | ila/U0/I_YES_D.U_ILA/U_RST/U_ARM_XFER/iCLR                                                    |                1 |              1 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_STAT/DSTAT_en_dly1                                | ila/U0/I_YES_D.U_ILA/U_STAT/U_DSL1/iCLR                                                       |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           |                                                                          | icon/CONTROL0[13]                                                                             |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           |                                                                          | ila/U0/I_YES_D.U_ILA/iARM                                                                     |                1 |              1 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_RST/U_HALT_XFER/iDOUT                             | ila/U0/I_YES_D.U_ILA/U_RST/U_HALT_XFER/iCLR                                                   |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           |                                                                          | ila/U0/I_YES_D.U_ILA/U_STAT/U_RESET_EDGE/iDOUT[0]                                             |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           | icon/U0/U_ICON/U_SYNC/iGOT_SYNC                                          | icon/U0/U_ICON/U_SYNC/iDATA_CMD_n                                                             |                1 |              1 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/SCNT_CMP_CE                       | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/CMP_RESET                                              |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[5]                                                         | ila/U0/I_YES_D.U_ILA/U_STAT/U_DSL1/iCLR                                                       |                1 |              1 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[6]                                                         |                                                                                               |                1 |              1 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[4]                                                                |                1 |              2 |
+|  clk_BUFG                       |                                                                          | hdmi0/iic_config0/n_0_SDA_out_reg_i_2                                                         |                1 |              2 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[7]                                                                |                1 |              2 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iARM                                                                     |                2 |              2 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_STAT/DSTAT_load                                   | ila/U0/I_YES_D.U_ILA/iARM                                                                     |                1 |              2 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_STAT/U_DSL1/iCLR                                                       |                1 |              2 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_RST/U_ARM_XFER/iCLR                                                    |                2 |              2 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_RST/U_HALT_XFER/iCLR                                                   |                1 |              2 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[8]                                                         |                                                                                               |                1 |              2 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[3]                                                                |                3 |              3 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[0]                                                                |                3 |              3 |
+|  n_0_HDMI_PXL_CLK_OBUF_inst_i_1 |                                                                          | RESET_IBUF                                                                                    |                2 |              4 |
+|  n_0_stored_data_reg[37]_i_3    |                                                                          | RESET_IBUF                                                                                    |                2 |              6 |
+|  icon/U0/U_ICON/iDRCK           |                                                                          |                                                                                               |                5 |              6 |
+|  icon/U0/U_ICON/iDRCK           |                                                                          | icon/U0/U_ICON/U_STAT/iSTATCMD_CE_n                                                           |                2 |              6 |
+|  n_0_HDMI_PXL_CLK_OBUF_inst_i_1 | hdmi0/video0/fsm/E[0]                                                    | RESET_IBUF                                                                                    |                3 |              7 |
+|  icon/U0/U_ICON/iDRCK           |                                                                          | icon/U0/U_ICON/U_SYNC/iDATA_CMD_n                                                             |                1 |              7 |
+|  n_0_HDMI_PXL_CLK_OBUF_inst_i_1 | hdmi0/video0/fsm/O9[0]                                                   | RESET_IBUF                                                                                    |                4 |              8 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/U_RST/PRE_RESET0                                                         |                4 |              8 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[6]                                                         | ila/U0/I_YES_D.U_ILA/U_CAPSTOR/I_CASE1.I_YES_TB.U_TRACE_BUFFER/I_SINGLE_ROW.U_RD_COL_ADDR/rst |                2 |              8 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[6]                                                         | icon/CONTROL0[14]                                                                             |                3 |              8 |
+|  n_0_stored_data_reg[37]_i_3    | hdmi0/spdif0/subframe_count0__0                                          | RESET_IBUF                                                                                    |                4 |              9 |
+|  n_0_HDMI_PXL_CLK_OBUF_inst_i_1 | hdmi0/video0/fsm/O7[0]                                                   | RESET_IBUF                                                                                    |                3 |             10 |
+|  icon/U0/U_ICON/iDRCK           | icon/U0/U_ICON/U_CMD/iTARGET_CE                                          | icon/U0/U_ICON/U_CMD/iSEL_n                                                                   |                3 |             10 |
+|  icon/U0/U_ICON/iDRCK           |                                                                          | ila/U0/I_YES_D.U_ILA/U_STAT/iSTATCMD_CE_n                                                     |                3 |             10 |
+|  n_0_HDMI_PXL_CLK_OBUF_inst_i_1 | hdmi0/video0/fsm/O5[0]                                                   | RESET_IBUF                                                                                    |                3 |             11 |
+|  clk_BUFG                       | hdmi0/spdif0/n_0_capture_data_reg[15]_i_1                                | RESET_IBUF                                                                                    |               10 |             16 |
+|  icon/U0/U_ICON/iDRCK           | ila/U0/I_YES_D.U_ILA/U_CAPSTOR/I_CASE1.I_YES_TB.U_TRACE_BUFFER/rd_row_en | icon/CONTROL0[14]                                                                             |                4 |             16 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[20]                                                        |                                                                                               |                4 |             16 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_STAT/NS_load                                      | ila/U0/I_YES_D.U_ILA/iARM                                                                     |                3 |             16 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/SCNT_CE                           | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/SCNT_RESET                                             |                4 |             16 |
+|  clk_BUFG                       | ila/U0/I_YES_D.U_ILA/U_G2_SQ.U_CAPCTRL/WCNT_CE                           | ila/U0/I_YES_D.U_ILA/iRESET[6]                                                                |                4 |             16 |
+|  clk_BUFG                       | hdmi0/iic_config0/n_0_SDA_BUFFER_reg[27]_i_1                             | RESET_IBUF                                                                                    |                5 |             27 |
+|  clk_BUFG                       | hdmi0/iic_config0/n_0_bit_count_reg[0]_i_1                               | hdmi0/iic_config0/n_0_bit_count_reg[0]_i_3                                                    |                9 |             32 |
+|  clk_BUFG                       |                                                                          | ila/U0/I_YES_D.U_ILA/iRESET[6]                                                                |               10 |             36 |
+|  n_0_stored_data_reg[37]_i_3    | hdmi0/spdif0/n_0_stored_data_reg[37]_i_1                                 | RESET_IBUF                                                                                    |               11 |             44 |
+|  clk_BUFG                       |                                                                          | RESET_IBUF                                                                                    |               21 |             46 |
+|  clk_BUFG                       |                                                                          | icon/CONTROL0[20]                                                                             |               25 |             48 |
+|  icon/U0/U_ICON/iDRCK           | icon/CONTROL0[9]                                                         |                                                                                               |               15 |             48 |
+|  clk_BUFG                       | hdmi0/iic_config0/O4                                                     | RESET_IBUF                                                                                    |              313 |            394 |
+|  clk_BUFG                       |                                                                          |                                                                                               |               81 |            444 |
++---------------------------------+--------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------+------------------+----------------+
+
+

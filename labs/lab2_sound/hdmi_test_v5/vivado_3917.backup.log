@@ -1,0 +1,50 @@
+#-----------------------------------------------------------
+# Vivado v2013.2 (64-bit)
+# Build 272601 by xbuild on Sat Jun 15 11:11:11 MDT 2013
+# Start of session at: Tue Sep 24 18:54:28 2013
+# Process ID: 3678
+# Log file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/vivado.log
+# Journal file: /work/team_psx/labs/lab2_sound/hdmi_test_v5/vivado.jou
+#-----------------------------------------------------------
+INFO: [Common 17-78] Attempting to get a license: Implementation
+INFO: [Common 17-81] Feature available: Implementation
+INFO: [Common 17-78] Attempting to get a license: Synthesis
+INFO: [Common 17-81] Feature available: Synthesis
+INFO: [Device 21-36] Loading parts and site information from /opt/Xilinx/Vivado/2013.2/data/parts/arch.xml
+Parsing RTL primitives file [/opt/Xilinx/Vivado/2013.2/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+Finished parsing RTL primitives file [/opt/Xilinx/Vivado/2013.2/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+INFO: [Common 17-362] Using Tcl App repository from '/opt/Xilinx/Vivado/2013.2/data/XilinxTclStore'.
+INFO: [Common 17-364] Updating Tcl app persistent manifest '/root/.Xilinx/Vivado/tclapp/manifest.tcl'
+start_gui
+open_project /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.xpr
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/video.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/iic_config.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/hdmi.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/feed.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/top_test.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/audio_mem.hex: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/audio_mem.hex'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv.back: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv.back'.
+Scanning sources...
+Finished scanning sources
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/video.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/video.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/iic_config.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/iic_config.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/hdmi.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/hdmi.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/feed.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/feed.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/hdmi_icon.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.v: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.v'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc: Could not find the file '/work/team_psx/labs/ipcores/chipscope_1/chipscope_ila.ngc'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/top_test.sv: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/top_test.sv'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/audio_mem.hex: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/audio_mem.hex'.
+Import path for source /work/team_psx/labs/lab2_sound/hdmi_test_v5/hdmi_test_v5.srcs/sources_1/imports/hdmi/spdif.sv.back: Could not find the file '/work/team_psx/Arnob Mallick/13 - Carnegie Mellon/2013-2014/18-545 - Adv Digital Design/team_psx/psx/hdmi/spdif.sv.back'.
+CRITICAL WARNING: [Board 49-35] Deprecated feature. Use board full name xilinx.com:virtex7:vc707:a instead of name vc707
+CRITICAL WARNING: [Board 49-35] Deprecated feature. Use board full name xilinx.com:virtex7:vc707:a instead of name vc707
+INFO: [Project 1-230] Project 'hdmi_test_v5.xpr' upgraded for this version of Vivado.
+exit
+INFO: [Common 17-206] Exiting Vivado at Tue Sep 24 18:57:19 2013...
