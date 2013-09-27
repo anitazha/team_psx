@@ -49,7 +49,6 @@ module vram(
 
       /* 24-bit addressing, not the same transform */
       if (mode[3]) begin
-	 vram_addr = {line, (col * 6)};
       end
       else begin
 	 vram_addr = {line, (col << mode)};
