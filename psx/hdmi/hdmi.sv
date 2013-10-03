@@ -41,9 +41,10 @@ module hdmi(
    assign audio_rdy = audio_mod_rdy & config_done;
    
    /* IIC Module */
-   iic_config iic_config0(.done(config_done),
+   i2c_config iic_config0(.done(config_done),
 			  .SDA(IIC_SDA),
 			  .SCL(IIC_SCL),
+			  .error(),
 			  .*);
 
    /* HDMI Video Module */

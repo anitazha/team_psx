@@ -64,18 +64,22 @@ typedef enum reg [5:0] {  STB_CYC,
 			  SWITCH_VERIFY,
 			  HDMI_VERIFY,
 			  HPD_VERIFY,
-			  IDLE,
-			  ERROR } iic_fsm_t;
+			  ERROR,
+			  IDLE } iic_fsm_t;
 
 
 
-module iic_config(input logic  clk,
+module i2c_config(input logic  clk,
 		  input logic  rst,
+		/*input logic  skip,*/
 		  inout logic  SDA,
 		  inout logic  SCL,
 		  output logic IIC_RST,
 		  output logic done,
-		  output logic [5:0] error);
+		  output logic error         /*,
+		  output logic [7:0] error_1,
+		  output logic [7:0] error_2,
+		  output logic [7:0] error_3 */);
 
    localparam  PRER_LO  = 8'h8F;
    localparam  PRER_HI  = 8'h01;
@@ -166,7 +170,7 @@ module iic_config(input logic  clk,
    
    /* CONFIGURATION REGISTERS */
    assign DATA[ 0] = 8'h10;     /* 00 - power on ADV7511 */
-   assign DATA[ 1] = 8'hC7;     /* 01 - */
+   assign DATA[ 1] = 8'hCE;     /* 01 - */
    assign DATA[ 2] = 8'h02;     /* 02 - 16-bit */
    assign DATA[ 3] = 8'h00;     /* 03 - 24-bit RGB 4:4:4 */
    assign DATA[ 4] = 8'h32;     /* 04 - color depth 8-bit, rising edge */
@@ -255,10 +259,8 @@ module iic_config(input logic  clk,
    reg 	       done_out;
    reg 	       switch_reset;
    reg [1:0]   count;
-   reg [5:0]   reg_count;
-   reg 	       reg_incr;
-   reg [5:0]   error_out;
-   reg 	       error_incr;
+   reg [5:0]   adv_reg, next_adv_reg;
+   reg [7:0]   error_out;
    
    /* state variables */
    iic_fsm_t   curr_state, next_state;
@@ -267,7 +269,11 @@ module iic_config(input logic  clk,
    /* outputs */
    assign IIC_RST = IIC_RST_out;
    assign done    = done_out;
+ 
    assign error   = error_out;   
+ /*assign error_1 = ADDR[adv_reg];
+   assign error_2 = DATA[adv_reg];
+   assign error_3 = wb_dat_o;*/
    
    /* setup tri-state buffers for SDA and SCL */
    assign SCL       = scl_padoen_o ? 1'bz : scl_pad_o;
@@ -297,7 +303,6 @@ module iic_config(input logic  clk,
 			   .sda_pad_i    (sda_pad_i),
 			   .sda_pad_o    (sda_pad_o),
 			   .sda_padoen_o (sda_padoen_o),
-			   .wb_tip_o     (tip_o),
 			   .*);
    
    
@@ -324,24 +329,21 @@ module iic_config(input logic  clk,
       end
    end
 
-   /* move to the next register if ready */
-   always @ (posedge clk, posedge rst) begin
-      if (rst) begin
-	 reg_count <= 5'd0;
-      end
-      else if (reg_incr) begin
-	 reg_count <= reg_count + 1;
-      end
-   end
-
-   always @ (posedge clk, posedge rst) begin
+ /*always @ (posedge clk, posedge rst) begin
       if (rst) begin
 	 error_out <= 0;
       end
-      else if (error_incr) begin
-	 error_out <= error_out + 1;
+      //else if (error_incr) begin
+	 //error_out <= error_out + 1;
+      //end
+      else if (curr_state == ERROR) begin
+	 //error_out <= wb_dat_o;
+	 
+	 error_out[5:0] <= adv_reg;
+	 error_out[6]   <= (curr_state == ERROR);
+	 error_out[7]   <= done;
       end
-   end
+   end*/
 
    /* FSM next state logic */
    always @ (posedge clk, posedge rst) begin
@@ -349,11 +351,13 @@ module iic_config(input logic  clk,
 	 curr_state <= STB_CYC;
 	 wb_adr_i   <= 3'b000;
 	 wb_dat_i   <= 8'b00000000;
+	 adv_reg    <= 6'b000000;
       end
       else begin
 	 curr_state <= next_state;
 	 wb_adr_i   <= next_wb_adr;
 	 wb_dat_i   <= next_wb_dat;
+	 adv_reg    <= next_adv_reg;
       end
    end
 
@@ -362,18 +366,17 @@ module iic_config(input logic  clk,
    /* FSM */
    always_comb begin
       /* Defaults */
-      next_state  = curr_state;
-      next_wb_adr = wb_adr_i;
-      next_wb_dat = wb_dat_i;
+      next_state   = curr_state;
+      next_wb_adr  = wb_adr_i;
+      next_wb_dat  = wb_dat_i;
+      next_adv_reg = adv_reg;
 
       wb_stb_i = 1'b1;
       wb_cyc_i = 1'b1;
       wb_we_i  = 1'b0;
-
-      reg_incr = 1'b0;
       
-      error_incr = 1'b0;
       done_out  = 1'b0;
+      error_out = 1'b0;
 
       case (curr_state)
 	/* prepare the core with correct clock and parameters */
@@ -682,7 +685,7 @@ module iic_config(input logic  clk,
 	      next_wb_dat = { HDMI_ADDR, WRITE };
 	   end
 
-	   else if (count == 0) begin
+	   else if (~wb_dat_o[7] && count == 0) begin
 	      next_state = CHECK_HPD_SI_1;
 	      next_wb_dat = { HDMI_ADDR, WRITE };
 	   end
@@ -695,25 +698,28 @@ module iic_config(input logic  clk,
 	/* confirm the write is same as read */
 	HDMI_VERIFY: begin
 	   /* check if data is correct */
-	   if (wb_dat_o == DATA[reg_count] && count == 0) begin
-	      next_state = SLAVE_INIT;
-	      next_wb_dat = { HDMI_ADDR, WRITE };
-	      reg_incr = 1'b1;
-	   end
-	   
-	   /* did not read correct data */
-	   else if (wb_dat_o != DATA[reg_count] && count == 0) begin
-	      //next_state = ERROR;
-	      next_state = SLAVE_INIT;
-	      next_wb_dat = { HDMI_ADDR, WRITE };
-	      reg_incr = 1'b1;
-	      error_incr = 1'b1;
-	   end
+	   if (count == 0) begin
+	      if (wb_dat_o == DATA[adv_reg]) begin
+		 next_wb_dat = { HDMI_ADDR, WRITE };
+		 next_state = SLAVE_INIT;
+	      end
+
+	      /* incorrect value */
+	      else begin
+		 if (adv_reg == 22 || adv_reg == 11) begin
+		    next_state = SLAVE_INIT;
+		    next_wb_dat = { HDMI_ADDR, WRITE };
+		 end
+		 else begin
+		    next_state = ERROR;
+		 end
+	      end
+	   end // if (count == 0)
 	end
 
 	SLAVE_INIT: begin
 	   /* done writing registers */
-	   if (reg_count == 63) begin
+	   if (adv_reg == 'd62) begin
 	      next_state = IDLE;
 	   end
 	   
@@ -723,6 +729,7 @@ module iic_config(input logic  clk,
 	      next_state = SLAVE_WAIT;
 	      next_wb_adr = 3'b100;
 	      next_wb_dat = 8'h90;  // set START and WR bits
+	      next_adv_reg = adv_reg + 1;
 	   end
 	end
 
@@ -744,7 +751,7 @@ module iic_config(input logic  clk,
 	   if (~wb_dat_o[7] && count == 0) begin
 	      next_state = ADDR_INIT;
 	      next_wb_adr = 3'b011;
-	      next_wb_dat = ADDR[reg_count];
+	      next_wb_dat = ADDR[adv_reg];
 	   end
 	end
 
@@ -776,7 +783,7 @@ module iic_config(input logic  clk,
 	   if (~wb_dat_o[7] && count == 0) begin
 	      next_state = DATA_INIT;
 	      next_wb_adr = 3'b011;
-	      next_wb_dat = DATA[reg_count];
+	      next_wb_dat = DATA[adv_reg];
 	   end
 	end
 
@@ -840,7 +847,7 @@ module iic_config(input logic  clk,
 	   if (~wb_dat_o[7] && count == 0) begin
 	      next_state = CHECK_HDMI_AI;
 	      next_wb_adr = 3'b011;
-	      next_wb_dat = ADDR[reg_count];
+	      next_wb_dat = ADDR[adv_reg];
 	   end
 	end
 
@@ -926,13 +933,16 @@ module iic_config(input logic  clk,
 /***********************************************************
  *                     END CONFIGURATION                   *
  ***********************************************************/ 
-
+	ERROR: begin
+	 /*if (skip && count == 0) begin
+	      next_state = SLAVE_INIT;
+	      next_wb_dat = { HDMI_ADDR, WRITE };
+	   end*/
+	   error_out = 1'b1;
+	end
+	
 	IDLE: begin
 	   done_out = 1'b1;
-	end
-
-	ERROR: begin
-	   // do nothing
 	end
 
 	default:
