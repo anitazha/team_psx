@@ -1,15 +1,22 @@
-`define HTOTAL    'd841 // width, in pixels (w/ porch and sync)
-`define VTOTAL    'd516 // height, in lines (w/ porch and sync)
-`define HSYNC_LEN 'd62  // hsync length in pixels
-`define VSYNC_LEN 'd6   // vsync length in lines
-`define HBP       'd105 // end of horizontal back porch (sync starts @ 0)
-`define HFP       'd825 // start of horizontal front porch
-`define VBP       'd27  // end of vertical back porch (sync starts @ 0)
-`define VFP       'd507 // start of vertical front porch
-`define HSYNC_ON  'd0   // asserted sync pulse -- used with SYNC_OFF
-`define HSYNC_OFF 'd1   // deasserted sync pulse
-`define VSYNC_ON  'd0   // asserted sync pulse -- used with SYNC_OFF
-`define VSYNC_OFF 'd1   // deasserted sync pulse
+/*       -----------------------------------
+ * |     |     .     Active Area      .     .
+ * |     |     .                      .     .
+ * -------     .                      .     .
+ *  HSYNC     HBP                    HFP    End
+ */
+
+`define HTOTAL    'd2592 // width, in pixels (w/ porch and sync)
+`define VTOTAL    'd1242 // height, in lines (w/ porch and sync)
+`define HSYNC_LEN 'd208  // hsync length in pixels
+`define VSYNC_LEN 'd3    // vsync length in lines
+`define HBP       'd544  // end of horizontal back porch (sync starts @ 0)
+`define HFP       'd2464 // start of horizontal front porch
+`define VBP       'd41   // end of vertical back porch (sync starts @ 0)
+`define VFP       'd1241 // start of vertical front porch
+`define HSYNC_ON  'd0    // asserted sync pulse -- used with SYNC_OFF
+`define HSYNC_OFF 'd1    // deasserted sync pulse
+`define VSYNC_ON  'd1    // asserted sync pulse -- used with SYNC_OFF
+`define VSYNC_OFF 'd0    // deasserted sync pulse
 
 module video(
     input  logic [23:0] data,
