@@ -1,0 +1,120 @@
+Clock Primitive Utilization
+--------------------------------------------------
+Type      Used      Available      Num Locked     
+--------------------------------------------------
+BUFG      2         32             0              
+BUFH      0         168            0              
+BUFIO     0         56             0              
+MMCM      0         14             0              
+BUFR      0         56             0              
+
+Details of Global Clocks
+--------------------------------------------------------------------------------------------------
+                                                     Num Loads  
+Index BUFG cell         Net Name                    BELs  Sites  Locked  MaxDelay (ns) Skew (ns)     
+--------------------------------------------------------------------------------------------------
+1     clk_BUFG_inst     clk_BUFG                       1      1    no       1.31    0.0782
+2     state_reg[0]_i_2  n_28392_state_reg[0]_i_2     620    360    no       2.09     0.923
+
+
+Details of Regional Clocks
+
+Details of Local Clocks
+
+Clock Regions : key resource utilizations
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Clock      Global
+Region Clock Networks     BUFRs    BUFIOs      MMCM       PLL        GT       PCI    ILOGIC    OLOGIC        FF          LUTM         RAMB36   DSP48E1  
+Name    Used Aval      Used Aval Used Aval Used Aval Used Aval Used Aval Used Aval Used Aval Used Aval   Used   Aval   Used   Aval   Used Aval Used Aval
+------------------------------------------------------------------------------------------------------------------------------------------------------
+X0Y0       1   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50    227  44000      0   8800    0   70    0  180
+X1Y0       1   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50     31  44800      0  10000    0   80    0  220
+X0Y1       1   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50    255  39200      0   8800    0   70    0  180
+X1Y1       1   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50    101  44800      0  10000    0   80    0  220
+X0Y2       1   12         0    4    0    4    0    1    0    1    0    0    0    1    0   50    0   50     85  38000      0   8600    0   65    0  180
+X1Y2       0   12         0    4    0    4    0    1    0    1    0    0    0    1    0   50    0   50      0  43600      0   9800    0   75    0  220
+X0Y3       0   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50      0  44000      0   8800    0   70    0  180
+X1Y3       1   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50      1  44800      0  10000    0   80    0  220
+X0Y4       0   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50      0  44000      0   8800    0   70    0  180
+X1Y4       0   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50      0  44800      0  10000    0   80    0  220
+X0Y5       0   12         0    4    0    4    0    1    0    1    0    0    0    1    0   50    0   50      0  42800      0   8600    0   65    0  180
+X1Y5       0   12         0    4    0    4    0    1    0    1    0    0    0    1    0   50    0   50      0  43600      0   9800    0   75    0  220
+X0Y6       0   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50      0  44000      0   8800    0   70    0  180
+X1Y6       0   12         0    4    0    4    0    1    0    1    0    0    0    0    0   50    0   50      0  44800      0  10000    0   80    0  220
+
+* RAMB36 site  can be used as two RAMB18/FIFO18 sites
+
+Net wise resources used in clock region X0Y0
+----------------------------------------------------------------------------------------------------
+                   MMCM  BRAM 
+ Src Type  Locked  Pins  Pins  ILOGICs OLOGICs  FFs   LUTMs  DSP48E1s PLLs Clock Net Name         
+----------------------------------------------------------------------------------------------------
+BUFG         no       0     0      0       0     169      0        0      0 n_28392_state_reg[0]_i_2
+
+Net wise resources used in clock region X1Y0
+----------------------------------------------------------------------------------------------------
+                   MMCM  BRAM 
+ Src Type  Locked  Pins  Pins  ILOGICs OLOGICs  FFs   LUTMs  DSP48E1s PLLs Clock Net Name         
+----------------------------------------------------------------------------------------------------
+BUFG         no       0     0      0       0       9      0        0      0 n_28392_state_reg[0]_i_2
+
+Net wise resources used in clock region X0Y1
+----------------------------------------------------------------------------------------------------
+                   MMCM  BRAM 
+ Src Type  Locked  Pins  Pins  ILOGICs OLOGICs  FFs   LUTMs  DSP48E1s PLLs Clock Net Name         
+----------------------------------------------------------------------------------------------------
+BUFG         no       0     0      0       0     255      0        0      0 n_28392_state_reg[0]_i_2
+
+Net wise resources used in clock region X1Y1
+----------------------------------------------------------------------------------------------------
+                   MMCM  BRAM 
+ Src Type  Locked  Pins  Pins  ILOGICs OLOGICs  FFs   LUTMs  DSP48E1s PLLs Clock Net Name         
+----------------------------------------------------------------------------------------------------
+BUFG         no       0     0      0       0     101      0        0      0 n_28392_state_reg[0]_i_2
+
+Net wise resources used in clock region X0Y2
+----------------------------------------------------------------------------------------------------
+                   MMCM  BRAM 
+ Src Type  Locked  Pins  Pins  ILOGICs OLOGICs  FFs   LUTMs  DSP48E1s PLLs Clock Net Name         
+----------------------------------------------------------------------------------------------------
+BUFG         no       0     0      0       0      85      0        0      0 n_28392_state_reg[0]_i_2
+
+Net wise resources used in clock region X1Y3
+-------------------------------------------------------------------------------------------
+                   MMCM  BRAM 
+ Src Type  Locked  Pins  Pins  ILOGICs OLOGICs  FFs   LUTMs  DSP48E1s PLLs Clock Net Name
+-------------------------------------------------------------------------------------------
+BUFG         no       0     0      0       0       1      0        0      0        clk_BUFG
+
+
+# Location of BUFG Primitives 
+set_property LOC BUFGCTRL_X0Y16 [get_cells clk_BUFG_inst]
+set_property LOC BUFGCTRL_X0Y0 [get_cells state_reg[0]_i_2]
+
+# Location of IO Clock Primitives
+
+# Location of MMCM Clock Primitives
+
+# Location of BUFH Clock Primitives
+
+# Location of BUFR Clock Primitives
+
+# Location of IO Primitives which is load of clock spine
+
+# Location of clock ports
+set_property LOC IOB_X1Y275 [get_ports SYSCLK_N]
+set_property LOC IOB_X1Y276 [get_ports SYSCLK_P]
+
+# Clock net "clk_BUFG" driven by instance "clk_BUFG_inst" located at site "BUFGCTRL_X0Y16"
+#startgroup
+create_pblock CLKAG_clk_BUFG
+add_cells_to_pblock [get_pblocks  CLKAG_clk_BUFG] [get_cells  -filter { IS_PRIMITIVE==1 } -of_object [get_pins -leaf -filter {DIRECTION==IN} -of_objects [get_nets  -hierarchical clk_BUFG]]]
+resize_pblock [get_pblocks CLKAG_clk_BUFG] -add {CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
+#endgroup
+
+# Clock net "n_28392_state_reg[0]_i_2" driven by instance "state_reg[0]_i_2" located at site "BUFGCTRL_X0Y0"
+#startgroup
+create_pblock CLKAG_n_28392_state_reg[0]_i_2
+add_cells_to_pblock [get_pblocks  CLKAG_n_28392_state_reg[0]_i_2] [get_cells  -filter { IS_PRIMITIVE==1 } -of_object [get_pins -leaf -filter {DIRECTION==IN} -of_objects [get_nets  -hierarchical n_28392_state_reg[0]_i_2]]]
+resize_pblock [get_pblocks CLKAG_n_28392_state_reg[0]_i_2] -add {CLOCKREGION_X0Y0:CLOCKREGION_X0Y0 CLOCKREGION_X1Y0:CLOCKREGION_X1Y0 CLOCKREGION_X0Y1:CLOCKREGION_X0Y1 CLOCKREGION_X1Y1:CLOCKREGION_X1Y1 CLOCKREGION_X0Y2:CLOCKREGION_X0Y2 CLOCKREGION_X1Y3:CLOCKREGION_X1Y3}
+#endgroup

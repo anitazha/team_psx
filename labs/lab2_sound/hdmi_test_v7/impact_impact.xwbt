@@ -1,0 +1,8 @@
+INTSTYLE=impact
+INFILE=C:\work\psx_synthesis\hdmi_test_v7\impact.xsl
+OUTFILE=C:\work\psx_synthesis\hdmi_test_v7\impact.xsl
+FAMILY=None
+PART=None
+WORKINGDIR=C:\work\psx_synthesis\hdmi_test_v7
+LICENSE=iMPACT
+USER_INFO=iMPACT

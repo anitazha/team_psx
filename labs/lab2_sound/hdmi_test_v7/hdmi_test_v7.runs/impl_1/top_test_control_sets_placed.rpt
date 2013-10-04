@@ -1,0 +1,32 @@
+Control Set Information: 
+Number of unique control sets: 25
+Minimum Number of register sites lost to control set restrictions: 97
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Clock Signal                        | Enable Signal                                                                         | Set/Reset Signal        | Slice Load Count   | Bel Load Count |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| hdmi0/video0/pixel_clk/O1           | hdmi0/video0/fsm/n_28392_curr_state_reg[0]_i_1                                        | n_28392_RESET_IBUF_inst | 1                  | 1
+| clk_BUFG                            |                                                                                       | n_28392_RESET_IBUF_inst | 1                  | 1
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/O2                                                                  | n_28392_RESET_IBUF_inst | 1                  | 1
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/O4                                                                  | n_28392_RESET_IBUF_inst | 1                  | 1
+| hdmi0/spdif0/n_28392_clk_5_6MHz_reg | hdmi0/spdif0/capture_valid                                                            | n_28392_RESET_IBUF_inst | 2                  | 2
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/n_28392_wb_adr_i_reg[2]_i_1                                         | n_28392_RESET_IBUF_inst | 2                  | 3
+| hdmi0/spdif0/n_28392_clk_5_6MHz_reg |                                                                                       | n_28392_RESET_IBUF_inst | 2                  | 4
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/i2c_core/byte_controller/bit_controller/n_28392_fSDA_reg[2]_i_1     | n_28392_RESET_IBUF_inst | 3                  | 6
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/n_28392_curr_state_reg[5]_i_1                                       | n_28392_RESET_IBUF_inst | 4                  | 6
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/n_28392_adv_reg_reg[5]_i_1                                          | n_28392_RESET_IBUF_inst | 3                  | 6
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/i2c_core/byte_controller/n_28392_core_cmd_reg[3]_i_1                | n_28392_RESET_IBUF_inst | 3                  | 7
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/i2c_core/n_28392_ctr_reg[7]_i_1                                     | n_28392_RESET_IBUF_inst | 4                  | 8
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/i2c_core/n_28392_txr_reg[7]_i_1                                     | n_28392_RESET_IBUF_inst | 4                  | 8
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/n_28392_wb_dat_i_reg[7]_i_1                                         | n_28392_RESET_IBUF_inst | 5                  | 8
+| hdmi0/spdif0/n_28392_clk_5_6MHz_reg | hdmi0/spdif0/n_28392_subframe_count_reg[8]_i_1                                        | n_28392_RESET_IBUF_inst | 3                  | 9
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/i2c_core/byte_controller/n_28392_sr_reg[7]_i_1                      | n_28392_RESET_IBUF_inst | 4                  | 11
+| n_28392_state_reg[0]_i_2            |                                                                                       |                         | 8                  | 11
+| hdmi0/video0/pixel_clk/O1           | hdmi0/video0/h_count/O1                                                               | n_28392_RESET_IBUF_inst | 4                  | 11
+| hdmi0/video0/pixel_clk/O1           |                                                                                       | n_28392_RESET_IBUF_inst | 6                  | 11
+| n_28392_state_reg[0]_i_2            | hdmi0/spdif0/n_28392_capture_data_reg[15]_i_1                                         | n_28392_RESET_IBUF_inst | 9                  | 16
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/i2c_core/byte_controller/bit_controller/n_28392_cnt_reg[0]_i_1      | n_28392_RESET_IBUF_inst | 5                  | 16
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/i2c_core/byte_controller/bit_controller/n_28392_c_state_reg[16]_i_1 | n_28392_RESET_IBUF_inst | 7                  | 17
+| hdmi0/spdif0/n_28392_clk_5_6MHz_reg | hdmi0/spdif0/n_28392_stored_data_reg[35]_i_1                                          | n_28392_RESET_IBUF_inst | 15                 | 42
+| n_28392_state_reg[0]_i_2            |                                                                                       | n_28392_RESET_IBUF_inst | 35                 | 83
+| n_28392_state_reg[0]_i_2            | hdmi0/i2c_config0/O5                                                                  | n_28392_RESET_IBUF_inst | 261                | 411
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

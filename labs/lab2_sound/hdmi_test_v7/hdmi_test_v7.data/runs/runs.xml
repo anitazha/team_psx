@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<Runs Version="1" Minor="8">
+	<Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7vx485tffg1761-2" LaunchPart="xc7vx485tffg1761-2" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" State="current" Dir="$PRUNDIR/synth_1" LaunchTime="1380852426">
+		<File Type="RUN-STRAT" Name="$PDATADIR/runs/synth_1/synth_1.psg"/>
+		<File Type="RDS-DCP" Name="top_test.dcp"/>
+		<File Type="PA-TCL" Name="top_test.tcl"/>
+		<File Type="RUN-SRCS" Name="$PDATADIR/runs/synth_1/sources.xml"/>
+		<File Type="RUN-CONSTRS" Name="$PDATADIR/runs/synth_1/constrs_in.xml"/>
+		<File Type="RDS-RDS" Name="top_test.rds"/>
+		<File Type="RDS-UTIL" Name="top_test_utilization_synth.rpt"/>
+	</Run>
+	<Run Id="impl_1" Type="Ft2:EntireDesign" SynthRun="synth_1" Part="xc7vx485tffg1761-2" LaunchPart="xc7vx485tffg1761-2" ConstrsSet="constrs_1" Description="Vivado Implementation Defaults" State="current" Dir="$PRUNDIR/impl_1" LaunchTime="1380852803">
+		<File Type="PLACE-UTIL" Name="top_test_utilization_placed.rpt"/>
+		<File Type="PLACE-CTRL" Name="top_test_control_sets_placed.rpt"/>
+		<File Type="ROUTE-DRC" Name="top_test_drc_routed.rpt"/>
+		<File Type="ROUTE-PWR" Name="top_test_power_routed.rpt"/>
+		<File Type="ROUTE-PWR-SUM" Name="top_test_power_summary_routed.rpt"/>
+		<File Type="ROUTE-STATUS" Name="top_test_route_status_routed.rpt"/>
+		<File Type="ROUTE-DCP" Name="top_test_routed.dcp"/>
+		<File Type="ROUTE-TIMINGSUMMARY" Name="top_test_timing_summary_routed.rpt"/>
+		<File Type="OPT-DCP" Name="top_test_opt.dcp"/>
+		<File Type="PA-TCL" Name="top_test.tcl"/>
+		<File Type="PLACE-DCP" Name="top_test_placed.dcp"/>
+		<File Type="PWROPT-DCP" Name="top_test_pwropt.dcp"/>
+		<File Type="POSTPLACE-PWROPT-DCP" Name="top_test_postplace_pwropt.dcp"/>
+		<File Type="PWROPT-DRC" Name="top_test_drc_pwropted.rpt"/>
+		<File Type="PHYSOPT-DCP" Name="top_test_physopt.dcp"/>
+		<File Type="PHYSOPT-DRC" Name="top_test_drc_physopted.rpt"/>
+		<File Type="RDI-RDI" Name="top_test.rdi"/>
+		<File Type="PA-DCP" Name="top_test.dcp"/>
+		<File Type="MAP-PCF" Name="top_test.pcf"/>
+		<File Type="PAR-NCD" Name="top_test_routed.ncd"/>
+		<File Type="BG-BIT" Name="top_test.bit"/>
+		<File Type="BG-DRC" Name="top_test.drc"/>
+		<File Type="BG-BGN" Name="top_test.bgn"/>
+		<File Type="BG-BIN" Name="top_test.bin"/>
+		<File Type="BITSTR-MSK" Name="top_test.msk"/>
+		<File Type="BITSTR-RBT" Name="top_test.rbt"/>
+		<File Type="BITSTR-NKY" Name="top_test.nky"/>
+		<File Type="BITSTR-BMM" Name="top_test_bd.bmm"/>
+		<File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+		<File Type="RUN-CONSTRS" Name="$PDATADIR/runs/impl_1/constrs_in.xml"/>
+		<File Type="RUN-STRAT" Name="$PDATADIR/runs/impl_1/impl_1.psg"/>
+		<File Type="OPT-DRC" Name="top_test_drc_opted.rpt"/>
+		<File Type="PLACE-IO" Name="top_test_io_placed.rpt"/>
+		<File Type="PLACE-CLK" Name="top_test_clock_utilization_placed.rpt"/>
+	</Run>
+</Runs>
+

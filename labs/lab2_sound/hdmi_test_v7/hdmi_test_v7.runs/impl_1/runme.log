@@ -1,0 +1,88 @@
+
+*** Running vivado
+    with args -log top_test.rdi -applog -m32 -messageDb vivado.pb -mode batch -source top_test.tcl -notrace
+
+
+****** Vivado v2012.3
+  **** Build 209282 by xbuild on Thu Oct 18 20:54:02 MDT 2012
+    ** Copyright 1986-1999, 2001-2012 Xilinx, Inc. All Rights Reserved.
+
+INFO: [Common 17-81] Feature available: Implementation
+INFO: [Common 17-81] Feature available: Synthesis
+INFO: [Device 21-36] Loading parts and site information from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/arch.xml
+Parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+Finished parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+source top_test.tcl -notrace
+INFO: [Netlist 29-17] Analyzing 2 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+Loading clock regions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockRegion.xml
+Loading clock buffers from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockBuffers.xml
+Loading clock placement rules from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/virtex7/ClockPlacerRules.xml
+Loading package pin functions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/PinFunctions.xml...
+Loading package from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ffg1761/Package.xml
+Loading io standards from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/IOStandards.xml
+Loading device configuration modes from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/ConfigModes.xml
+Loading list of drcs for the architecture : C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/drc.xml
+Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-5844-TomatoBiscuit/dcp/top_test.xdc]
+Finished Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-5844-TomatoBiscuit/dcp/top_test.xdc]
+Reading XDEF placement.
+Reading XDEF routing.
+Read XDEF File: Time (s): elapsed = 00:00:00.200˛t’èÙ⁄Æê% . Memory (MB): peak = 632.648 ; gain = 0.000
+Restoring placement.
+Restored 56 out of 56 XDEF sites from archive | CPU: 0.000000 secs | Memory: 0.000000 MB |
+WARNING: [Chipscope 16-85] Could not trace control bus of detected core attached to CONTROL0. This core will be ignored.
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 137 instances were transformed.
+  (MUXCY,XORCY) => CARRY4: 5 instances
+  FD => FDCE: 11 instances
+  FDC => FDCE: 74 instances
+  FDE => FDCE: 3 instances
+  FDP => FDPE: 25 instances
+  FDR => FDRE: 7 instances
+  INV => LUT1: 7 instances
+  IOBUF => IOBUF (OBUFT, IBUF): 2 instances
+  MUXF5 => LUT3: 2 instances
+  MUXF6 => LUT3: 1 instances
+
+Phase 0 | Netlist Checksum: 1f4f3151
+read_checkpoint: Time (s): elapsed = 00:00:30 . Memory (MB): peak = 632.648 ; gain = 440.305
+INFO: [Common 17-347] Attempting to get a license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+
+Starting Logic Optimization Task
+Logic Optimization | Checksum: 739bf192
+Netlist sorting complete. Time (s): elapsed = 00:00:00.549
+|’è†·Æê% . Memory (MB): peak = 726.914 ; gain = 0.000
+
+Phase 1 Retarget
+
+INFO: [Opt 31-49] Retargeted 0 cell(s).
+Phase 1 Retarget | Checksum: 75586258
+
+Time (s): elapsed = 00:00:01 . Memory (MB): peak = 726.914 ; gain = 0.000
+
+Phase 2 Constant Propagation
+INFO: [Opt 31-10] Eliminated 50 cells.
+Phase 2 Constant Propagation | Checksum: 91f361bb
+
+Time (s): elapsed = 00:00:26 . Memory (MB): peak = 804.023 ; gain = 77.109
+
+Phase 3 Sweep
+WARNING: [Opt 31-6] Deleting driverless net: icon/CONTROL0[3].
+INFO: [Opt 31-12] Eliminated 107 unconnected nets.
+ERROR: [Opt 31-67] Problem: A LUT6 cell in the design is missing a connection on input pin I4, which is used by the LUT equation. This pin has either been left unconnected in the design or the connection was removed due to the trimming of unused logic. The LUT cell name is: icon/U0/U_ICON/U_TDO_MUX/U_CS_MUX/I4.U_MUX16/Mmux_O11 
+Resolution: Please review the preceding OPT INFO messages that detail what has been trimmed in the design to determine if the removal of unused logic is causing this error. If opt_design is being specified directly, it will need to be rerun with opt_design -verbose to generate detailed INFO messages about trimming.
+
+INFO: [Opt 31-11] Eliminated 77 unconnected cells.
+Phase 3 Sweep | Checksum: 44d732cf
+
+Time (s): elapsed = 00:00:27 . Memory (MB): peak = 804.023 ; gain = 77.109
+Ending Logic Optimization Task | Checksum: 44d732cf
+
+Time (s): elapsed = 00:00:27 . Memory (MB): peak = 804.023 ; gain = 77.109
+INFO: [Common 17-83] Releasing license: Implementation
+
+    while executing
+"opt_design "
+INFO: [Common 17-206] Exiting Vivado at Thu Oct 03 22:14:36 2013...
