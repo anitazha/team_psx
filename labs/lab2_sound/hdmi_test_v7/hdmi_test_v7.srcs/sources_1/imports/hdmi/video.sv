@@ -50,7 +50,8 @@ module video(
     register #(36) pixel_reg (.in(in_pixel), .out(out_pixel), .clr(1'b0), .*);
 
     video_fsm fsm (.*);
-    pixel_clock pixel_clk (.clk_pix(clk_pix), .*);
+    assign clk_pix = clk;
+    //pixel_clock pixel_clk (.clk_pix(clk_pix), .*);
 
     /* whether FSM is ready for more data -- on system clock in order
      * synchronize FSM with the outside world */
