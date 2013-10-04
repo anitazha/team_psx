@@ -1,0 +1,12 @@
+Route storage status
+                                          :      # nets :
+   -------------------------------------- : ----------- :
+   # of logical nets..................... :       90200 :
+       # of nets not needing routing..... :       21678 :
+           # of internally routed nets... :       21678 :
+       # of routable nets................ :       68522 :
+           # of fully routed nets........ :       68522 :
+           # of unrouted nets............ :           0 :
+   -------------------------------------- : ----------- :
+
+

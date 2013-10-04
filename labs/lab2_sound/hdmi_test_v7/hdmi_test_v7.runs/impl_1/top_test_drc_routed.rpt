@@ -1,0 +1,103 @@
+
+DESIGN RULE CHECK VIOLATION REPORT
+   Build: Vivado v2012.3 by xbuild
+          on  Thu Oct 18 20:54:02 MDT 2012
+  Report: by Arnob on host TomatoBiscuit, pid 11336
+          on Thu Oct 03 17:27:00 2013
+
+REPORT SUMMARY
+            Netlist: netlist
+          Floorplan: checkpoint_top_test
+      Design limits: <entire design considered>
+             Checks: DCI Cascade Checks
+                     DCI Cascade with part compatibility
+                     DCI Cascade IO standard
+                     Bank IO standard Vcc
+                     Bank IO standard Support
+                     Bank IO standard Termination
+                     Bank IO standard Vref
+                     Bank IO standard Vref utilization
+                     Bank IO standard internal Vref conflict
+                     Bank IO standard limits
+                     Bank IO standard VRN/VRP Occupied
+                     Inconsistent Diff pair IOStandards
+                     Inconsistent Diff pair IOStandards
+                     Inconsistent Diff pair IOStandards
+                     Vccaux voltage requirement for LVCMOS25
+                     Inconsistent port properties
+                     Differential IO pads
+                     IOStandard Type
+                     Number of IOs
+                     IOs placed on disallowed sites
+                     Part compatibility implied prohibits not respected
+                     MGT not allowed for part compatibility
+                     IOs crosstalk to MGT
+                     IO Bus SLR Crossings
+                     Part compatibility between monolithic and multi-die devices.
+                     Incompatible BUFGs among compatible parts.
+                     Directionless IOs
+                     Bidirection LVDS IOs
+                     IN_TERM / OUT_TERM requirements
+                     Configuration Mode
+                     INTERNAL_VREF
+                     VCCOSENSEMODE not supported
+                     VCCAUX
+                     VCCAUX_IO unsupported with I/O Standard
+                     Part compatibility for differing bank types.
+                     Placement Constraints Check for Clock Region(s)
+                     Placement Constraints Check for Design Lock
+                     Placement Constraints Check for IO constraints
+                     IOSTANDARD violations
+                     Clock Placer Checks
+                     DSP Connectivity Checks
+                     Design Connectivity Checks
+                     IDELAYCTRL DRC Checks
+                     ODELAY Check for 3.3 V standard
+                     Dangling IBUFDS output inside IOBUFDS_DIFF_OUT macro 
+                     DRC check between IO and buffer(IBUF/OBUF)
+                     Unroutable connections to BUFG
+                     Non-Optimal connections to BUFG
+                     Unroutable connection between IOB and IDDR
+                     Non-Optimal connections which could lead to hold violations
+                     Unroutable connections to GTH instance
+                     DRC check of BUFIO loads
+                     Unspecified I/O Standard
+                     Unconstrained Logical Port
+                     Driverless Nets
+                     Multiple Driver Nets
+                     Black Box Instances
+                     Longest carry chain height
+                     Input Buffer Connections
+                     Pblock overlap
+                     Pblock partition
+                     Resource utilization
+                     LOC Excursion
+                     LUTNM on instances assigned to non-overlapping pblocks
+                     HLUTNM on instances assigned to non-overlapping pblocks
+                     IOB clock sharing
+                     IOB set reset sharing
+                     DSP output registers
+                     DSP input registers
+                     DSP output pipelining
+                     DSP input pipelining
+                     RAMB output registers
+                     Area group tile alignment
+                     Invalid attribute value
+                     Attribute not defined
+                     Required Pin
+                     Clock restrictions for READ_FIRST mode
+                     Built-in Error Correction mode
+                     DSP48 Cascade
+                     DSP48 Buffering
+                     DSP48 asynchronous feedback
+                     FIFO synchronous
+                     Physical design rule
+                     Physical Design Attribute Defined
+                     Physical Design Attribute Format
+                     Physical Design Connection Required
+                     Unrouted net
+                     Design Rule Check Disabled
+           Max violations: <unlimited>
+         Violations found: 0
+
+REPORT DETAILS
