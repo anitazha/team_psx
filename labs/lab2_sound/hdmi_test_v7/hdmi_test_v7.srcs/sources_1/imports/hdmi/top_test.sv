@@ -59,8 +59,8 @@ module top_test(
    assign GPIO_LED_LS[5] = audio_valid;
    assign GPIO_LED_LS[4] = audio_rdy;
    assign GPIO_LED_LS[3] = done_out;
-   assign GPIO_LED_LS[2] = RESET;
-   assign GPIO_LED_LS[1] = HDMI_SPDIF;
+   assign GPIO_LED_LS[2] = HDMI_DE;
+   assign GPIO_LED_LS[1] = HDMI_HSYNC;
    assign GPIO_LED_LS[0] = HDMI_VSYNC;
 
    /* HDMI Module */
@@ -84,7 +84,7 @@ module top_test(
 			    .audio_valid(audio_valid),
 			    .clk(slow_clk),
 			    .*);
-/*				
+	/*			
    wire [127:0] 		  ila_data;
    wire [63:0] 			  ila_trig;
    
@@ -96,11 +96,14 @@ module top_test(
    assign ila_data[5] = HDMI_DE;
    assign ila_data[6] = HDMI_HSYNC;
    assign ila_data[7] = HDMI_VSYNC;
+   assign ila_data[9:8] = 'd0;
    assign ila_data[45:10] = HDMI_D;
+   assign ila_data[49:11] = 'd0;
    assign ila_data[50] = audio_rdy;
    assign ila_data[51] = audio_valid;
    assign ila_data[52] = video_rdy;
    assign ila_data[53] = video_valid;
+   assign ila_data[127:54] = 'd0;
    
    assign ila_trig = ila_data[63:0];
    

@@ -332,7 +332,7 @@ module i2c_config(input logic  clk,
       wb_we_i  = 1'b0;
       
       done_out  = 1'b0;
-      error_out = 1'b0;
+      //error_out = 1'b0;
 
       case (curr_state)
 	/* prepare the core with correct clock and parameters */

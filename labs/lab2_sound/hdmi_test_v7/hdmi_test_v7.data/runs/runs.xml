@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Runs Version="1" Minor="8">
-	<Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7vx485tffg1761-2" LaunchPart="xc7vx485tffg1761-2" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" State="current" Dir="$PRUNDIR/synth_1" LaunchTime="1380834590">
+	<Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7vx485tffg1761-2" LaunchPart="xc7vx485tffg1761-2" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" State="current" Dir="$PRUNDIR/synth_1" LaunchTime="1380852426">
 		<File Type="RUN-STRAT" Name="$PDATADIR/runs/synth_1/synth_1.psg"/>
 		<File Type="RDS-DCP" Name="top_test.dcp"/>
 		<File Type="PA-TCL" Name="top_test.tcl"/>
@@ -9,7 +9,7 @@
 		<File Type="RDS-RDS" Name="top_test.rds"/>
 		<File Type="RDS-UTIL" Name="top_test_utilization_synth.rpt"/>
 	</Run>
-	<Run Id="impl_1" Type="Ft2:EntireDesign" SynthRun="synth_1" Part="xc7vx485tffg1761-2" LaunchPart="xc7vx485tffg1761-2" ConstrsSet="constrs_1" Description="Vivado Implementation Defaults" State="current" Dir="$PRUNDIR/impl_1" LaunchTime="1380834954">
+	<Run Id="impl_1" Type="Ft2:EntireDesign" SynthRun="synth_1" Part="xc7vx485tffg1761-2" LaunchPart="xc7vx485tffg1761-2" ConstrsSet="constrs_1" Description="Vivado Implementation Defaults" State="current" Dir="$PRUNDIR/impl_1" LaunchTime="1380852803">
 		<File Type="PLACE-UTIL" Name="top_test_utilization_placed.rpt"/>
 		<File Type="PLACE-CTRL" Name="top_test_control_sets_placed.rpt"/>
 		<File Type="ROUTE-DRC" Name="top_test_drc_routed.rpt"/>

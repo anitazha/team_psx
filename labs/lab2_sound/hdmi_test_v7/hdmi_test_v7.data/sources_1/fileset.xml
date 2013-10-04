@@ -96,6 +96,40 @@
         <Attr Name="UsedInSimulation" Val="1"/>
       </FileInfo>
     </File>
+    <File Path="$PSRCDIR/sources_1/imports/chipscope_1/hdmi_icon.v">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../ipcores/chipscope_1/hdmi_icon.v"/>
+        <Attr Name="ImportTime" Val="1379898365"/>
+        <Attr Name="UsedInSynthesis" Val="1"/>
+        <Attr Name="UsedInImplementation" Val="1"/>
+        <Attr Name="UsedInSimulation" Val="1"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/chipscope_1/hdmi_icon.ngc">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../ipcores/chipscope_1/hdmi_icon.ngc"/>
+        <Attr Name="ImportTime" Val="1379898362"/>
+        <Attr Name="UsedInSynthesis" Val="1"/>
+        <Attr Name="UsedInImplementation" Val="1"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/chipscope_1/chipscope_ila.v">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../ipcores/chipscope_1/chipscope_ila.v"/>
+        <Attr Name="ImportTime" Val="1379898800"/>
+        <Attr Name="UsedInSynthesis" Val="1"/>
+        <Attr Name="UsedInImplementation" Val="1"/>
+        <Attr Name="UsedInSimulation" Val="1"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/chipscope_1/chipscope_ila.ngc">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../ipcores/chipscope_1/chipscope_ila.ngc"/>
+        <Attr Name="ImportTime" Val="1379898799"/>
+        <Attr Name="UsedInSynthesis" Val="1"/>
+        <Attr Name="UsedInImplementation" Val="1"/>
+      </FileInfo>
+    </File>
     <File Path="$PSRCDIR/sources_1/imports/hdmi/audio_mem.hex">
       <FileInfo>
         <Attr Name="ImportPath" Val="$PPRDIR/../hdmi_test_v6/hdmi_test_v6.srcs/sources_1/imports/hdmi/audio_mem.hex"/>

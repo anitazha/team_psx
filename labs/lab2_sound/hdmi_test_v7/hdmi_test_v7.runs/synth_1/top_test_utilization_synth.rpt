@@ -10,13 +10,13 @@ Slice Logic
 +-------------------------+---------+----------+--------------+----------+
 |Site Type                |     Used|     Loced|     Available|     Util%|
 +-------------------------+---------+----------+--------------+----------+
-|Slice LUTs*              |    78736|         0|        303600|     25.93|
-|  LUT as Logic           |    78736|         0|        303600|     25.93|
+|Slice LUTs*              |    78855|         0|        303600|     25.97|
+|  LUT as Logic           |    78855|         0|        303600|     25.97|
 |  LUT as Memory          |        0|         0|        130800|      0.00|
-|Slice Registers          |      700|         0|        607200|      0.11|
-|  Register as Flip Flop  |      700|         0|        607200|      0.11|
+|Slice Registers          |      728|         0|        607200|      0.11|
+|  Register as Flip Flop  |      728|         0|        607200|      0.11|
 |  Register as Latch      |        0|         0|        607200|      0.00|
-|F7 Muxes                 |     7761|         0|        151800|      5.11|
+|F7 Muxes                 |     7760|         0|        151800|      5.11|
 |F8 Muxes                 |     2904|         0|         75900|      3.82|
 +-------------------------+---------+----------+--------------+----------+
 *The Final LUT count, after physical optimizations and full implementation, is typically lower.
@@ -67,7 +67,7 @@ Clocking
 +--------------+---------+----------+--------------+----------+
 |Site Type     |     Used|     Loced|     Available|     Util%|
 +--------------+---------+----------+--------------+----------+
-|BUFGCTRL      |        2|         0|            32|      6.25|
+|BUFGCTRL      |        3|         0|            32|      9.37|
 |MMCME2_ADV    |        0|         0|            14|      0.00|
 |PLLE2_ADV     |        0|         0|            14|      0.00|
 |BUFMRCE       |        0|         0|            28|      0.00|
@@ -80,7 +80,7 @@ Specific Feature
 +--------------+---------+----------+--------------+----------+
 |Site Type     |     Used|     Loced|     Available|     Util%|
 +--------------+---------+----------+--------------+----------+
-|BSCANE2       |        0|         0|             4|      0.00|
+|BSCANE2       |        1|         0|             4|     25.00|
 |CAPTUREE2     |        0|         0|             1|      0.00|
 |DNA_PORT      |        0|         0|             1|      0.00|
 |EFUSE_USR     |        0|         0|             1|      0.00|
@@ -97,21 +97,23 @@ Primitives
 |Ref Name     |     Used|
 +-------------+---------+
 |LUT6         |    76668|
-|MUXF7        |     7761|
+|MUXF7        |     7760|
 |MUXF8        |     2904|
-|LUT5         |     1564|
-|FDCE         |      667|
-|LUT4         |      283|
-|LUT3         |      114|
-|LUT2         |       60|
+|LUT5         |     1557|
+|FDCE         |      681|
+|LUT4         |      360|
+|LUT3         |      121|
+|LUT1         |       83|
+|LUT2         |       66|
 |OBUF         |       50|
-|LUT1         |       47|
 |FDPE         |       33|
-|CARRY4       |       15|
+|CARRY4       |       26|
+|FDRE         |       14|
 |IBUF         |        4|
+|BUFG         |        3|
 |OBUFT        |        2|
-|BUFG         |        2|
 |IBUFDS       |        1|
+|BSCANE2      |        1|
 +-------------+---------+
                          
 
@@ -124,6 +126,8 @@ Black Boxes
 Instantiated Netlists
 +-------------+---------+
 |Ref Name     |     Used|
++-------------+---------+
+|hdmi_icon    |        1|
 +-------------+---------+
                          
 

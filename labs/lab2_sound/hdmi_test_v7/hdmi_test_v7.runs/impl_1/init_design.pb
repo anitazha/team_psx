@@ -39,14 +39,14 @@ IC:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/ConfigModes.xmlZ21-1
 /Loading list of drcs for the architecture : %s
 17*drc2E
 CC:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/drc.xmlZ23-17
-¤
+£
 Parsing XDC File [%s]
-179*designutils2n
-lC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-11336-TomatoBiscuit/dcp/top_test.xdcZ20-179
-­
+179*designutils2m
+kC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-5844-TomatoBiscuit/dcp/top_test.xdcZ20-179
+¬
 Finished Parsing XDC File [%s]
-178*designutils2n
-lC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-11336-TomatoBiscuit/dcp/top_test.xdcZ20-178
+178*designutils2m
+kC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-5844-TomatoBiscuit/dcp/top_test.xdcZ20-178
 6
 Reading XDEF placement.
 206*designutilsZ20-206
@@ -57,9 +57,9 @@ lC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-11336-T
 >%sTime (s): elapsed = %s . Memory (MB): peak = %s ; gain = %s
 269*common2
 Read XDEF File: 2
-00:00:00.198¯ÐÑFôÚ¼%2	
-633.0272
-0.660Z17-269
+00:00:00.200þtÕôÚ®%2	
+632.6482
+0.000Z17-269
 3
 Restoring placement.
 754*designutilsZ20-754
@@ -72,28 +72,37 @@ ORestored %s out of %s XDEF sites from archive | CPU: %s secs | Memory: %s MB |
 0.0000002
 
 0.000000Z20-403
-®
+~
+XCould not trace control bus of detected core attached to %s. This core will be ignored.
+83*	chipscope2
+
+CONTROL0Z16-85
+ž
 !Unisim Transformation Summary:
-%s111*project2ñ
-î  A total of 115 instances were transformed.
-  (MUXCY,XORCY) => CARRY4: 1 instances
+%s111*project2á
+Þ  A total of 137 instances were transformed.
+  (MUXCY,XORCY) => CARRY4: 5 instances
   FD => FDCE: 11 instances
   FDC => FDCE: 74 instances
+  FDE => FDCE: 3 instances
   FDP => FDPE: 25 instances
-  INV => LUT1: 2 instances
+  FDR => FDRE: 7 instances
+  INV => LUT1: 7 instances
   IOBUF => IOBUF (OBUFT, IBUF): 2 instances
+  MUXF5 => LUT3: 2 instances
+  MUXF6 => LUT3: 1 instances
 Z1-111
 1
-%Phase 0 | Netlist Checksum: 489e1a73
+%Phase 0 | Netlist Checksum: 1f4f3151
 *common
 Ž
 >%sTime (s): elapsed = %s . Memory (MB): peak = %s ; gain = %s
 269*common2
 read_checkpoint: 2
 
-00:00:292	
-633.0272	
-440.676Z17-269
+00:00:302	
+632.6482	
+440.305Z17-269
 
 
 End Record

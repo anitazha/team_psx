@@ -58,142 +58,226 @@ module i2c_config(input logic  clk,
    reg [7:0]   ADDR [0:62];
 
    /* CONFIGURATION REGISTERS */
-   assign ADDR[ 0] = 8'h41;     /* 00 - power-up power-down */
-   assign ADDR[ 1] = 8'h0B;     /* 01 - SPDIF config */
-   assign ADDR[ 2] = 8'h14;     /* 02 - audio sample word length */
+   assign ADDR[ 0] = 8'h01;     /* 00 - power-up power-down */
+   assign ADDR[ 1] = 8'h02;     /* 01 - SPDIF config */
+   assign ADDR[ 2] = 8'h03;     /* 02 - audio sample word length */
    assign ADDR[ 3] = 8'h15;     /* 03 - input video format */
    assign ADDR[ 4] = 8'h16;     /* 04 - color depth, video input edge, RGB */
-   assign ADDR[ 5] = 8'h17;     /* 05 - vsync hsync polarity */
-   assign ADDR[ 6] = 8'h3C;     /* 06 - VIC to send to Rx */
-   assign ADDR[ 7] = 8'h0A;     /* 07 - audio type select */
-   assign ADDR[ 8] = 8'h55;     /* 08 - video output format */
-   assign ADDR[ 9] = 8'h73;     /* 09 - audio channel count */
-   assign ADDR[10] = 8'h9D;     /* 10 - input pixel clock divide */
-   assign ADDR[11] = 8'hAF;     /* 11 - HDCP encryption, HDMI mode */
-   assign ADDR[12] = 8'hD7;     /* 12 - vsync hsync durations */
-   assign ADDR[13] = 8'hD8;     /* 13 - */
-   assign ADDR[14] = 8'hD9;     /* 14 - */
-   assign ADDR[15] = 8'hDA;     /* 15 - */
-   assign ADDR[16] = 8'hDB;     /* 16 - */
-   assign ADDR[17] = 8'hF9;     /* 17 - fixed I2C address */
-
-   /* REQUIRED REGISTERS (reserved) */
-   assign ADDR[18] = 8'h3B;     /* 18 - */
-   assign ADDR[19] = 8'h44;     /* 19 - */
-   assign ADDR[20] = 8'h48;     /* 20 - */
-   assign ADDR[21] = 8'h94;     /* 21 - */
-   assign ADDR[22] = 8'h96;     /* 22 - */
-   assign ADDR[23] = 8'h98;     /* 23 - */
-   assign ADDR[24] = 8'h99;     /* 24 - */
-   assign ADDR[25] = 8'h9A;     /* 25 - */
-   assign ADDR[26] = 8'h9B;     /* 26 - */
-   assign ADDR[27] = 8'h9C;     /* 27 - */
-   assign ADDR[28] = 8'h9F;     /* 28 - */
-   assign ADDR[29] = 8'hA1;     /* 29 - */
-   assign ADDR[30] = 8'hA2;     /* 30 - */
-   assign ADDR[31] = 8'hA3;     /* 31 - */
-   assign ADDR[32] = 8'hA4;     /* 32 - */
-   assign ADDR[33] = 8'hA5;     /* 33 - */
-   assign ADDR[34] = 8'hA6;     /* 34 - */
-   assign ADDR[35] = 8'hA7;     /* 35 - */
-   assign ADDR[36] = 8'hA8;     /* 36 - */
-   assign ADDR[37] = 8'hA9;     /* 37 - */
-   assign ADDR[38] = 8'hAA;     /* 38 - */
-   assign ADDR[39] = 8'hAB;     /* 39 - */
-   assign ADDR[40] = 8'hB9;     /* 40 - */
-   assign ADDR[41] = 8'hBA;     /* 41 - */
-   assign ADDR[42] = 8'hBB;     /* 42 - */
-   assign ADDR[43] = 8'hC7;     /* 43 - */
-   assign ADDR[44] = 8'hCD;     /* 44 - */
-   assign ADDR[45] = 8'hCE;     /* 45 - */
-   assign ADDR[46] = 8'hCF;     /* 46 - */
-   assign ADDR[47] = 8'hD0;     /* 47 - */
-   assign ADDR[48] = 8'hD1;     /* 48 - */
-   assign ADDR[49] = 8'hD2;     /* 49 - */
-   assign ADDR[50] = 8'hD3;     /* 50 - */
-   assign ADDR[51] = 8'hD4;     /* 51 - */
-   assign ADDR[52] = 8'hD5;     /* 52 - */
-   assign ADDR[53] = 8'hD6;     /* 53 - */
-   assign ADDR[54] = 8'hDC;     /* 54 - */
-   assign ADDR[55] = 8'hDD;     /* 55 - */
-   assign ADDR[56] = 8'hDE;     /* 56 - */
-   assign ADDR[57] = 8'hDF;     /* 57 - */
-   assign ADDR[58] = 8'hE0;     /* 58 - */
-   assign ADDR[59] = 8'hE2;     /* 59 - */
-   assign ADDR[60] = 8'hE3;     /* 60 - */
-   assign ADDR[61] = 8'hE4;     /* 61 - */
-   assign ADDR[62] = 8'hFA;     /* 62 - */
+   assign ADDR[ 5] = 8'h18;     /* 05 - vsync hsync polarity */
+   assign ADDR[ 6] = 8'h19;     /* 06 - VIC to send to Rx */
+   assign ADDR[ 7] = 8'h40;     /* 07 - audio type select */
+   assign ADDR[ 8] = 8'h41;     /* 08 - video output format */
+   assign ADDR[ 9] = 8'h48;     /* 09 - audio channel count */
+   assign ADDR[10] = 8'h49;     /* 10 - input pixel clock divide */
+   assign ADDR[11] = 8'h4C;     /* 11 - HDCP encryption, HDMI mode */
+   assign ADDR[12] = 8'h55;     /* 12 - vsync hsync durations */
+   assign ADDR[13] = 8'h56;     /* 13 - */
+   assign ADDR[14] = 8'h96;     /* 14 - */
+   assign ADDR[15] = 8'h98;     /* 15 - */
+   assign ADDR[16] = 8'h99;     /* 16 - */
+   assign ADDR[17] = 8'h9A;     /* 17 - fixed I2C address */
+   assign ADDR[18] = 8'h9C;     /* 18 - */
+   assign ADDR[19] = 8'h9D;     /* 19 - */
+   assign ADDR[20] = 8'hA2;     /* 20 - */
+   assign ADDR[21] = 8'hA3;     /* 21 - */
+   assign ADDR[22] = 8'hA5;     /* 22 - */
+   assign ADDR[23] = 8'hAB;     /* 23 - */
+   assign ADDR[24] = 8'hAF;     /* 24 - */
+   assign ADDR[25] = 8'hBA;     /* 25 - */
+   assign ADDR[26] = 8'hD0;     /* 26 - */
+   assign ADDR[27] = 8'hD1;     /* 27 - */
+   assign ADDR[28] = 8'hDE;     /* 28 - */
+   assign ADDR[29] = 8'hE0;     /* 29 - */
+   assign ADDR[30] = 8'hE4;     /* 30 - */
+   assign ADDR[31] = 8'hF9;     /* 31 - */
+   assign ADDR[32] = 8'hFA;     /* 32 - */
+   assign ADDR[33] = 8'h17;     /* 33 - */
+   assign ADDR[34] = 8'h0A;     /* 34 - */
+   assign ADDR[35] = 8'h0B;     /* 35 - */
+   assign ADDR[36] = 8'h0C;     /* 36 - */
+   assign ADDR[37] = 8'h73;     /* 37 - */
+   assign ADDR[38] = 8'h14;     /* 38 - */
    
    /* values that have to be written to above registers */
    reg [7:0]   DATA [0:62];
    
    /* CONFIGURATION REGISTERS */
-   assign DATA[ 0] = 8'h10;     /* 00 - power on ADV7511 */
-   assign DATA[ 1] = 8'hCE;     /* 01 - */
-   assign DATA[ 2] = 8'h02;     /* 02 - 16-bit */
+   assign DATA[ 0] = 8'h00;     /* 00 - power on ADV7511 */
+   assign DATA[ 1] = 8'h18;     /* 01 - */
+   assign DATA[ 2] = 8'h00;     /* 02 - 16-bit */
    assign DATA[ 3] = 8'h00;     /* 03 - 24-bit RGB 4:4:4 */
-   assign DATA[ 4] = 8'h32;     /* 04 - color depth 8-bit, rising edge */
-   assign DATA[ 5] = 8'h60;     /* 05 - low polarity */
-   assign DATA[ 6] = 8'h02;     /* 06 - */
-   assign DATA[ 7] = 8'h10;     /* 07 - SPDIF, MCLK */
-   assign DATA[ 8] = 8'h00;     /* 08 - RGB output */
-   assign DATA[ 9] = 8'h01;     /* 09 - 2-channel audio */
-   assign DATA[10] = 8'h60;     /* 10 - clock not divided */
-   assign DATA[11] = 8'h06;     /* 11 - disable encryption, HDMI */
-   assign DATA[12] = 8'h04;     /* 12 - hsync front porch = 16 */
-   assign DATA[13] = 8'h03;     /* 13 - hsync duration    = 62 */
-   assign DATA[14] = 8'hE0;     /* 14 - vsync front porch = 9  */
-   assign DATA[15] = 8'h24;     /* 15 - vsync duration    = 6  */
-   assign DATA[16] = 8'h06;     /* 16 - */
-   assign DATA[17] = 8'h00;     /* 17 - set to come non-conflicting address */
+   assign DATA[ 4] = 8'h20;     /* 04 - color depth 8-bit, rising edge */
+   assign DATA[ 5] = 8'h46;     /* 05 - low polarity */
+   assign DATA[ 6] = 8'h62;     /* 06 - */
+   assign DATA[ 7] = 8'h80;     /* 07 - SPDIF, MCLK */
+   assign DATA[ 8] = 8'h10;     /* 08 - RGB output */
+   assign DATA[ 9] = 8'h00;     /* 09 - 2-channel audio */
+   assign DATA[10] = 8'hA8;     /* 10 - clock not divided */
+   assign DATA[11] = 8'h00;     /* 11 - disable encryption, HDMI */
+   assign DATA[12] = 8'h00;     /* 12 - hsync front porch = 128 */
+   assign DATA[13] = 8'h08;     /* 13 - hsync duration    = 208 */
+   assign DATA[14] = 8'h20;     /* 14 - vsync front porch = 1   */
+   assign DATA[15] = 8'h03;     /* 15 - vsync duration    = 3   */
+   assign DATA[16] = 8'h02;     /* 16 - */
+   assign DATA[17] = 8'hE0;     /* 17 - set to some non-conflicting address */
+   assign DATA[18] = 8'h30;     /* 18 - */
+   assign DATA[19] = 8'h61;     /* 19 - */
+   assign DATA[20] = 8'hA4;     /* 20 - */
+   assign DATA[21] = 8'hA4;     /* 21 - */
+   assign DATA[22] = 8'h44;     /* 22 - */
+   assign DATA[23] = 8'h40;     /* 23 - */
+   assign DATA[24] = 8'h06;     /* 24 - */
+   assign DATA[25] = 8'h00;     /* 25 - */
+   assign DATA[26] = 8'h3C;     /* 26 - */
+   assign DATA[27] = 8'hFF;     /* 27 - */
+   assign DATA[28] = 8'h9C;     /* 28 - */
+   assign DATA[29] = 8'hD0;     /* 29 - */
+   assign DATA[30] = 8'h60;     /* 30 - */
+   assign DATA[31] = 8'h00;     /* 31 - */
+   assign DATA[32] = 8'h00;     /* 32 - */
+   assign DATA[33] = 8'h02;     /* 33 - */
+   assign DATA[34] = 8'h10;     /* 34 - */
+   assign DATA[35] = 8'h8E;     /* 35 - */
+   assign DATA[36] = 8'h00;     /* 36 - */
+   assign DATA[37] = 8'h01;     /* 37 - */
+   assign DATA[38] = 8'h02;     /* 38 - */
+   
+   /* CONFIGURATION REGISTERS */
+   //assign ADDR[ 0] = 8'h41;     /* 00 - power-up power-down */
+   //assign ADDR[ 1] = 8'h0B;     /* 01 - SPDIF config */
+   //assign ADDR[ 2] = 8'h14;     /* 02 - audio sample word length */
+   //assign ADDR[ 3] = 8'h15;     /* 03 - input video format */
+   //assign ADDR[ 4] = 8'h16;     /* 04 - color depth, video input edge, RGB */
+   //assign ADDR[ 5] = 8'h17;     /* 05 - vsync hsync polarity */
+   //assign ADDR[ 6] = 8'h3C;     /* 06 - VIC to send to Rx */
+   //assign ADDR[ 7] = 8'h0A;     /* 07 - audio type select */
+   //assign ADDR[ 8] = 8'h55;     /* 08 - video output format */
+   //assign ADDR[ 9] = 8'h73;     /* 09 - audio channel count */
+   //assign ADDR[10] = 8'h9D;     /* 10 - input pixel clock divide */
+   //assign ADDR[11] = 8'hAF;     /* 11 - HDCP encryption, HDMI mode */
+   //assign ADDR[12] = 8'hD7;     /* 12 - vsync hsync durations */
+   //assign ADDR[13] = 8'hD8;     /* 13 - */
+   //assign ADDR[14] = 8'hD9;     /* 14 - */
+   //assign ADDR[15] = 8'hDA;     /* 15 - */
+   //assign ADDR[16] = 8'hDB;     /* 16 - */
+   //assign ADDR[17] = 8'hF9;     /* 17 - fixed I2C address */
+
+   /* REQUIRED REGISTERS (reserved) */
+   //assign ADDR[18] = 8'h3B;     /* 18 - */
+   //assign ADDR[19] = 8'h44;     /* 19 - */
+   //assign ADDR[20] = 8'h48;     /* 20 - */
+   //assign ADDR[21] = 8'h94;     /* 21 - */
+   //assign ADDR[22] = 8'h96;     /* 22 - */
+   //assign ADDR[23] = 8'h98;     /* 23 - */
+   //assign ADDR[24] = 8'h99;     /* 24 - */
+   //assign ADDR[25] = 8'h9A;     /* 25 - */
+   //assign ADDR[26] = 8'h9B;     /* 26 - */
+   //assign ADDR[27] = 8'h9C;     /* 27 - */
+   //assign ADDR[28] = 8'h9F;     /* 28 - */
+   //assign ADDR[29] = 8'hA1;     /* 29 - */
+   //assign ADDR[30] = 8'hA2;     /* 30 - */
+   //assign ADDR[31] = 8'hA3;     /* 31 - */
+   //assign ADDR[32] = 8'hA4;     /* 32 - */
+   //assign ADDR[33] = 8'hA5;     /* 33 - */
+   //assign ADDR[34] = 8'hA6;     /* 34 - */
+   //assign ADDR[35] = 8'hA7;     /* 35 - */
+   //assign ADDR[36] = 8'hA8;     /* 36 - */
+   //assign ADDR[37] = 8'hA9;     /* 37 - */
+   //assign ADDR[38] = 8'hAA;     /* 38 - */
+   //assign ADDR[39] = 8'hAB;     /* 39 - */
+   //assign ADDR[40] = 8'hB9;     /* 40 - */
+   //assign ADDR[41] = 8'hBA;     /* 41 - */
+   //assign ADDR[42] = 8'hBB;     /* 42 - */
+   //assign ADDR[43] = 8'hC7;     /* 43 - */
+   //assign ADDR[44] = 8'hCD;     /* 44 - */
+   //assign ADDR[45] = 8'hCE;     /* 45 - */
+   //assign ADDR[46] = 8'hCF;     /* 46 - */
+   //assign ADDR[47] = 8'hD0;     /* 47 - */
+   //assign ADDR[48] = 8'hD1;     /* 48 - */
+   //assign ADDR[49] = 8'hD2;     /* 49 - */
+   //assign ADDR[50] = 8'hD3;     /* 50 - */
+   //assign ADDR[51] = 8'hD4;     /* 51 - */
+   //assign ADDR[52] = 8'hD5;     /* 52 - */
+   //assign ADDR[53] = 8'hD6;     /* 53 - */
+   //assign ADDR[54] = 8'hDC;     /* 54 - */
+   //assign ADDR[55] = 8'hDD;     /* 55 - */
+   //assign ADDR[56] = 8'hDE;     /* 56 - */
+   //assign ADDR[57] = 8'hDF;     /* 57 - */
+   //assign ADDR[58] = 8'hE0;     /* 58 - */
+   //assign ADDR[59] = 8'hE2;     /* 59 - */
+   //assign ADDR[60] = 8'hE3;     /* 60 - */
+   //assign ADDR[61] = 8'hE4;     /* 61 - */
+   //assign ADDR[62] = 8'hFA;     /* 62 - */
+   
+   /* values that have to be written to above registers */
+   reg [7:0]   DATA [0:62];
+   
+   /* CONFIGURATION REGISTERS */
+   //assign DATA[ 0] = 8'h10;     /* 00 - power on ADV7511 */
+   //assign DATA[ 1] = 8'hCE;     /* 01 - */
+   //assign DATA[ 2] = 8'h02;     /* 02 - 16-bit */
+   //assign DATA[ 3] = 8'h00;     /* 03 - 24-bit RGB 4:4:4 */
+   //assign DATA[ 4] = 8'h32;     /* 04 - color depth 8-bit, rising edge */
+   //assign DATA[ 5] = 8'h60;     /* 05 - low polarity */
+   //assign DATA[ 6] = 8'h02;     /* 06 - */
+   //assign DATA[ 7] = 8'h10;     /* 07 - SPDIF, MCLK */
+   //assign DATA[ 8] = 8'h00;     /* 08 - RGB output */
+   //assign DATA[ 9] = 8'h01;     /* 09 - 2-channel audio */
+   //assign DATA[10] = 8'h60;     /* 10 - clock not divided */
+   //assign DATA[11] = 8'h06;     /* 11 - disable encryption, HDMI */
+   //assign DATA[12] = 8'h1E;     /* 12 - hsync front porch = 128 */
+   //assign DATA[13] = 8'h4D;     /* 13 - hsync duration    = 208 */
+   //assign DATA[14] = 8'h00;     /* 14 - vsync front porch = 1   */
+   //assign DATA[15] = 8'h04;     /* 15 - vsync duration    = 3   */
+   //assign DATA[16] = 8'h03;     /* 16 - */
+   //assign DATA[17] = 8'h00;     /* 17 - set to non-conflicting address */
    
    /* REQUIRED REGISTERS (reserved) */
-   assign DATA[18] = 8'hE0;     /* 18 - */
-   assign DATA[19] = 8'h00;     /* 19 - */
-   assign DATA[20] = 8'h00;     /* 20 - */
-   assign DATA[21] = 8'hC0;     /* 21 - */
-   assign DATA[22] = 8'h00;     /* 22 - */
-   assign DATA[23] = 8'h03;     /* 23 - */
-   assign DATA[24] = 8'h02;     /* 24 - */
-   assign DATA[25] = 8'hE0;     /* 25 - */
-   assign DATA[26] = 8'h18;     /* 26 - */
-   assign DATA[27] = 8'h30;     /* 27 - */
-   assign DATA[28] = 8'h00;     /* 28 - */
-   assign DATA[29] = 8'h00;     /* 29 - */
-   assign DATA[30] = 8'hA4;     /* 30 - */
-   assign DATA[31] = 8'hA4;     /* 31 - */
-   assign DATA[32] = 8'h08;     /* 32 - */
-   assign DATA[33] = 8'h04;     /* 33 - */
-   assign DATA[34] = 8'h00;     /* 34 - */
-   assign DATA[35] = 8'h00;     /* 35 - */
-   assign DATA[36] = 8'h00;     /* 36 - */
-   assign DATA[37] = 8'h00;     /* 37 - */
-   assign DATA[38] = 8'h00;     /* 38 - */
-   assign DATA[39] = 8'h40;     /* 39 - */
-   assign DATA[40] = 8'h00;     /* 40 - */
-   assign DATA[41] = 8'h00;     /* 41 - */
-   assign DATA[42] = 8'h00;     /* 42 - */
-   assign DATA[43] = 8'h00;     /* 43 - */
-   assign DATA[44] = 8'h00;     /* 44 - */
-   assign DATA[45] = 8'h01;     /* 45 - */
-   assign DATA[46] = 8'h04;     /* 46 - */
-   assign DATA[47] = 8'h3C;     /* 47 - */
-   assign DATA[48] = 8'hFF;     /* 48 - */
-   assign DATA[49] = 8'h80;     /* 49 - */
-   assign DATA[50] = 8'h80;     /* 50 - */
-   assign DATA[51] = 8'h80;     /* 51 - */
-   assign DATA[52] = 8'h00;     /* 52 - */
-   assign DATA[53] = 8'h00;     /* 53 - */
-   assign DATA[54] = 8'h00;     /* 54 - */
-   assign DATA[55] = 8'h00;     /* 55 - */
-   assign DATA[56] = 8'h10;     /* 56 - */
-   assign DATA[57] = 8'h01;     /* 57 - */
-   assign DATA[58] = 8'h3C;     /* 58 - */
-   assign DATA[59] = 8'h00;     /* 59 - */
-   assign DATA[60] = 8'h00;     /* 60 - */
-   assign DATA[61] = 8'h60;     /* 61 - */
-   assign DATA[62] = 8'h00;     /* 62 - */
- 
+   //assign DATA[18] = 8'hE0;     /* 18 - */
+   //assign DATA[19] = 8'h00;     /* 19 - */
+   //assign DATA[20] = 8'h00;     /* 20 - */
+   //assign DATA[21] = 8'hC0;     /* 21 - */
+   //assign DATA[22] = 8'h00;     /* 22 - */
+   //assign DATA[23] = 8'h03;     /* 23 - */
+   //assign DATA[24] = 8'h02;     /* 24 - */
+   //assign DATA[25] = 8'hE0;     /* 25 - */
+   //assign DATA[26] = 8'h18;     /* 26 - */
+   //assign DATA[27] = 8'h30;     /* 27 - */
+   //assign DATA[28] = 8'h00;     /* 28 - */
+   //assign DATA[29] = 8'h00;     /* 29 - */
+   //assign DATA[30] = 8'hA4;     /* 30 - */
+   //assign DATA[31] = 8'hA4;     /* 31 - */
+   //assign DATA[32] = 8'h08;     /* 32 - */
+   //assign DATA[33] = 8'h04;     /* 33 - */
+   //assign DATA[34] = 8'h00;     /* 34 - */
+   //assign DATA[35] = 8'h00;     /* 35 - */
+   //assign DATA[36] = 8'h00;     /* 36 - */
+   //assign DATA[37] = 8'h00;     /* 37 - */
+   //assign DATA[38] = 8'h00;     /* 38 - */
+   //assign DATA[39] = 8'h40;     /* 39 - */
+   //assign DATA[40] = 8'h00;     /* 40 - */
+   //assign DATA[41] = 8'h00;     /* 41 - */
+   //assign DATA[42] = 8'h00;     /* 42 - */
+   //assign DATA[43] = 8'h00;     /* 43 - */
+   //assign DATA[44] = 8'h00;     /* 44 - */
+   //assign DATA[45] = 8'h01;     /* 45 - */
+   //assign DATA[46] = 8'h04;     /* 46 - */
+   //assign DATA[47] = 8'h3C;     /* 47 - */
+   //assign DATA[48] = 8'hFF;     /* 48 - */
+   //assign DATA[49] = 8'h80;     /* 49 - */
+   //assign DATA[50] = 8'h80;     /* 50 - */
+   //assign DATA[51] = 8'h80;     /* 51 - */
+   //assign DATA[52] = 8'h00;     /* 52 - */
+   //assign DATA[53] = 8'h00;     /* 53 - */
+   //assign DATA[54] = 8'h00;     /* 54 - */
+   //assign DATA[55] = 8'h00;     /* 55 - */
+   //assign DATA[56] = 8'h10;     /* 56 - */
+   //assign DATA[57] = 8'h01;     /* 57 - */
+   //assign DATA[58] = 8'h3C;     /* 58 - */
+   //assign DATA[59] = 8'h00;     /* 59 - */
+   //assign DATA[60] = 8'h00;     /* 60 - */
+   //assign DATA[61] = 8'h60;     /* 61 - */
+   //assign DATA[62] = 8'h00;     /* 62 - */
    
    /* i2c core registers */
    reg [2:0]   wb_adr_i, next_wb_adr;
@@ -662,8 +746,7 @@ module i2c_config(input logic  clk,
 
 	      /* incorrect value */
 	      else begin
-		 if (adv_reg == 22 || adv_reg == 11 ||
-		     adv_reg == 12 || adv_reg == 13) begin
+		 if (adv_reg == 24 || adv_reg == 14) begin
 		    next_state = SLAVE_INIT;
 		    next_wb_dat = { HDMI_ADDR, WRITE };
 		 end

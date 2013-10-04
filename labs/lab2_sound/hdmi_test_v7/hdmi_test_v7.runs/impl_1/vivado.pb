@@ -19,8 +19,3 @@ IC:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xmlZ29-1
 *Finished parsing RTL primitives file [%s]
 11*netlist2K
 IC:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xmlZ29-11
-S
-Exiting %s at %s...
-206*common2
-Vivado2
-Thu Oct 03 17:31:45 2013Z17-206

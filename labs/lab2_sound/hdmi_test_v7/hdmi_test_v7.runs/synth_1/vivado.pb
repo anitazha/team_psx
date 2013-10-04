@@ -39,9 +39,24 @@ UUsing Xilinx IP in: C:/Xilinx/14.3/ISE_DS/ISE/coregen/ip/xilinx/primary/com/xil
 
 
 *common
+§
+%s has already been declared976*oasys2
+DATA2]
+YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
+2138@Z8-976
+­
+ second declaration of %s ignored2654*oasys2
+DATA2]
+YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
+2138@Z8-2654
+ž
+%s is declared here994*oasys2
+DATA2]
+YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
+1028@Z8-994
 w
 %s*synth2h
-fstarting Rtl Elaboration : Time (s): elapsed = 00:00:05 . Memory (MB): peak = 211.000 ; gain = 61.465
+fstarting Rtl Elaboration : Time (s): elapsed = 00:00:06 . Memory (MB): peak = 215.625 ; gain = 65.914
 
 £
 synthesizing module '%s'638*oasys2
@@ -86,7 +101,7 @@ I
 %done synthesizing module '%s' (%s#%s)256*oasys2
 IBUFDS2
 12
-162A
+172A
 =C:/Xilinx/14.3/ISE_DS/PlanAhead/scripts/rt/data/unisim_comp.v2	
 108348@Z8-256
 œ
@@ -239,7 +254,7 @@ C
 %done synthesizing module '%s' (%s#%s)256*oasys2
 i2c_master_bit_ctrl2
 22
-162d
+172d
 `C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_master_bit_ctrl.v2
 1438@Z8-256
 Ý
@@ -256,7 +271,7 @@ aC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_
 %done synthesizing module '%s' (%s#%s)256*oasys2
 i2c_master_byte_ctrl2
 32
-162e
+172e
 aC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_master_byte_ctrl.v2
 758@Z8-256
 ×
@@ -273,64 +288,64 @@ aC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_
 %done synthesizing module '%s' (%s#%s)256*oasys2
 i2c_master_top2
 42
-162_
+172_
 [C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_master_top.v2
 788@Z8-256
 °
 -case statement is not full and has no default155*oasys2]
 YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
-3488@Z8-155
+4328@Z8-155
 À
 %done synthesizing module '%s' (%s#%s)256*oasys2
 
 i2c_config2
 52
-162]
+172]
 YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
 318@Z8-256
 ž
 synthesizing module '%s'638*oasys2
 video2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-148@Z8-638
+218@Z8-638
 ¡
 synthesizing module '%s'638*oasys2	
 counter2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-638
-A
-%s*synth22
-0	Parameter WIDTH bound to: 841 - type: integer 
+1488@Z8-638
+B
+%s*synth23
+1	Parameter WIDTH bound to: 2592 - type: integer 
 
 ¹
 %done synthesizing module '%s' (%s#%s)256*oasys2	
 counter2
 62
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-256
+1488@Z8-256
 ±
 synthesizing module '%s'638*oasys2
 counter__parameterized02X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-638
-A
-%s*synth22
-0	Parameter WIDTH bound to: 516 - type: integer 
+1488@Z8-638
+B
+%s*synth23
+1	Parameter WIDTH bound to: 1242 - type: integer 
 
 É
 %done synthesizing module '%s' (%s#%s)256*oasys2
 counter__parameterized02
 62
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-256
+1488@Z8-256
 ¢
 synthesizing module '%s'638*oasys2
 
 register2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1568@Z8-638
+1648@Z8-638
 @
 %s*synth21
 /	Parameter WIDTH bound to: 36 - type: integer 
@@ -340,44 +355,32 @@ TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/vid
 
 register2
 72
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1568@Z8-256
+1648@Z8-256
 ¢
 synthesizing module '%s'638*oasys2
 	video_fsm2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-698@Z8-638
+778@Z8-638
 «
 -case statement is not full and has no default155*oasys2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1028@Z8-155
+1108@Z8-155
 º
 %done synthesizing module '%s' (%s#%s)256*oasys2
 	video_fsm2
 82
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-698@Z8-256
-¥
-synthesizing module '%s'638*oasys2
-pixel_clock2X
-TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1738@Z8-638
-½
-%done synthesizing module '%s' (%s#%s)256*oasys2
-pixel_clock2
-92
-162X
-TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1738@Z8-256
-·
+778@Z8-256
+¶
 %done synthesizing module '%s' (%s#%s)256*oasys2
-video2
-102
-162X
+video2
+92
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-148@Z8-256
+218@Z8-256
 ž
 synthesizing module '%s'638*oasys2
 spdif2X
@@ -415,22 +418,22 @@ TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/spd
 ¶
 %done synthesizing module '%s' (%s#%s)256*oasys2
 bmc2
-112
-162X
+102
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/spdif.sv2
 1978@Z8-256
 ·
 %done synthesizing module '%s' (%s#%s)256*oasys2
 spdif2
-122
-162X
+112
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/spdif.sv2
 258@Z8-256
 µ
 %done synthesizing module '%s' (%s#%s)256*oasys2
 hdmi2
-132
-162W
+122
+172W
 SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/hdmi.sv2
 238@Z8-256
 ¨
@@ -454,28 +457,253 @@ SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/fee
 Á
 %done synthesizing module '%s' (%s#%s)256*oasys2
 hdmi_test_sender2
-142
-162W
+132
+172W
 SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/feed.sv2
 618@Z8-256
 Á
 %done synthesizing module '%s' (%s#%s)256*oasys2
 hdmi_test_feeder2
-152
-162W
+142
+172W
 SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/feed.sv2
 248@Z8-256
+¬
+synthesizing module '%s'638*oasys2
+	hdmi_icon2b
+^C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/hdmi_icon.v2
+218@Z8-638
+Å
+%done synthesizing module '%s' (%s#%s)256*oasys2
+	hdmi_icon2
+152
+172b
+^C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/hdmi_icon.v2
+218@Z8-256
+´
+synthesizing module '%s'638*oasys2
+chipscope_ila2f
+bC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/chipscope_ila.v2
+218@Z8-638
+Í
+%done synthesizing module '%s' (%s#%s)256*oasys2
+chipscope_ila2
+162
+172f
+bC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/chipscope_ila.v2
+218@Z8-256
 ¼
 %done synthesizing module '%s' (%s#%s)256*oasys2
 
 top_test2
-162
-162[
+172
+172[
 WC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/top_test.sv2
 68@Z8-256
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[35]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[34]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[33]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[32]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[31]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[30]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[29]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[28]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[27]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[26]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[25]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[24]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[23]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[22]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[21]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[20]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[19]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[18]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[17]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[16]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[15]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[14]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[13]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[12]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[11]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[10]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[9]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[8]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[7]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[6]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[5]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[4]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[3]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[2]Z8-3331
+S
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+	HDMI_D[1]Z8-3331
 x
 %s*synth2i
-gfinished Rtl Elaboration : Time (s): elapsed = 00:00:18 . Memory (MB): peak = 501.285 ; gain = 351.750
+gfinished Rtl Elaboration : Time (s): elapsed = 00:00:18 . Memory (MB): peak = 501.160 ; gain = 351.449
 
 (
 %s*synth2
@@ -691,6 +919,44 @@ V
 3295*oasys2
 	video_fsm2
 vsyncZ8-3295
+æ
+EReading core file '%s' for (cell view '%s', library '%s', file '%s')
+108*designutils2b
+`C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc2
+	hdmi_icon2
+work2
+NOFILEZ20-108
+d
+Parsing EDIF File [%s]
+106*designutils2-
++./.ngc2edfcache/hdmi_icon_ngc_970ed6a3.edifZ20-106
+k
+ Finished Parsing EDIF File [%s]
+97*designutils2-
++./.ngc2edfcache/hdmi_icon_ngc_970ed6a3.edifZ20-97
+î
+EReading core file '%s' for (cell view '%s', library '%s', file '%s')
+108*designutils2f
+dC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/chipscope_ila.ngc2
+chipscope_ila2
+work2
+NOFILEZ20-108
+h
+Parsing EDIF File [%s]
+106*designutils21
+/./.ngc2edfcache/chipscope_ila_ngc_970ed6a3.edifZ20-106
+o
+ Finished Parsing EDIF File [%s]
+97*designutils21
+/./.ngc2edfcache/chipscope_ila_ngc_970ed6a3.edifZ20-97
+L
+-Analyzing %s Unisim elements for replacement
+17*netlist2
+986Z29-17
+O
+2Unisim Transformation completed in %s CPU seconds
+28*netlist2
+0Z29-28
 ”
 Loading clock regions from %s
 13*device2]
@@ -739,22 +1005,49 @@ WC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/constrs_1/imports/new/top_
 &Completed Processing XDC Constraints
 
 245*projectZ1-263
-c
+Ï
 !Unisim Transformation Summary:
-%s111*project2'
-%No Unisim elements were transformed.
+%s111*project2’
+  A total of 986 instances were transformed.
+  FD => FDCE: 321 instances
+  FDC => FDCE: 9 instances
+  FDE => FDCE: 32 instances
+  FDP => FDPE: 66 instances
+  FDR => FDRE: 60 instances
+  FDS => FDSE: 10 instances
+  LDC => LDCE: 1 instances
+  MUXCY_L => MUXCY: 98 instances
+  MUXF5 => LUT3: 2 instances
+  MUXF6 => LUT3: 1 instances
+  RAMB36 => RAMB36E1: 258 instances
+  SRL16 => SRL16E: 128 instances
 Z1-111
 1
-%Phase 0 | Netlist Checksum: 59eda915
+%Phase 0 | Netlist Checksum: 8eba25df
 *common
 a
 UUsing Xilinx IP in: C:/Xilinx/14.3/ISE_DS/ISE/coregen/ip/xilinx/primary/com/xilinx/ip*common
 
 
 *common
+§
+%s has already been declared976*oasys2
+DATA2]
+YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
+2138@Z8-976
+­
+ second declaration of %s ignored2654*oasys2
+DATA2]
+YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
+2138@Z8-2654
+ž
+%s is declared here994*oasys2
+DATA2]
+YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
+1028@Z8-994
 s
 %s*synth2d
-bstarting synthesize : Time (s): elapsed = 00:00:42 . Memory (MB): peak = 637.242 ; gain = 487.707
+bstarting synthesize : Time (s): elapsed = 00:00:45 . Memory (MB): peak = 646.594 ; gain = 496.883
 
 £
 synthesizing module '%s'638*oasys2
@@ -799,7 +1092,7 @@ I
 %done synthesizing module '%s' (%s#%s)256*oasys2
 IBUFDS2
 12
-162A
+172A
 =C:/Xilinx/14.3/ISE_DS/PlanAhead/scripts/rt/data/unisim_comp.v2	
 108348@Z8-256
 œ
@@ -952,7 +1245,7 @@ C
 %done synthesizing module '%s' (%s#%s)256*oasys2
 i2c_master_bit_ctrl2
 22
-162d
+172d
 `C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_master_bit_ctrl.v2
 1438@Z8-256
 Ý
@@ -969,7 +1262,7 @@ aC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_
 %done synthesizing module '%s' (%s#%s)256*oasys2
 i2c_master_byte_ctrl2
 32
-162e
+172e
 aC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_master_byte_ctrl.v2
 758@Z8-256
 ×
@@ -986,64 +1279,64 @@ aC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_
 %done synthesizing module '%s' (%s#%s)256*oasys2
 i2c_master_top2
 42
-162_
+172_
 [C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/i2c/i2c_master_top.v2
 788@Z8-256
 °
 -case statement is not full and has no default155*oasys2]
 YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
-3488@Z8-155
+4328@Z8-155
 À
 %done synthesizing module '%s' (%s#%s)256*oasys2
 
 i2c_config2
 52
-162]
+172]
 YC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/i2c_config.sv2
 318@Z8-256
 ž
 synthesizing module '%s'638*oasys2
 video2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-148@Z8-638
+218@Z8-638
 ¡
 synthesizing module '%s'638*oasys2	
 counter2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-638
-A
-%s*synth22
-0	Parameter WIDTH bound to: 841 - type: integer 
+1488@Z8-638
+B
+%s*synth23
+1	Parameter WIDTH bound to: 2592 - type: integer 
 
 ¹
 %done synthesizing module '%s' (%s#%s)256*oasys2	
 counter2
 62
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-256
+1488@Z8-256
 ±
 synthesizing module '%s'638*oasys2
 counter__parameterized02X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-638
-A
-%s*synth22
-0	Parameter WIDTH bound to: 516 - type: integer 
+1488@Z8-638
+B
+%s*synth23
+1	Parameter WIDTH bound to: 1242 - type: integer 
 
 É
 %done synthesizing module '%s' (%s#%s)256*oasys2
 counter__parameterized02
 62
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1408@Z8-256
+1488@Z8-256
 ¢
 synthesizing module '%s'638*oasys2
 
 register2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1568@Z8-638
+1648@Z8-638
 @
 %s*synth21
 /	Parameter WIDTH bound to: 36 - type: integer 
@@ -1053,44 +1346,32 @@ TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/vid
 
 register2
 72
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1568@Z8-256
+1648@Z8-256
 ¢
 synthesizing module '%s'638*oasys2
 	video_fsm2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-698@Z8-638
+778@Z8-638
 «
 -case statement is not full and has no default155*oasys2X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1028@Z8-155
+1108@Z8-155
 º
 %done synthesizing module '%s' (%s#%s)256*oasys2
 	video_fsm2
 82
-162X
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-698@Z8-256
-¥
-synthesizing module '%s'638*oasys2
-pixel_clock2X
-TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1738@Z8-638
-½
-%done synthesizing module '%s' (%s#%s)256*oasys2
-pixel_clock2
-92
-162X
-TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-1738@Z8-256
-·
+778@Z8-256
+¶
 %done synthesizing module '%s' (%s#%s)256*oasys2
-video2
-102
-162X
+video2
+92
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/video.sv2
-148@Z8-256
+218@Z8-256
 ž
 synthesizing module '%s'638*oasys2
 spdif2X
@@ -1128,8 +1409,8 @@ TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/spd
 ¶
 %done synthesizing module '%s' (%s#%s)256*oasys2
 bmc2
-112
-162X
+102
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/spdif.sv2
 1978@Z8-256
 Ú
@@ -1142,15 +1423,15 @@ TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/spd
 ·
 %done synthesizing module '%s' (%s#%s)256*oasys2
 spdif2
-122
-162X
+112
+172X
 TC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/spdif.sv2
 258@Z8-256
 µ
 %done synthesizing module '%s' (%s#%s)256*oasys2
 hdmi2
-132
-162W
+122
+172W
 SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/hdmi.sv2
 238@Z8-256
 ¨
@@ -1174,28 +1455,52 @@ SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/fee
 Á
 %done synthesizing module '%s' (%s#%s)256*oasys2
 hdmi_test_sender2
-142
-162W
+132
+172W
 SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/feed.sv2
 618@Z8-256
 Á
 %done synthesizing module '%s' (%s#%s)256*oasys2
 hdmi_test_feeder2
-152
-162W
+142
+172W
 SC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/feed.sv2
 248@Z8-256
+¬
+synthesizing module '%s'638*oasys2
+	hdmi_icon2b
+^C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/hdmi_icon.v2
+218@Z8-638
+Å
+%done synthesizing module '%s' (%s#%s)256*oasys2
+	hdmi_icon2
+152
+172b
+^C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/hdmi_icon.v2
+218@Z8-256
+´
+synthesizing module '%s'638*oasys2
+chipscope_ila2f
+bC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/chipscope_ila.v2
+218@Z8-638
+Í
+%done synthesizing module '%s' (%s#%s)256*oasys2
+chipscope_ila2
+162
+172f
+bC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/chipscope_ila.v2
+218@Z8-256
 ¼
 %done synthesizing module '%s' (%s#%s)256*oasys2
 
 top_test2
-162
-162[
+172
+172[
 WC:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/hdmi/top_test.sv2
 68@Z8-256
 s
 %s*synth2d
-bfinished synthesize : Time (s): elapsed = 00:02:49 . Memory (MB): peak = 974.641 ; gain = 825.105
+bfinished synthesize : Time (s): elapsed = 00:02:54 . Memory (MB): peak = 976.098 ; gain = 826.387
 
 
 
@@ -1222,7 +1527,7 @@ Q-------------------------------------------------------------------------------
 *common
 ‘
 %s*synth2
-Finished applying 'set_property' XDC Constraints : Time (s): elapsed = 00:02:49 . Memory (MB): peak = 974.641 ; gain = 825.105
+Finished applying 'set_property' XDC Constraints : Time (s): elapsed = 00:02:55 . Memory (MB): peak = 976.098 ; gain = 826.387
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -1268,7 +1573,7 @@ Q-------------------------------------------------------------------------------
 *common
 Œ
 %s*synth2}
-{Finished Loading Part and Timing Information : Time (s): elapsed = 00:03:04 . Memory (MB): peak = 974.641 ; gain = 825.105
+{Finished Loading Part and Timing Information : Time (s): elapsed = 00:03:10 . Memory (MB): peak = 976.098 ; gain = 826.387
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -1322,7 +1627,11 @@ Q-------------------------------------------------------------------------------
 
 ?
 %s*synth20
-.	   2 Input     11 Bit       Adders := 2     
+.	   2 Input     13 Bit       Adders := 1     
+
+?
+%s*synth20
+.	   2 Input     12 Bit       Adders := 1     
 
 ?
 %s*synth20
@@ -1342,7 +1651,7 @@ Q-------------------------------------------------------------------------------
 
 ?
 %s*synth20
-.	   2 Input      2 Bit       Adders := 2     
+.	   2 Input      2 Bit       Adders := 1     
 
 
 %s*synth2
@@ -1390,7 +1699,11 @@ Q-------------------------------------------------------------------------------
 
 ?
 %s*synth20
-.	               11 Bit    Registers := 2     
+.	               13 Bit    Registers := 1     
+
+?
+%s*synth20
+.	               12 Bit    Registers := 1     
 
 ?
 %s*synth20
@@ -1418,11 +1731,11 @@ Q-------------------------------------------------------------------------------
 
 ?
 %s*synth20
-.	                2 Bit    Registers := 5     
+.	                2 Bit    Registers := 4     
 
 ?
 %s*synth20
-.	                1 Bit    Registers := 42    
+.	                1 Bit    Registers := 41    
 
 
 %s*synth2
@@ -1440,13 +1753,13 @@ Q-------------------------------------------------------------------------------
 %s*synth20
 .	  19 Input     18 Bit        Muxes := 1     
 
-?
-%s*synth20
-.	   2 Input     16 Bit        Muxes := 3     
-
 A
 %s*synth22
 0	500001 Input     16 Bit        Muxes := 1     
+
+?
+%s*synth20
+.	   2 Input     16 Bit        Muxes := 3     
 
 ?
 %s*synth20
@@ -1462,7 +1775,7 @@ A
 
 ?
 %s*synth20
-.	   8 Input      8 Bit        Muxes := 1     
+.	   2 Input      8 Bit        Muxes := 9     
 
 ?
 %s*synth20
@@ -1470,11 +1783,11 @@ A
 
 ?
 %s*synth20
-.	   2 Input      8 Bit        Muxes := 9     
+.	   4 Input      8 Bit        Muxes := 1     
 
 ?
 %s*synth20
-.	   4 Input      8 Bit        Muxes := 1     
+.	   8 Input      8 Bit        Muxes := 1     
 
 ?
 %s*synth20
@@ -1498,7 +1811,7 @@ A
 
 ?
 %s*synth20
-.	   4 Input      3 Bit        Muxes := 1     
+.	  63 Input      3 Bit        Muxes := 1     
 
 ?
 %s*synth20
@@ -1510,7 +1823,7 @@ A
 
 ?
 %s*synth20
-.	  63 Input      3 Bit        Muxes := 1     
+.	   4 Input      3 Bit        Muxes := 1     
 
 ?
 %s*synth20
@@ -1518,7 +1831,7 @@ A
 
 ?
 %s*synth20
-.	   2 Input      2 Bit        Muxes := 2     
+.	   2 Input      2 Bit        Muxes := 1     
 
 ?
 %s*synth20
@@ -1526,19 +1839,7 @@ A
 
 ?
 %s*synth20
-.	   2 Input      1 Bit        Muxes := 56    
-
-?
-%s*synth20
 .	  19 Input      1 Bit        Muxes := 5     
-
-?
-%s*synth20
-.	   3 Input      1 Bit        Muxes := 11    
-
-?
-%s*synth20
-.	   4 Input      1 Bit        Muxes := 3     
 
 ?
 %s*synth20
@@ -1546,7 +1847,19 @@ A
 
 ?
 %s*synth20
+.	   3 Input      1 Bit        Muxes := 11    
+
+?
+%s*synth20
+.	   2 Input      1 Bit        Muxes := 55    
+
+?
+%s*synth20
 .	   5 Input      1 Bit        Muxes := 2     
+
+?
+%s*synth20
+.	   4 Input      1 Bit        Muxes := 3     
 
 
 
@@ -1839,6 +2152,101 @@ ESequential element (%s) is unused and will be removed from module %s.3332*
 \video_sender/addr_reg[18] 2
 
 counter__6Z8-3332
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[35]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[34]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[33]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[32]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[31]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[30]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[29]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[28]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[27]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[26]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[25]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[24]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[23]Z8-3331
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[22]Z8-3331
+¯
+Message '%s' appears more than %s times and has been disabled. User can change this message limit to see more message instances.
+14*common2
+Synth 8-33312
+50Z17-14
+T
+!design %s has unconnected port %s3331*oasys2
+
+top_test2
+
+HDMI_D[21]Z8-3331
 ]
 Q---------------------------------------------------------------------------------*common
 
@@ -1846,7 +2254,7 @@ Q-------------------------------------------------------------------------------
 *common
 „
 %s*synth2u
-sFinished Cross Boundary Optimization : Time (s): elapsed = 00:03:05 . Memory (MB): peak = 974.641 ; gain = 825.105
+sFinished Cross Boundary Optimization : Time (s): elapsed = 00:03:11 . Memory (MB): peak = 976.098 ; gain = 826.387
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -1897,7 +2305,7 @@ Q-------------------------------------------------------------------------------
 *common
 {
 %s*synth2l
-jFinished Area Optimization : Time (s): elapsed = 00:03:51 . Memory (MB): peak = 1024.508 ; gain = 874.973
+jFinished Area Optimization : Time (s): elapsed = 00:03:59 . Memory (MB): peak = 1032.262 ; gain = 882.551
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -1950,7 +2358,7 @@ Q-------------------------------------------------------------------------------
 *common
 ‰
 %s*synth2z
-xFinished Applying XDC Timing Constraints : Time (s): elapsed = 00:03:53 . Memory (MB): peak = 1024.508 ; gain = 874.973
+xFinished Applying XDC Timing Constraints : Time (s): elapsed = 00:04:01 . Memory (MB): peak = 1032.262 ; gain = 882.551
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -1975,7 +2383,7 @@ Q-------------------------------------------------------------------------------
 *common
 }
 %s*synth2n
-lFinished Timing Optimization : Time (s): elapsed = 00:03:56 . Memory (MB): peak = 1024.508 ; gain = 874.973
+lFinished Timing Optimization : Time (s): elapsed = 00:04:03 . Memory (MB): peak = 1032.262 ; gain = 882.551
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -2010,7 +2418,7 @@ Q-------------------------------------------------------------------------------
 *common
 |
 %s*synth2m
-kFinished Technology Mapping : Time (s): elapsed = 00:04:25 . Memory (MB): peak = 1024.508 ; gain = 874.973
+kFinished Technology Mapping : Time (s): elapsed = 00:04:33 . Memory (MB): peak = 1032.262 ; gain = 882.551
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -2117,7 +2525,7 @@ Q-------------------------------------------------------------------------------
 *common
 v
 %s*synth2g
-eFinished IO Insertion : Time (s): elapsed = 00:04:33 . Memory (MB): peak = 1024.508 ; gain = 874.973
+eFinished IO Insertion : Time (s): elapsed = 00:04:41 . Memory (MB): peak = 1032.262 ; gain = 882.551
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -2194,7 +2602,7 @@ Q-------------------------------------------------------------------------------
 *common
 ƒ
 %s*synth2t
-rFinished Rebuilding User Hierarchy : Time (s): elapsed = 00:05:07 . Memory (MB): peak = 1024.508 ; gain = 874.973
+rFinished Rebuilding User Hierarchy : Time (s): elapsed = 00:05:15 . Memory (MB): peak = 1032.262 ; gain = 882.551
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -2240,111 +2648,119 @@ Q-------------------------------------------------------------------------------
 
 /
 %s*synth2 
+1    |hdmi_icon    |        1
+
+/
+%s*synth2 
 -----+-------------+---------
 
 %
 %s*synth2
 Report Cell Usage: 
 
-$
-%s*synth2
------+------+-----
+'
+%s*synth2
+-----+---------+-----
 
-$
-%s*synth2
-     |Cell  |Count
+'
+%s*synth2
+     |Cell     |Count
 
-$
-%s*synth2
------+------+-----
+'
+%s*synth2
+-----+---------+-----
 
-$
-%s*synth2
-1    |BUFG  |    2
+'
+%s*synth2
+1    |hdmi_icon|    1
 
-$
-%s*synth2
-2    |CARRY4|   14
+'
+%s*synth2
+2    |BUFG     |    2
 
-$
-%s*synth2
-3    |INV   |    2
+'
+%s*synth2
+3    |CARRY4   |   21
 
-$
-%s*synth2
-4    |LUT1  |   45
+'
+%s*synth2
+4    |INV      |    2
 
-$
-%s*synth2
-5    |LUT2  |   60
+'
+%s*synth2
+5    |LUT1     |   70
 
-$
-%s*synth2
-6    |LUT3  |  114
+'
+%s*synth2
+6    |LUT2     |   59
 
-$
-%s*synth2
-7    |LUT4  |  283
+'
+%s*synth2
+7    |LUT3     |  118
 
-$
-%s*synth2
-8    |LUT5  | 1564
+'
+%s*synth2
+8    |LUT4     |  289
 
-$
-%s*synth2
-9    |LUT6  |76668
+'
+%s*synth2
+9    |LUT5     | 1557
 
-$
-%s*synth2
-10   |MUXF7 | 7761
+'
+%s*synth2
+10   |LUT6     |76667
 
-$
-%s*synth2
-11   |MUXF8 | 2904
+'
+%s*synth2
+11   |MUXF7    | 7760
 
-$
-%s*synth2
-12   |XORCY |    1
+'
+%s*synth2
+12   |MUXF8    | 2904
 
-$
-%s*synth2
-13   |FD    |   11
+'
+%s*synth2
+13   |XORCY    |    3
 
-$
-%s*synth2
-14   |FDC   |   74
+'
+%s*synth2
+14   |FD       |   11
 
-$
-%s*synth2
-15   |FDCE  |  582
+'
+%s*synth2
+15   |FDC      |   73
 
-$
-%s*synth2
-16   |FDP   |   25
+'
+%s*synth2
+16   |FDCE     |  583
 
-$
-%s*synth2
-17   |FDPE  |    8
+'
+%s*synth2
+17   |FDP      |   25
 
-$
-%s*synth2
-18   |IBUF  |    2
+'
+%s*synth2
+18   |FDPE     |    8
 
-$
-%s*synth2
-19   |IBUFDS|    1
+'
+%s*synth2
+19   |IBUF     |    2
 
-$
-%s*synth2
-20   |IOBUF |    2
+'
+%s*synth2
+20   |IBUFDS   |    1
 
-$
-%s*synth2
-21   |OBUF  |   50
+'
+%s*synth2
+21   |IOBUF    |    2
 
-$
-%s*synth2
------+------+-----
+'
+%s*synth2
+22   |OBUF     |   50
+
+'
+%s*synth2
+-----+---------+-----
 
 )
 %s*synth2
@@ -2364,31 +2780,31 @@ N
 
 N
 %s*synth2?
-=1    |top                     |                       |90173
+=1    |top                     |                       |90207
 
 N
 %s*synth2?
-=2    |  hdmi0                 |hdmi                   |  758
+=2    |  hdmi0                 |hdmi                   |  792
 
 N
 %s*synth2?
-=3    |    i2c_config0         |i2c_config             |  519
+=3    |    i2c_config0         |i2c_config             |  523
 
 N
 %s*synth2?
-=4    |      i2c_core          |i2c_master_top         |  411
+=4    |      i2c_core          |i2c_master_top         |  387
 
 N
 %s*synth2?
-=5    |        byte_controller |i2c_master_byte_ctrl   |  293
+=5    |        byte_controller |i2c_master_byte_ctrl   |  272
 
 N
 %s*synth2?
-=6    |          bit_controller|i2c_master_bit_ctrl    |  189
+=6    |          bit_controller|i2c_master_bit_ctrl    |  192
 
 N
 %s*synth2?
-=7    |    spdif0              |spdif                  |  162
+=7    |    spdif0              |spdif                  |  161
 
 N
 %s*synth2?
@@ -2396,35 +2812,31 @@ N
 
 N
 %s*synth2?
-=9    |    video0              |video                  |   77
+=9    |    video0              |video                  |  108
 
 N
 %s*synth2?
-=10   |      fsm               |video_fsm              |    3
+=10   |      h_count           |counter                |   51
 
 N
 %s*synth2?
-=11   |      pixel_clk         |pixel_clock            |    6
+=11   |      fsm               |video_fsm              |   10
 
 N
 %s*synth2?
-=12   |      h_count           |counter                |   28
+=12   |      v_count           |counter__parameterized0|   44
 
 N
 %s*synth2?
-=13   |      v_count           |counter__parameterized0|   26
+=13   |  feeder0               |hdmi_test_feeder       |89354
 
 N
 %s*synth2?
-=14   |  feeder0               |hdmi_test_feeder       |89354
+=14   |    video_sender        |hdmi_test_sender       |    2
 
 N
 %s*synth2?
-=15   |    video_sender        |hdmi_test_sender       |    2
-
-N
-%s*synth2?
-=16   |    audio_sender        |hdmi_test_sender_0     |28808
+=15   |    audio_sender        |hdmi_test_sender_0     |28808
 
 N
 %s*synth2?
@@ -2437,7 +2849,7 @@ Q-------------------------------------------------------------------------------
 *common
 ‚
 %s*synth2s
-qFinished Writing Synthesis Report : Time (s): elapsed = 00:05:07 . Memory (MB): peak = 1024.508 ; gain = 874.973
+qFinished Writing Synthesis Report : Time (s): elapsed = 00:05:15 . Memory (MB): peak = 1032.262 ; gain = 882.551
 
 ]
 Q---------------------------------------------------------------------------------*common
@@ -2452,31 +2864,55 @@ Q-------------------------------------------------------------------------------
 269*common2#
 !Synthesis Optimization Complete: 2
 
-00:05:062
+00:05:142
 
-1024.5082	
-831.965Z17-269
+1032.2622	
+839.535Z17-269
+æ
+EReading core file '%s' for (cell view '%s', library '%s', file '%s')
+108*designutils2b
+`C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.srcs/sources_1/imports/chipscope_1/hdmi_icon.ngc2
+	hdmi_icon2
+work2
+NOFILEZ20-108
+d
+Parsing EDIF File [%s]
+106*designutils2-
++./.ngc2edfcache/hdmi_icon_ngc_970ed6a3.edifZ20-106
+k
+ Finished Parsing EDIF File [%s]
+97*designutils2-
++./.ngc2edfcache/hdmi_icon_ngc_970ed6a3.edifZ20-97
 L
 -Analyzing %s Unisim elements for replacement
 17*netlist2
-112Z29-17
+130Z29-17
 O
 2Unisim Transformation completed in %s CPU seconds
 28*netlist2
 0Z29-28
-®
+~
+XCould not trace control bus of detected core attached to %s. This core will be ignored.
+83*	chipscope2
+
+CONTROL0Z16-85
+ž
 !Unisim Transformation Summary:
-%s111*project2ñ
-î  A total of 115 instances were transformed.
-  (MUXCY,XORCY) => CARRY4: 1 instances
+%s111*project2á
+Þ  A total of 137 instances were transformed.
+  (MUXCY,XORCY) => CARRY4: 5 instances
   FD => FDCE: 11 instances
   FDC => FDCE: 74 instances
+  FDE => FDCE: 3 instances
   FDP => FDPE: 25 instances
-  INV => LUT1: 2 instances
+  FDR => FDRE: 7 instances
+  INV => LUT1: 7 instances
   IOBUF => IOBUF (OBUFT, IBUF): 2 instances
+  MUXF5 => LUT3: 2 instances
+  MUXF6 => LUT3: 1 instances
 Z1-111
 1
-%Phase 0 | Netlist Checksum: 35ae1bd5
+%Phase 0 | Netlist Checksum: 2a9bd501
 *common
 :
 Releasing license: %s
@@ -2487,15 +2923,15 @@ Z1-111
 269*common2
 synth_design: 2
 
-00:05:372
+00:05:452
 
-1024.5082	
-831.965Z17-269
+1032.2622	
+839.535Z17-269
 ‚
-vreport_utilization: Time (s): elapsed = 00:00:00.200¼[ÜÁè¬è¬@Xîx‘5 . Memory (MB): peak = 1024.508 ; gain = 0.000
+vreport_utilization: Time (s): elapsed = 00:00:00.203„¶J‹èºèº@•ex‘› . Memory (MB): peak = 1032.262 ; gain = 0.000
 *common
 S
 Exiting %s at %s...
 206*common2
 Vivado2
-Thu Oct 03 17:15:34 2013Z17-206
+Thu Oct 03 22:12:58 2013Z17-206

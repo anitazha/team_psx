@@ -1,0 +1,381 @@
+#-----------------------------------------------------------
+# Vivado v2012.3
+# Build 209282 by xbuild on Thu Oct 18 20:54:02 MDT 2012
+# Start of session at: Thu Oct 03 21:14:05 2013
+# Process ID: 13532
+# Log file: C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/top_test.rdi
+# Journal file: C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+INFO: [Common 17-81] Feature available: Implementation
+INFO: [Common 17-81] Feature available: Synthesis
+INFO: [Device 21-36] Loading parts and site information from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/arch.xml
+Parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+Finished parsing RTL primitives file [C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/rtl/prims/rtl_prims.xml]
+source top_test.tcl -notrace
+INFO: [Netlist 29-17] Analyzing 2 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+Loading clock regions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockRegion.xml
+Loading clock buffers from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ClockBuffers.xml
+Loading clock placement rules from C:/Xilinx/14.3/ISE_DS/PlanAhead/data/parts/xilinx/virtex7/ClockPlacerRules.xml
+Loading package pin functions from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/PinFunctions.xml...
+Loading package from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/virtex7/xc7vx485t/ffg1761/Package.xml
+Loading io standards from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/IOStandards.xml
+Loading device configuration modes from C:/Xilinx/14.3/ISE_DS/PlanAhead/data\parts/xilinx/virtex7/ConfigModes.xml
+Loading list of drcs for the architecture : C:/Xilinx/14.3/ISE_DS/PlanAhead/data\./parts/xilinx/virtex7/drc.xml
+Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-13532-TomatoBiscuit/dcp/top_test.xdc]
+Finished Parsing XDC File [C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/.Xil/Vivado-13532-TomatoBiscuit/dcp/top_test.xdc]
+Reading XDEF placement.
+Reading XDEF routing.
+Read XDEF File: Time (s): elapsed = 00:00:00.184®âÙ⁄©êü . Memory (MB): peak = 633.156 ; gain = 0.953
+Restoring placement.
+Restored 56 out of 56 XDEF sites from archive | CPU: 0.000000 secs | Memory: 0.000000 MB |
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 116 instances were transformed.
+  (MUXCY,XORCY) => CARRY4: 3 instances
+  FD => FDCE: 11 instances
+  FDC => FDCE: 73 instances
+  FDP => FDPE: 25 instances
+  INV => LUT1: 2 instances
+  IOBUF => IOBUF (OBUFT, IBUF): 2 instances
+
+Phase 0 | Netlist Checksum: b8fd3c61
+read_checkpoint: Time (s): elapsed = 00:00:29 . Memory (MB): peak = 633.156 ; gain = 440.996
+INFO: [Common 17-347] Attempting to get a license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+
+Starting Logic Optimization Task
+Logic Optimization | Checksum: b8645ed1
+Netlist sorting complete. Time (s): elapsed = 00:00:00.541\¯â†·©êü . Memory (MB): peak = 726.121 ; gain = 0.000
+
+Phase 1 Retarget
+INFO: [Opt 31-49] Retargeted 0 cell(s).
+Phase 1 Retarget | Checksum: e9f01412
+
+Time (s): elapsed = 00:00:01 . Memory (MB): peak = 726.121 ; gain = 0.000
+
+Phase 2 Constant Propagation
+INFO: [Opt 31-10] Eliminated 44 cells.
+Phase 2 Constant Propagation | Checksum: 4eda0772
+
+Time (s): elapsed = 00:00:25 . Memory (MB): peak = 803.449 ; gain = 77.328
+
+Phase 3 Sweep
+INFO: [Opt 31-12] Eliminated 106 unconnected nets.
+INFO: [Opt 31-11] Eliminated 12 unconnected cells.
+Phase 3 Sweep | Checksum: 9bfdf6af
+
+Time (s): elapsed = 00:00:27 . Memory (MB): peak = 803.449 ; gain = 77.328
+Ending Logic Optimization Task | Checksum: 9bfdf6af
+
+Time (s): elapsed = 00:00:28 . Memory (MB): peak = 803.449 ; gain = 77.328
+Netlist sorting complete. Time (s): elapsed = 00:00:00.332\¯â†·©êü . Memory (MB): peak = 803.449 ; gain = 0.000
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [Common 17-83] Releasing license: Implementation
+opt_design: Time (s): elapsed = 00:00:41 . Memory (MB): peak = 848.043 ; gain = 214.887
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): elapsed = 00:00:01 . Memory (MB): peak = 851.133 ; gain = 0.000
+INFO: [Common 17-347] Attempting to get a license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7vx485t'
+Running DRC as a precondition to command place_design
+INFO: [Drc 23-27] Running DRC with 2 threads
+
+Starting Placer Task
+Effort Level for place_design : MEDIUM (Default)
+INFO: [Place 30-611] Multithreading enabled for place_design using a maximum of 2 CPUs
+
+Phase 1 Mandatory Logic Optimization
+Netlist sorting complete. Time (s): elapsed = 00:00:00.338‘˛â‹©êü . Memory (MB): peak = 851.133 ; gain = 0.000
+Phase 1 Mandatory Logic Optimization | Checksum: 61ddbc99
+
+Time (s): elapsed = 00:00:02 . Memory (MB): peak = 851.133 ; gain = 0.000
+
+Phase 2 Build SLR Info
+Phase 2 Build SLR Info | Checksum: 61ddbc99
+
+Time (s): elapsed = 00:00:02 . Memory (MB): peak = 851.133 ; gain = 0.000
+
+Phase 3 Add Constraints
+Phase 3 Add Constraints | Checksum: 61ddbc99
+
+Time (s): elapsed = 00:00:02 . Memory (MB): peak = 851.133 ; gain = 0.000
+
+Phase 4 Build Shapes
+Phase 4 Build Shapes | Checksum: 6cfd9473
+
+Time (s): elapsed = 00:00:04 . Memory (MB): peak = 851.133 ; gain = 0.000
+
+Phase 5 Implementation Feasibility check
+Phase 5 Implementation Feasibility check | Checksum: 6cfd9473
+
+Time (s): elapsed = 00:00:06 . Memory (MB): peak = 851.133 ; gain = 0.000
+
+Phase 6 PrePlace Elements
+Phase 6 PrePlace Elements | Checksum: 6cfd9473
+
+Time (s): elapsed = 00:00:06 . Memory (MB): peak = 851.133 ; gain = 0.000
+
+Phase 7 Placer Initialization
+
+Phase 7.1 IO & Clk Placer & Init
+
+Phase 7.1.1 IO / Clock Placer
+
+Phase 7.1.2 Build Placer Device
+
+Phase 7.1.2.1 Place Init Device
+Phase 7.1.2.1 Place Init Device | Checksum: 6cfd9473
+
+Time (s): elapsed = 00:00:08 . Memory (MB): peak = 852.098 ; gain = 0.965
+Phase 7.1.2 Build Placer Device | Checksum: 6cfd9473
+
+Time (s): elapsed = 00:00:08 . Memory (MB): peak = 852.098 ; gain = 0.965
+Phase 7.1.1 IO / Clock Placer | Checksum: 6cfd9473
+
+Time (s): elapsed = 00:00:09 . Memory (MB): peak = 852.098 ; gain = 0.965
+Phase 7.1 IO & Clk Placer & Init | Checksum: 6cfd9473
+
+Time (s): elapsed = 00:00:09 . Memory (MB): peak = 852.098 ; gain = 0.965
+
+Phase 7.2 Build Placer Netlist
+
+Phase 7.2.1 Place Init Design
+Phase 7.2.1 Place Init Design | Checksum: 63326dc3
+
+Time (s): elapsed = 00:00:14 . Memory (MB): peak = 859.199 ; gain = 8.066
+Phase 7.2 Build Placer Netlist | Checksum: 63326dc3
+
+Time (s): elapsed = 00:00:14 . Memory (MB): peak = 859.199 ; gain = 8.066
+
+Phase 7.3 Constrain Clocks
+Phase 7.3 Constrain Clocks | Checksum: 63326dc3
+
+Time (s): elapsed = 00:00:15 . Memory (MB): peak = 859.199 ; gain = 8.066
+Phase 7 Placer Initialization | Checksum: 63326dc3
+
+Time (s): elapsed = 00:00:15 . Memory (MB): peak = 859.199 ; gain = 8.066
+
+Phase 8 Global Placement
+Phase 8 Global Placement | Checksum: 5a7dac21
+
+Time (s): elapsed = 00:03:52 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 9 Detail Placement
+
+Phase 9.1 Commit Multi Column shapes
+Phase 9.1 Commit Multi Column shapes | Checksum: 5a7dac21
+
+Time (s): elapsed = 00:03:53 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 9.2 Commit Most Shapes & LUTRAMs
+Phase 9.2 Commit Most Shapes & LUTRAMs | Checksum: f5519048
+
+Time (s): elapsed = 00:03:54 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 9.3 Area Swap
+Phase 9.3 Area Swap | Checksum: fdd8aab1
+
+Time (s): elapsed = 00:03:57 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 9.4 Path Optimizer
+Phase 9.4 Path Optimizer | Checksum: fdd8aab1
+
+Time (s): elapsed = 00:03:57 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 9.5 Commit Small Shapes
+Phase 9.5 Commit Small Shapes | Checksum: eeb4db3f
+
+Time (s): elapsed = 00:04:21 . Memory (MB): peak = 891.934 ; gain = 40.801
+Phase 9 Detail Placement | Checksum: eeb4db3f
+
+Time (s): elapsed = 00:04:22 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 10 PostPlace Cleanup
+Phase 10 PostPlace Cleanup | Checksum: eeb4db3f
+
+Time (s): elapsed = 00:04:23 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 11 Placer Reporting
+Phase 11 Placer Reporting | Checksum: eeb4db3f
+
+Time (s): elapsed = 00:04:24 . Memory (MB): peak = 891.934 ; gain = 40.801
+
+Phase 12 Cleanup
+Phase 12 Cleanup | Checksum: 501bf9e4
+
+Time (s): elapsed = 00:04:24 . Memory (MB): peak = 891.934 ; gain = 40.801
+Ending Placer Task | Checksum: 48713150
+
+Time (s): elapsed = 00:04:24 . Memory (MB): peak = 891.934 ; gain = 40.801
+INFO: [Common 17-83] Releasing license: Implementation
+place_design: Time (s): elapsed = 00:04:26 . Memory (MB): peak = 891.934 ; gain = 40.801
+INFO: [Timing 38-163] DEBUG : Generate clock report | CPU: 0 secs 
+
+report_utilization: Time (s): elapsed = 00:00:00.216ƒ¸â,‹©,‹© . Memory (MB): peak = 891.934 ; gain = 0.000
+INFO: [Designutils 20-134] DEBUG : Generate Control Sets report | CPU: 0 secs 
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): elapsed = 00:00:09 . Memory (MB): peak = 891.934 ; gain = 0.000
+write_checkpoint: Time (s): elapsed = 00:00:13 . Memory (MB): peak = 891.934 ; gain = 0.000
+INFO: [Common 17-347] Attempting to get a license for feature 'Implementation' and/or device 'xc7vx485t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7vx485t'
+Running DRC as a precondition to command route_design
+INFO: [Drc 23-27] Running DRC with 2 threads
+
+
+Starting Routing Task
+
+Effort Level for route_design : MEDIUM (Default)
+INFO: [Route 35-254] Multithreading enabled for route_design using a maximum of 2 CPUs
+
+Starting Route Task
+
+Phase 1 Build RT Design
+
+Phase 1.1 Build Netlist & NodeGraph (MT)
+Netlist sorting complete. Time (s): elapsed = 00:00:00.359¯ÛâD◊©êü . Memory (MB): peak = 891.934 ; gain = 0.000
+Phase 1.1 Build Netlist & NodeGraph (MT) | Checksum: 0
+
+Time (s): elapsed = 00:02:30 . Memory (MB): peak = 1238.945 ; gain = 347.012
+Phase 1 Build RT Design | Checksum: 0
+
+Time (s): elapsed = 00:02:31 . Memory (MB): peak = 1238.945 ; gain = 347.012
+
+Phase 2 Router Initialization
+INFO: [Route 35-64] No timing constraints were detected. The router will operate in resource-optimization mode.
+INFO: [Route 35-23] Estimated Global Vertical Wire Utilization = 0.75 %
+INFO: [Route 35-22] Estimated Global Horizontal Wire Utilization = 1.91 %
+
+Phase 2.1 Restore Routing
+INFO: [Route 35-249] Design has 68552 routable nets.
+INFO: [Route 35-252] Restored 0 nets from the routeDb.
+INFO: [Route 35-251] Found 0 nets with FIXED_ROUTE property.
+Phase 2.1 Restore Routing | Checksum: 1d295fc2
+
+Time (s): elapsed = 00:02:32 . Memory (MB): peak = 1238.945 ; gain = 347.012
+
+Phase 2.2 Special Net Routing
+ Number of Wires with overlaps = 0
+Phase 2.2 Special Net Routing | Checksum: 7ad81949
+
+Time (s): elapsed = 00:02:33 . Memory (MB): peak = 1365.004 ; gain = 473.070
+
+Phase 2.3 Non Guided Clock Net Routing
+Phase 2.3 Non Guided Clock Net Routing | Checksum: 7ad81949
+
+Time (s): elapsed = 00:02:33 . Memory (MB): peak = 1365.008 ; gain = 473.074
+Phase 2 Router Initialization | Checksum: 7ad81949
+
+Time (s): elapsed = 00:02:33 . Memory (MB): peak = 1367.496 ; gain = 475.563
+
+Phase 3 Initial Routing
+Phase 3 Initial Routing | Checksum: e592702c
+
+Time (s): elapsed = 00:03:25 . Memory (MB): peak = 1368.723 ; gain = 476.789
+
+Phase 4 Rip-up And Reroute
+
+Phase 4.1 Global Iteration 0
+ Number of Wires with overlaps = 10547
+ Number of Wires with overlaps = 164
+ Number of Wires with overlaps = 0
+Phase 4.1 Global Iteration 0 | Checksum: 103abe96
+
+Time (s): elapsed = 00:04:18 . Memory (MB): peak = 1368.723 ; gain = 476.789
+Phase 4 Rip-up And Reroute | Checksum: 103abe96
+
+Time (s): elapsed = 00:04:19 . Memory (MB): peak = 1368.723 ; gain = 476.789
+
+Phase 5 Post Hold Fix
+Phase 5 Post Hold Fix | Checksum: 103abe96
+
+Time (s): elapsed = 00:04:19 . Memory (MB): peak = 1368.723 ; gain = 476.789
+
+
+  CostCode Usage Stats for the entire design:
+  +----------+----------------------+------------+-----------+-------+
+  | CostCode |         Name         | TotalCount | UsedCount | Usage |
+  +----------+----------------------+------------+-----------+-------+
+  |     0    | GENERIC              |       4425 |         6 |  0.14 |
+  |     1    | DOUBLE               |    1699200 |    116518 |  6.86 |
+  |     2    | INPUT                |    1899635 |     11923 |  0.63 |
+  |     3    | BENTQUAD             |     849600 |     14486 |  1.71 |
+  |     4    | SLOWSINGLE           |      12572 |        17 |  0.14 |
+  |     5    | CLKPIN               |     105638 |       401 |  0.38 |
+  |     6    | GLOBAL               |     663992 |       434 |  0.07 |
+  |     7    | OUTPUT               |    1679265 |    137604 |  8.19 |
+  |     8    | PINFEED              |    3879390 |    435086 | 11.22 |
+  |     9    | BOUNCEIN             |     479300 |     14890 |  3.11 |
+  |    10    | LUTINPUT             |    1821600 |    434245 | 23.84 |
+  |    11    | IOBOUTPUT            |      19544 |         5 |  0.03 |
+  |    12    | BOUNCEACROSS         |     477900 |      9099 |  1.90 |
+  |    13    | VLONG                |      53100 |        91 |  0.17 |
+  |    14    | OUTBOUND             |    1597567 |     68537 |  4.29 |
+  |    15    | HLONG                |      53100 |        96 |  0.18 |
+  |    16    | PINBOUNCE            |     849600 |     34181 |  4.02 |
+  |    17    | BUFGROUT             |         88 |         4 |  4.55 |
+  |    18    | PINFEEDR             |          0 |         0 |  0.00 |
+  |    19    | OPTDELAY             |      43200 |         0 |  0.00 |
+  |    20    | IOBIN2OUT            |       3500 |         5 |  0.14 |
+  |    21    | HQUAD                |     424800 |     11268 |  2.65 |
+  |    22    | IOBINPUT             |      25480 |         0 |  0.00 |
+  |    23    | PADINPUT             |       3080 |        56 |  1.82 |
+  |    24    | PADOUTPUT            |       2380 |         7 |  0.29 |
+  |    25    | VLONG12              |      53100 |         6 |  0.01 |
+  |    26    | HVCCGNDOUT           |     109000 |        94 |  0.09 |
+  |    27    | SVLONG               |          0 |         0 |  0.00 |
+  |    28    | VQUAD                |     424800 |     16297 |  3.84 |
+  |    29    | SINGLE               |    1699200 |    179151 | 10.54 |
+  |    30    | BUFINP2OUT           |        168 |         9 |  5.36 |
+  |    31    | REFCLK               |         14 |         0 |  0.00 |
+  +----------+----------------------+------------+-----------+-------+
+  | ****                TOTAL       |   18934238 |   1484516 |  7.84 |
+  +----------+----------------------+------------+-----------+-------+
+  Global Vertical Wire Utilization    = 3.13636 %
+  Global Horizontal Wire Utilization  = 3.86668 %
+  Total Num Pips                      = 1415871
+  Number of Open Nets                 = 0
+  Number of Pin Open Nets             = 0
+
+Phase 6 Verifying routed nets
+
+ Verification completed successfully
+Phase 6 Verifying routed nets | Checksum: 103abe96
+
+Time (s): elapsed = 00:04:19 . Memory (MB): peak = 1368.723 ; gain = 476.789
+
+Phase 7 Depositing Routes
+Phase 7 Depositing Routes | Checksum: 21f2e776
+
+Time (s): elapsed = 00:04:33 . Memory (MB): peak = 1368.723 ; gain = 476.789
+INFO: [Route 35-16] Router Completed Successfully
+Ending Route Task | Checksum: 0
+
+Time (s): elapsed = 00:04:34 . Memory (MB): peak = 1368.723 ; gain = 476.789
+
+Routing Is Done.
+INFO: [Project 1-118] WebTalk data collection is enabled (User setting is ON. Install Setting is ON.).
+INFO: [Common 17-185] WebTalk report has not been sent to Xilinx. Please check your network and proxy settings.
+
+Time (s): elapsed = 00:04:37 . Memory (MB): peak = 1368.723 ; gain = 476.789
+INFO: [Common 17-83] Releasing license: Implementation
+route_design: Time (s): elapsed = 00:04:39 . Memory (MB): peak = 1368.723 ; gain = 476.789
+INFO: [Drc 23-27] Running DRC with 2 threads
+INFO: [Coretcl 2-168] The results of DRC are in file C:/work/psx_synthesis/hdmi_test_v7/hdmi_test_v7.runs/impl_1/top_test_drc_routed.rpt.
+report_drc: Time (s): elapsed = 00:00:12 . Memory (MB): peak = 1368.723 ; gain = 0.000
+Running Vector-less Activity Propagation...
+
+Finished Running Vector-less Activity Propagation
+report_power: Time (s): elapsed = 00:00:34 . Memory (MB): peak = 1368.723 ; gain = 0.000
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -2, Delay Type: min_max, Constraints type: SDC.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 2 CPUs
+report_timing_summary: Time (s): elapsed = 00:00:19 . Memory (MB): peak = 1368.723 ; gain = 0.000
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): elapsed = 00:00:14 . Memory (MB): peak = 1368.723 ; gain = 0.000
+write_checkpoint: Time (s): elapsed = 00:00:18 . Memory (MB): peak = 1368.723 ; gain = 0.000
+INFO: [Common 17-206] Exiting Vivado at Thu Oct 03 21:26:02 2013...
