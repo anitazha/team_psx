@@ -10,6 +10,8 @@ module poly_breaker(
    reg [1:0] 			      side1_02, side3_02;
    reg 				      is_bowtie, chosen_pairing, bowtie_pairing;
    reg [15:0] 			      bowtie_x, bowtie_y;
+   reg [15:0] 			      dx_b1, dy_b1, dx_b2, dy_b2;
+   reg signed [31:0] 		      a, b, c, dx_b1_32, dy_b1_32, dx_b2_32, dy_b2_32;
 
    /* Line finders */
    line_finder lf0_12(.x0(x1), .y0(y1),
@@ -52,6 +54,8 @@ module poly_breaker(
          Bowtie - Both pairs on same side */
       if ((side0_12 == side3_12) & (side1_03 == side2_03)) begin
 	 /* Its a bowtie... (more logic is needed...) */
+	 $display("BOWTIE");
+	 
 	 is_bowtie = 1'b1;
       end
       else if ((side0_12 != side3_12) & (side1_03 == side2_03)) begin
@@ -59,7 +63,7 @@ module poly_breaker(
 	 chosen_pairing = 1'b0;
       end
 
-      /* The other possibility, either Chevron with points 0, 3 or regular, are
+      /* The other possibilities, either Chevron with points 0, 3 or regular, are
          handled by the default split (splitting using 0, 3) */
    end // always_comb
 
@@ -69,7 +73,66 @@ module poly_breaker(
       bowtie_x = 16'b0;
       bowtie_y = 16'b0;
       bowtie_pairing = 1'b0;
+      dx_b1 = 16'b0;
+      dy_b1 = 16'b0;
+      dx_b2 = 16'b0;
+      dy_b2 = 16'b0;
+      a = 'd0;
+      b = 'd0;
+      c = 'd0;
+      dx_b1_32 = 'd0;
+      dy_b1_32 = 'd0;
+      dx_b2_32 = 'd0;
+      dy_b2_32 = 'd0;
+      
+      if (side3_02 == side1_02) begin
+	 /* 1 and 3 are on the same side, so cross lines are 0, 1 and 2, 3
+	    Thus, the pairing for triangles should be 0, 2 and 1, 3 (default bowtie_pairing) */	 
+	 dx_b1 = x0 - x1;
+	 dy_b1 = y0 - y1;
+	 dx_b2 = x2 - x3;
+	 dy_b2 = y2 - y3;
+	 
+	 c = (({{16{dx_b1[15]}}, dx_b1} * {{16{dy_b2[15]}}, dy_b2}) - 
+	      ({{16{dy_b1[15]}}, dy_b1} * {{16{dx_b2[15]}}, dx_b2}));
+	 
+	 a = ({16'b0, x0} * {16'b0, y1}) - ({16'b0, x1} * {16'b0, y0});
+	 b = ({16'b0, x2} * {16'b0, y3}) - ({16'b0, x3} * {16'b0, y2});
 
+	 dx_b1_32 = {{16{dx_b1[15]}}, dx_b1};
+	 dy_b1_32 = {{16{dy_b1[15]}}, dy_b1};
+	 dx_b2_32 = {{16{dx_b2[15]}}, dx_b2};
+	 dy_b2_32 = {{16{dy_b2[15]}}, dy_b2};
+	 
+	 bowtie_x = ((a * dx_b2_32) - (b * dx_b1_32)) / c;
+	 bowtie_y = ((a * dy_b2_32) - (b * dy_b1_32)) / c;
+      end // if (side3_02 == side1_02)
+      else begin
+	 /* 1 and 3 are on different sides, so cross lines are 0, 2 and 1, 3
+	    Thus, the paring for the triangles should be 0, 1 and 2, 3 */
+	 $display("here");
+	 
+	 bowtie_pairing = 1'b1;
+	 
+	 dx_b1 = x0 - x2;
+	 dy_b1 = y0 - y2;
+	 dx_b2 = x1 - x3;
+	 dy_b2 = y1 - y3;
+
+	 c = (({{16{dx_b1[15]}}, dx_b1} * {{16{dy_b2[15]}}, dy_b2}) -
+	      ({{16{dy_b1[15]}}, dy_b1} * {{16{dx_b2[15]}}, dx_b2}));
+
+	 a = ({16'b0, x0} * {16'b0, y2}) - ({16'b0, x2} * {16'b0, y0});
+	 b = ({16'b0, x1} * {16'b0, y3}) - ({16'b0, x3} * {16'b0, y1});
+
+	 dx_b1_32 = {{16{dx_b1[15]}}, dx_b1};
+	 dy_b1_32 = {{16{dy_b1[15]}}, dy_b1};
+	 dx_b2_32 = {{16{dx_b2[15]}}, dx_b2};
+	 dy_b2_32 = {{16{dy_b2[15]}}, dy_b2};
+
+	 bowtie_x = ((a * dx_b2_32) - (b * dx_b1_32)) / c;
+	 bowtie_y = ((a * dy_b2_32) - (b * dy_b1_32)) / c;
+      end // else: !if(side3_02 == side1_02)
    end
 
    /* Split logic */
@@ -93,8 +156,8 @@ module poly_breaker(
       if (is_bowtie) begin
 	 x0_0 = bowtie_x;
 	 y0_0 = bowtie_y;
-	 x1_0 = bowtie_x;
-	 y1_0 = bowtie_y;
+	 x0_1 = bowtie_x;
+	 y0_1 = bowtie_y;
 
 	 if (bowtie_pairing) begin
 	    x1_0 = x0;

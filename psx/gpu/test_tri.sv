@@ -3,12 +3,12 @@ module test_line;
 
    parameter H = 'd48;
    parameter W = 'd48;
-   parameter X0 = 16'd14;
-   parameter Y0 = 16'd1;
-   parameter X1 = 16'd45;
-   parameter Y1 = 16'd23;
-   parameter X2 = 16'd26;
-   parameter Y2 = 16'd2;
+   parameter X0 = 16'd3;
+   parameter Y0 = 16'd17;
+   parameter X1 = 16'd20;
+   parameter Y1 = 16'd18;
+   parameter X2 = 16'd41;
+   parameter Y2 = 16'd42;
    
    reg [15:0] x, y;
    reg 	      in;
