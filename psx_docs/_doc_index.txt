@@ -37,6 +37,10 @@
 (frame buffer, primitives, textures, texture pages, CLUT, rendering, registers...)
 - PsyQ-DOC/DOCREFS/HRDWR.pdf
 (High level and information on GPU and its memory)
+- PsyQ-DOC/TRAINING/WINTER95/ADVANCED/A_GRAPH.PDF
+(Details on GPU internals and caching)
+- PsyQ-DOC/TRAINING/WINTER95/BEGINNER/B_GRAPH.PDF
+(Some info on textures and other GPU elements)
 
 +-----------------------------------------------+
 |                   Memory                      |
