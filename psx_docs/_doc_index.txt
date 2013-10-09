@@ -20,6 +20,14 @@
 (Register list and description)
 - PsyQ-DOC/TECHNOTE/GTE_REF.pdf
 (Instruction descriptions)
+- PsyQ-DOC/TECHNOTE/GTE_PROG.pdf
+(Overview of (in)valid programming, timings, etc)
+- PsyQ-DOC/TECHNOTE/GTE_FUNC.pdf
+(Inline functions and DMPSX)
+- PsyQ-DOC/CONF/SCEA/ADV_GTE.pdf
+(GTE Speedups)
+- PsyQ-DOC/FAQ/GTE7.pdf
+(libgte FAQ; mostly programming stuff)
 
 +-----------------------------------------------+
 |                     GPU                       |
