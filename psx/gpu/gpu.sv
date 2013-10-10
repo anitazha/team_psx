@@ -101,15 +101,21 @@ module gpu(
    localparam GP1_NB_DIS_MODE       'h08; // Set display mode
    localparam GP1_NB_TEXT           'h09; // Enable textures
    localparam GP1_NB_GETINFO        'h10; // Get GPU info
-   localparam GP1_NB_TEXT_ANC       'h20; // Ancient texture disable
 
    /* Some important constants */
-   localparam GPU_STATUS_RST        'h
+   localparam GPU_STATUS_RST        'h14802000; // Reset status of GPU
 
    
    /* Internal Lines */
+   /* Status reg lines */
    GPU_status_t GPU_status, GPU_status_new;
+   reg 			     GPU_status_clr;
    
+   reg [31:0] 		     GPU_read_reg, GPU_read_reg_new;
+   reg 			     GPU_read_reg_ld;
+
+   reg [9:0] 		     display_start_x, display_start_x_new;
+   reg [8:0] 		     display_start_y, display_start_y_new;
 
    /* #####################################################
       #                                                   #
@@ -117,25 +123,44 @@ module gpu(
       #                                                   #
       ##################################################### */
    
-   /* GPU Status register */
+   /* GPU Status register (0x1F801814) */
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 GPU_status <= GPU_STATUS_RST;
       end
       else begin
-	 GPU_status <= GPU_status_new;
+	 if (GPU_status_clr) begin
+	    GPU_status <= GPU_STATUS_RST;
+	 end
+	 else begin
+	    GPU_status <= GPU_status_new;
+	 end
       end
    end
 
-   /* GPU New Status logic */
-   always_comb begin
-      GPU_status_new.text_x = ;
-      GPU_status_new.text_y = ;
-
-      GPU_status_new.semi_trans_mode;
-
+   /* GPU Read register (0x1F801810) */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 GPU_read_reg <= 32'b0;
+      end
+      else begin
+	 if (GPU_read_reg_ld) begin
+	    GPU_read_reg <= GPU_read_reg_new;
+	 end
+      end
    end
 
+   /* Display start registers */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 display_start_x <= 10'b0;
+	 display_start_y <= 9'b0;
+      end
+      else begin
+	 display_start_x <= display_start_x_new;
+	 display_start_y <= display_start_y_new;
+      end
+   end
    
    /* #####################################################
       #                                                   #               
@@ -155,10 +180,103 @@ module gpu(
    /* Process Non-buffer commands immediately */
    always_comb begin
       /* Defaults */
+      GPU_read_reg_ld = 1'b0;
+      GPU_read_reg_new = 32'b0;
 
+      GPU_status_clr = 1'b0;
+      GPU_status_new.irq = GPU_status.irq;
+      GPU_status_new.display_en = GPU_status.display_en;
+      GPU_status_new.DMA_direction = GPU_status.DMA_direction;
+      GPU_status_new.horizontal_res_1 = GPU_status.horizontal_res_1;
+      GPU_status_new.vertical_res = GPU_status.vertical_res;
+      GPU_status_new.video_mode = GPU_status.video_mode;
+      GPU_status_new.depth = GPU_status.depth;
+      GPU_status_new.interlace_en = GPU_status.interlace_en;
+      GPU_status_new.horizontal_res_2 = GPU_status.horizontal_res_2;
+      GPU_status_new.reverse = GPU_status.reverse;
+      
+      display_start_x_new = display_start_x;
+      display_start_y_new = display_start_y;
+      
+      /* Process all GP1 commands (only non-buffered GP0 command is a nop... */
       if (to_gp1) begin
-	 case (data_in)
-	   GP1_
+	 case (data_in[31:24])
+	   GP1_NB_RST: begin
+	      GPU_status_clr = 1'b1;
+	   end
+	   GP1_NB_RST_CMDBUF: begin
+	   end
+	   GP1_NB_ACKINT: begin
+	      /* Acknowledge interrupt */
+	      GPU_status_new.irq = 1'b0;
+	   end
+	   GP1_NB_DIS: begin
+	      /* Display enable/disable */
+	      GPU_status_new.display_en = data_in[0];
+	   end
+	   GP1_NB_DMADIR: begin
+	      /* DMA direction */
+	      GPU_status_new.DMA_direction = data_in[1:0];
+	   end
+	   GP1_NB_DIS_TL: begin
+	      /* Display area VRAM */
+	      display_start_x_new = data_in[9:0];
+	      display_start_y_new = data_in[18:10];
+	   end
+	   GP1_NB_DIS_HZ: begin
+	      /* Display width (hsync) */
+	   end
+	   GP1_NB_DIS_VR: begin
+	      /* Display height (vsync) */
+	   end
+	   GP1_NB_DIS_MODE: begin
+	      /* Display mode */
+	      GPU_status_new.horizontal_res_1 = data_in[1:0];
+	      GPU_status_new.vertical_res = data_in[2];
+	      GPU_status_new.video_mode = data_in[3];
+	      GPU_status_new.depth = data_in[4];
+	      GPU_status_new.interlace_en = data_in[5];
+	      GPU_status_new.horizontal_res_2 = data_in[6];
+	      GPU_status_new.reverse = data_in[7];
+	   end
+	   GP1_NB_TEXT: begin
+	      /* Texture enable/disable */
+	   end
+	   GP1_NB_GETINFO: begin
+	   case (data_in[3:0])
+	     'h02: begin
+		/* Texture window setting */
+		GPU_read_reg_ld = 1'b1;
+		
+	     end
+	     'h03: begin
+		/* Draw area top-left */
+		GPU_read_reg_ld = 1'b1;
+		
+	     end
+	     'h04: begin
+		/* Draw area bottom-right */
+		GPU_read_reg_ld = 1'b1;
+		
+	     end
+	     'h05: begin
+		/* Draw area offset */
+		GPU_read_reg_ld = 1'b1;
+		
+	     end
+	     'h07: begin
+		/* GPU Version */
+		GPU_read_reg_ld = 1'b1;
+		GPU_read_reg_new = 32'h2;
+	     end
+	     'h08: begin
+		/* 0s (?) */
+		GPU_read_reg_ld = 1'b1;
+	     end
+	   endcase // case (data_in[3:0])
+	   end // case: GP1_NB_GETINFO
+	 endcase // case (data_in[31:24])
+      end // if (to_gp1)
    end
 
    
