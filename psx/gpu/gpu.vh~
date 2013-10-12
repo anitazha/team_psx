@@ -2,25 +2,6 @@
 /* Defines the number of pixels a single pipeline stage processes at once */
 `define GPU_PIPELINE_WIDTH 32
 
-/* CMD struct */
-typedef struct packed {
-   logic [9:0]                      x0, x1, x2;
-   logic [9:0] 			    y0, y1, y2;
-   logic [7:0] 			    r0, g0, b0;
-   logic [7:0] 			    r1, g1, b1;
-   logic [7:0] 			    r2, g2, b2;
-   logic [7:0] 			    u0, u1, u2; // Texture page coords
-   logic [7:0] 			    v0, v1, v2; //    "     "     "
-   logic [15:0] 		    clut;
-   logic [15:0] 		    text_page;
-   enum logic {TRI, RECT, LINE}     shape;
-   enum logic {SEMI, OPAQ}          transparency;
-   enum logic {GOURAUD, FLAT, NONE} shade;
-   enum logic {TEXT, MONO}          texture;
-   enum logic {BLEND, RAW}          texture_mode;
-} CMD_t;
-   
-
 /* GPU Status register struct */
 typedef struct packed {
    logic       interlaced_parity;

@@ -17,11 +17,15 @@ module fifo_16x32(
 	 queue_end <= 5
       end
       else begin
-	 if (re) begin
+	 if (re & we) begin
+	    queue <= queue << 'd32;
+	    queue[queue_end] <= data_in;
+	 end
+	 else if (re) begin
 	    queue <= queue << 'd32;
 	    queue_end <= queue_end - 'd1;
 	 end
-	 if (we) begin
+	 else if (we) begin
 	    queue[queue_end] <= data_in;
 	    queue_end <= queue_end + 'd1;
 	 end

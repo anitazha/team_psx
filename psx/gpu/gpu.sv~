@@ -119,17 +119,9 @@ module gpu(
    reg [8:0] 		     display_start_y, display_start_y_new;
 
    /* FIFO lines */
-   CMD_t cmd;
    wire 		     cmd_fifo_full;
 
    wire 		     dma_fifo_full;
-
-   /* DRAWING STAGE */
-   logic [`GPU_PIPELINE_WIDTH-1:0]       in_triangle;
-   logic [1:0][`GPU_PIPELINE_WIDTH-1:0]  in_line;
-   logic [`GPU_PIPELINE_WIDTH-1:0] 	 in_rect;
-   genvar 				 triangles, lines, rects;
-   
 
    /* #####################################################
       #                                                   #
@@ -175,7 +167,6 @@ module gpu(
 	 display_start_y <= display_start_y_new;
       end
    end
-   
    
    /* #####################################################
       #                                                   #               
@@ -338,65 +329,12 @@ module gpu(
       #                                                   #
       ##################################################### */
 
-   
-   /* Pass Values */
-   assign next_color_stage.valid = draw_stage.valid;
-   assign next_color_stage.x = draw_stage.x;
-   assign next_color_stage.y = draw_stage.y;
-
-   /* Triangle Modules */
-   generate
-      for (triangles = 0; triangles < `GPU_PIPELINE_WIDTH; triangles = triangles + 1) begin
-	 triangle_fill draw_tri_fill(.x0(), .y0(), .x1(), .y1(), .x2(), .y2(),
-				     .x(draw_stage.x), .y(draw_state.y),
-				     .side0(), .side1(), .side2(),
-				     .in(in_triangle[triangles]));
-      end
-   endgenerate
-
-   /* Line Modules */
-   generate
-      for (lines = 0; lines < `GPU_PIPELINE_WIDTH; lines = lines + 1) begin
-	 line_finder draw_line_fill(.x0(), .y0(), .x1(), .y1(),
-				    .x(drawin_stage.x), .y(drawing_state.y),
-				    .result({in_line[1][lines], in_line[0][lines]}));
-      end
-   endgenerate
-
-   /* Rectangle check */
-   generate
-      for (rects = 0; rects < `GPU_PIPELINE_WIDTH; rects = rects + 1) begin
-	 always_comb begin
-	    /* Defaults */
-	    in_rect[rects] = 1'b0;
-
-	    if ((x[rects] > cmd.x0) & (x[rects] < cmd.x1) &
-		(y[rects] > cmd.y0) & (y[rects] < cmd.y1)) begin
-	       in_rect[rects] = 1'b1;
-	    end
-	 end
-      end // for (rects = 0; rects < `GPU_PIPELINE_WIDTH; rects = rects + 1)
-   endgenerate
-   
-   /* Final Fill Logic */
+   /* Rectangle Draw */
    always_comb begin
       /* Defaults */
-      next_color_stage.in_shape = 'd0;
 
-      case (cmd.shape)
-	RECT: begin
-	   next_color_stage.in_shape = in_rect;
-	end
-	TRI: begin
-	   next_color_stage.in_shape = in_triangle;
-	end
-	LINE: begin
-	   next_color_stage.in_shape = in_line[0];
-	end
-      endcase
-   end // always_comb
-	 
-      
+   end
+
    /* Color stage pipeline barrier */
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
@@ -409,14 +347,10 @@ module gpu(
 
    /* #####################################################
       #                                                   #
-      #                   COLOR STAGE                     #
+      #                  SHADER STAGE                     #
       #                                                   #
       ##################################################### */
 
-   /* Pass Values */
-   assign next_shader_stage.valid = color_stage.valid;
-   assign next_shader_stage.x = color_stage.x;
-   assign next_shader_stage.y = color_stage.y;
 
    /* Shader stage pipeline barrier */
    always_ff @(posedge clk, posedge rst) begin
@@ -430,28 +364,7 @@ module gpu(
 
    /* #####################################################
       #                                                   #
-      #                   SHADER STAGE                    #
-      #                                                   #
-      ##################################################### */
-
-   /* Pass Values */
-   assign next_wb_stage.valid = shader_stage.valid;
-   assign next_wb_stage.x = shader_stage.x;
-   assign next_wb_stage.y = shader_stage.y;
-
-   /* Writeback stage pipeline barrier */
-   always_ff @(posedge clk, posedge rst) begin
-      if (rst) begin
-	 wb_stage <= 'd0;
-      end
-      else begin
-	 wb_stage <= next_wb_stage;
-      end
-   end
-   
-   /* #####################################################
-      #                                                   #
-      #                  WRITEBACK STAGE                  #
+      #                 WRITEBACK STAGE                   #
       #                                                   #
       ##################################################### */
 
