@@ -122,17 +122,20 @@ module gpu(
 
    reg [1:0] 		     xy_flip_reg, xy_flip_reg_new;
 
+   reg [9:0] 		     x_tl, y_tl, x_br, y_br, x_off, y_off;
+   reg [9:0] 		     x_lt_new, y_tl_new, x_br_new, y_br_new, x_off_new, y_off_new;
+
    /* FETCH STAGE */
    /* FIFO lines */
    wire [31:0] 		     cmd_fifo_cmd;
    wire 		     cmd_fifo_full, cmd_fifo_empty, cmd_fifo_clr, cmd_fifo_re;
 
-   wire [31:0] 		     dma_fifo_cmd;
-   wire 		     dma_fifo_full, dma_fifo_empty, dma_fifo_clr, dma_fifo_re;
 
    /* PARSE STAGE */
    /* Command reg */
    CMD_t cmd, new_cmd;
+
+   logic [1:0] 		     side0, side1, side2;
 
    /* Stall */
    logic 		     pipeline_stall;
@@ -227,6 +230,26 @@ module gpu(
       else begin
 	 xy_flip_reg <= xy_flip_reg_new;
       end
+   end
+
+   /* Draw area registers */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 x_tl <= 'd0;
+	 y_tl <= 'd0;
+	 x_br <= 'd0;
+	 y_br <= 'd0;
+	 x_off <= 'd0;
+	 y_off <= 'd0;
+      end
+      else begin
+	 x_tl <= x_tl_new;
+	 y_tl <= y_tl_new;
+	 x_br <= x_br_new;
+	 y_br <= y_br_new;
+	 x_off <= x_off_new;
+	 y_off <= y_off_new;
+      end // else: !if(rst)
    end
    
 
@@ -415,6 +438,13 @@ module gpu(
       
       xy_flip_reg_new[0] = xy_flip_reg[0];
       xy_flip_reg_new[1] = xy_flip_reg[1];
+
+      x_tl_new = x_lt;
+      y_tl_new = y_lt;
+      x_br_new = x_br;
+      y_br_new = y_br;
+      x_off_new = x_off;
+      y_off_new = y_off;
 
       /* Process commands (or handle whats going on if in the middle of one) */
       case (decode_state)
@@ -712,16 +742,20 @@ module gpu(
 		GP0_B_DRWWND_TL: begin
 		   /* Set top-left of drawing window */
 		   cmd_fifo_re = 1'b1;
+		   x_tl_new = cmd_fifo_cmd[9:0];
+		   y_tl_new = cmd_fifo_cmd[19:10];
 		end
 		GP0_B_DRWWND_BR: begin
 		   /* Set bottom-right of drawing window */
 		   cmd_fifo_re = 1'b1;
-
+		   x_br_new = cmd_fifo_cmd[9:0];
+		   y_br_new = cmd_fifo_cmd[19:10];
 		end
 		GP0_B_DRWWND_OS: begin
 		   /* Set drawing window offset */
-		    cmd_fifo_re = 1'b1;
-
+		   cmd_fifo_re = 1'b1;
+		   x_off_new = cmd_fifo_cmd[10:0];
+		   y_off_new = cmd_fifo_cmd[21:11];
 		end
 		GP0_B_MSK: begin
 		   /* Set mask handle */
@@ -770,7 +804,20 @@ module gpu(
       end
    end
 
-
+   /* Side finder for triangles */
+   line_finder lf_s0(.x0(cmd.x1), .y0(cmd.y1),
+		     .x1(cmd.x2), .y1(cmd.y2),
+		     .x(cmd.x0), .y(cmd.y0),
+		     .result(side0)),
+     lf_s1(.x0(cmd.x0), .y0(cmd.y0),
+	   .x1(cmd.x2), .y1(cmd.y2),
+	   .x(cmd.x1), .y(cmd.y1),
+	   .result(side1)),
+     lf_s2(.x0(cmd.x0), .y0(cmd.y0),
+	   .x1(cmd.x1), .y1(cmd.y1),
+	   .x(cmd.x2), .y(cmd.y2),
+	   .result(side2));
+     
 
 
 
@@ -795,9 +842,11 @@ module gpu(
    /* Triangle Modules */
    generate
       for (triangles = 0; triangles < `GPU_PIPELINE_WIDTH; triangles = triangles + 1) begin
-	 triangle_fill draw_tri_fill(.x0(), .y0(), .x1(), .y1(), .x2(), .y2(),
+	 triangle_fill draw_tri_fill(.x0(cmd.x0), .y0(cmd.y0),
+				     .x1(cmd.x1), .y1(cmd.y1),
+				     .x2(cmd.x2), .y2(cmd.y2),
 				     .x(draw_stage.x), .y(draw_state.y),
-				     .side0(), .side1(), .side2(),
+				     .side0(side0), .side1(side1), .side2(side2),
 				     .in(in_triangle[triangles]));
       end
    endgenerate
@@ -805,7 +854,7 @@ module gpu(
    /* Line Modules */
    generate
       for (lines = 0; lines < `GPU_PIPELINE_WIDTH; lines = lines + 1) begin
-	 line_finder draw_line_fill(.x0(), .y0(), .x1(), .y1(),
+	 line_finder draw_line_fill(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1),
 				    .x(drawin_stage.x), .y(drawing_state.y),
 				    .result({in_line[1][lines], in_line[0][lines]}));
       end
