@@ -135,6 +135,8 @@ module gpu(
    /* Command reg */
    CMD_t cmd, new_cmd;
 
+   logic [7:0] 		     cmd_hold, cmd_hold_new;
+   
    logic [1:0] 		     side0, side1, side2;
 
    /* Stall */
@@ -416,15 +418,29 @@ module gpu(
       end
    end
 
+   /* Command Storage register */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 cmd_hold <= 8'b0;
+      end
+      else begin
+	 cmd_hold <= cmd_hold_new;
+      end
+   end
+
    /* Command (and thus next decode state) logic */
    always_comb begin
       /* Defaults */
       decode_state_next = decode_state;
       new_cmd = cmd;
+      cmd_hold_new = cmd_hold;
       
       cmd_fifo_re = 1'b0;
 
       set_gpu_iqr = 1'b0;
+
+      clr_text_cache = 1'b0;
+      clr_clut_cache = 1'b0;
 
       GPU_status_new.text_x = GPU_status.text_x;
       GPU_status_new.text_y = GPU_status.text_y;
@@ -450,8 +466,11 @@ module gpu(
       case (decode_state)
 	WAIT: begin
 	   if (~cmd_fifo_empty) begin
-	      /* Pick either drawing or memory transfer state depending on instruction, or
-	         handle other functions immediately */
+	      cmd_hold_new = cmd_fifo_cmd[31:24];
+	      
+	      /* Pick either move to getting next arg  or
+	         handle function immediately depending on type.
+	         Also, set as many of the command params as possible */
 	      case (cmd_fifo_cmd[31:24])
 		GP0_B_NOP: begin
 		   /* nop */
@@ -602,6 +621,7 @@ module gpu(
 		   /* Monochrome, line, opaque */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -614,6 +634,7 @@ module gpu(
 		   /* Monochrome, line, semi-trans */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -626,6 +647,7 @@ module gpu(
 		   /* Shaded, line, opaque */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = SHADE;
@@ -638,6 +660,7 @@ module gpu(
 		   /* Shaded, line, semi-trans */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = SHADE;
@@ -650,6 +673,7 @@ module gpu(
 		   /* Monochrome, rect, opaque */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -662,6 +686,7 @@ module gpu(
 		   /* Monochrome, rect, semi-trans */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -674,6 +699,7 @@ module gpu(
 		   /* Textured, rect, opaque, blended */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -687,6 +713,7 @@ module gpu(
 		   /* Textured, rect, semi-trans, blended */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -700,6 +727,7 @@ module gpu(
 		   /* Textured, rect, opaque, raw */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -713,6 +741,7 @@ module gpu(
 		   /* Textured, rect, semi-trans, raw */
 		   decode_state_next = GET_XY0;
 
+		   cmd_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -762,10 +791,54 @@ module gpu(
 		   cmd_fifo_re = 1'b1;
 		   GPU_status_new.mask_en = cmd_fifo_cmd[1];
 		   GPU_status_new.set_mask = cmd_fifo_cmd[0];
-		end	
+		end
+		GP0_B_CLRC: begin
+		   /* Clear texture and clut caches */
+		   cmd_fifo_re = 1'b1;
+		   clr_text_cache = 1'b1;
+		   clr_clut_cache = 1'b1;
+		end
+		GP0_B_FILRECT: begin
+		   /* Fill VRAM rect */
+		   decode_state_next = GET_XY0;
+
+		   cmd_fifo_re = 1'b1;
+		   new_cmd.b0 = cmd_fifo_cmd[23:16];
+		   new_cmd.g0 = cmd_fifo_cmd[15:8];
+		   new_cmd.r0 = cmd_fifo_cmd[7:0];
+		end
+		GP0_B_CPYRECT_V2V, GP0_B_CPYRECT_C2V, GP0_B_CPYRECT_V2C: begin
+		   /* Copy rect */
+		   decode_state_next = GET_XY0;
+
+		   cmd_fifo_re = 1'b1;
+		end
 	      endcase // case (cmd_fifo_cmd[31:24]) 
 	   end // if (~cmd_fifo_empty)
 	end // case: WAIT
+	GET_XY0: begin
+	   new_cmd.x0 = cmd_fifo_cmd[10:0] + {1'b0, x_off};
+	   new_cmd.y0 = cmd_fifo_cmd[26:16] + {1'b0, y_off};
+	   
+	   /* Now the command is in the hold register */
+	   case (cmd_hold) begin
+	      GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST: begin
+		 /* Now to get the next coord */
+		 decode_stage_next = GET_XY1;
+	      end
+	     GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
+	       GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		  /* Now get the text coords and stuff */
+		  decode_state_next = GET_TX0;
+	       end
+	     GP0_B_P3_MC_OQ_SH, GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH: begin
+		/* Also get the text coords and stuff */
+		decode_state_next = GET_TX0;
+	     end
+	   endcase // case (cmd_hold)
+	end // case: GET_XY0
+	     
+	   
       endcase // case (decode_state)
    end
    
