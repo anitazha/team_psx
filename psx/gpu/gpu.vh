@@ -15,7 +15,7 @@ typedef struct packed {
    logic [15:0] 		    text_page;
    enum logic {TRI, RECT, LINE}     shape;
    enum logic {SEMI, OPAQ}          transparency;
-   enum logic {GOURAUD, FLAT, NONE} shade;
+   enum logic {SHADE, NONE}         shade;
    enum logic {TEXT, MONO}          texture;
    enum logic {BLEND, RAW}          texture_mode;
 } CMD_t;
@@ -24,11 +24,11 @@ typedef struct packed {
 /* GPU Status register struct */
 typedef struct packed {
    logic       interlaced_parity;
-   logic [1:0] DMA_direction;
-   logic       DMA_rdy;
+   logic [1:0] dma_direction;
+   logic       dma_rdy;
    logic       VRAM2CPU_rdy;
-   logic       CMD_rdy;
-   logic       DMA_fifo_state;
+   logic       cmd_rdy;
+   logic       dma_fifo_state;
    logic       irq;
    logic       display_en;
    logic       interlaced;

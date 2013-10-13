@@ -14,9 +14,13 @@ module fifo_16x32(
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 queue <= 'd0;
-	 queue_end <= 5
+	 queue_end <= 5'd0;
       end
       else begin
+	 if (clr) begin
+	    queue <= 'd0;
+	    queue_end <= 5'd0;
+	 end
 	 if (re & we) begin
 	    queue <= queue << 'd32;
 	    queue[queue_end] <= data_in;
