@@ -1,27 +1,105 @@
-`define 32'h0180001 RTPS
-`define 32'h0280030 RTPT
-`define 32'h0400012 MVMVA
-`define 32'h0680029 DPCL
-`define 32'h0780010 DPCS
-`define 32'h0F8002A DPCT
-`define 32'h0980011 INTPL
-`define 32'h0A00428 SQR
-`define 32'h0C8041E NCS
-`define 32'h0D80420 NCT
-`define 32'h0E80413 NCDS
-`define 32'h0F80416 NCDT
-`define 32'h108041B NCCS
-`define 32'h118043F NCCT
-`define 32'h1280414 CDP
-`define 32'h138041C CC
-`define 32'h1400006 NCLIP
-`define 32'h158002D AVSZ3
-`define 32'h168002E AVSZ4
-`define 32'h170000C OP
-`define 32'h190003D GPF
-`define 32'h1A0003E GPL
+`define INST_RTPS  25'h0180001 
+`define INST_RTPT  25'h0280030 
+`define INST_MVMVA 25'h0400012 
+`define INST_DCPL  25'h0680029 
+`define INST_DPCS  25'h0780010 
+`define INST_DPCT  25'h0F8002A 
+`define INST_INTPL 25'h0980011 
+`define INST_SQR   25'h0A00428 
+`define INST_NCS   25'h0C8041E 
+`define INST_NCT   25'h0D80420 
+`define INST_NCDS  25'h0E80413 
+`define INST_NCDT  25'h0F80416 
+`define INST_NCCS  25'h108041B 
+`define INST_NCCT  25'h118043F 
+`define INST_CDP   25'h1280414 
+`define INST_CC    25'h138041C 
+`define INST_NCLIP 25'h1400006 
+`define INST_AVSZ3 25'h158002D 
+`define INST_AVSZ4 25'h168002E 
+`define INST_OP    25'h170000C 
+`define INST_GPF   25'h190003D 
+`define INST_GPL   25'h1A0003E 
 
+function [15:0] limC; // <18>
+    input [31:0] val;
+    begin
+        if (val[31]) limC = 16'h0;
+        else limC = ((val[30:0] > 'h7FFF) ? 16'h7FFF : {1'b0, val[14:0]});
+    end
+endfunction
 
+function [15:0] limA1U; // <24>
+    input [31:0] val;
+    begin
+        if (val[31]) limA1U = 16'h0;
+        else limA1U = ((val[30:0] > 'h7FFF) ? 16'h7FFF : {1'b0, val[14:0]});
+    end
+endfunction
+
+function [15:0] limA2U; // <23>
+    input [31:0] val;
+    begin
+        if (val[31]) limA2U = 16'h0;
+        else limA2U = ((val[30:0] > 'h7FFF) ? 16'h7FFF : {1'b0, val[14:0]});
+    end
+endfunction
+
+function [15:0] limA3U; // <22>
+    input [31:0] val;
+    begin
+        if (val[31]) limA3U = 16'h0;
+        else limA3U = ((val[30:0] > 'h7FFF) ? 16'h7FFF : {1'b0, val[14:0]});
+    end
+endfunction
+
+function [15:0] limA1S; // <24>
+    input [31:0] val;
+    begin
+        if ((val[30:0] > 'h7FFF)) limA1S = {val[31], 15'h7FFF};
+        else limA1S = {val[31], val[14:0]};
+    end
+endfunction
+
+function [15:0] limA2S; // <23>
+    input [31:0] val;
+    begin
+        if ((val[30:0] > 'h7FFF)) limA2S = {val[31], 15'h7FFF};
+        else limA2S = {val[31], val[14:0]};
+    end
+endfunction
+
+function [15:0] limA3S; // <22>
+    input [31:0] val;
+    begin
+        if ((val[30:0] > 'h7FFF)) limA3S = {val[31], 15'h7FFF};
+        else limA3S = {val[31], val[14:0]};
+    end
+endfunction
+
+function [7:0] limB1; // <24>
+    input [31:0] val;
+    begin
+        if (val[31]) limB1 = 8'h0;
+        else limB1 = {val[31], val[6:0]};
+    end
+endfunction
+
+function [7:0] limB2; // <23>
+    input [31:0] val;
+    begin
+        if (val[31]) limB2 = 8'h0;
+        else limB2 = {val[31], val[6:0]};
+    end
+endfunction
+
+function [7:0] limB3; // <22>
+    input [31:0] val;
+    begin
+        if (val[31]) limB3 = 8'h0;
+        else limB3 = {val[31], val[6:0]};
+    end
+endfunction
 /* Cop2C registers */
 //rarb_t R11R12;
 //rarb_t R13R21;
@@ -123,77 +201,3 @@
 `define IDX_ORGB   29 // color data output register
 `define IDX_LZCS   30 // leading zero/one count source data
 `define IDX_LZCR   31 // leading zero/one count processing result
-
-
-`define LO_REG_MASK 32'h0000FFFF // ie. masks R11 of R11R12
-`define HI_REG_MASK 32'hFFFF0000 // ie. masks R12 of R11R12
-
-
-typedef struct packed {
-    bit        ra_sign;
-    bit [2:0]  ra_integ;
-    bit [11:0] ra_frac;
-    bit        rb_sign;
-    bit [2:0]  rb_integ;
-    bit [11:0] rb_frac;
-} rarb_t;
-
-typedef struct packed {
-    bit        sign;
-    bit [30:0] integ;
-} tr_t;
-
-typedef struct packed {
-    bit        sign;
-    bit [26:0] integ;
-    bit [3:0]  frac;
-} fc_t;
-
-typedef struct packed {
-    bit        sign;
-    bit [14:0] integ;
-    bit [15:0] frac;
-} of_t;
-
-typedef struct packed {
-    bit        sign;
-    bit [18:0] integ;
-    bit [11:0] frac;
-} bk_t;
-
-typedef struct packed {
-    bit [15:0] zero;
-    bit [15:0] integ;
-} h_t;
-
-typedef struct packed {
-    bit [15:0] zero;
-    bit        sign;
-    bit [6:0]  integ;
-    bit [7:0]  frac;
-} dq_t;
-
-typedef struct packed {
-    bit        log_sum;
-    bit        calc1_ovf;
-    bit        calc2_ovf;
-    bit        calc3_ovf;
-    bit        calc1_udf;
-    bit        calc2_udf;
-    bit        calc3_udf;
-    bit        a1_oor;
-    bit        a2_oor;
-    bit        a3_oor;
-    bit        b1_oor;
-    bit        b2_oor;
-    bit        b3_oor;
-    bit        c_oor;
-    bit        div_ovf;
-    bit        calc4_ovf;
-    bit        calc4_udf;
-    bit        d1_oor;
-    bit        d2_oor;
-    bit        e_oor;
-    bit [11:0] zero;
-} flag_t;
-
