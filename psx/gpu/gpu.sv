@@ -833,8 +833,15 @@ module gpu(
 	       end
 	     GP0_B_P3_MC_OQ_SH, GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH: begin
 		/* Also get the text coords and stuff */
-		decode_state_next = GET_TX0;
+		decode_state_next = GET_CL1;
 	     end
+	     GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_OQ_BL_SH,
+	       GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_OQ_BL_SH, 
+	       GP0_B_P3_TX_OQ_BL_SH: begin
+		  /* New get text coords and stuff */
+		  decode_state_next = GET_TX0;
+	       end
+	     
 	   endcase // case (cmd_hold)
 	end // case: GET_XY0
 	     
