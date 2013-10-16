@@ -2,7 +2,7 @@
 module fifo_16x32(
 		  input wire 	    clk, rst,
 		  input wire [31:0] data_in,
-		  input wire 	    re, we,
+		  input wire 	    re, we, clr,
 		  output reg 	    full, empty,
 		  output reg [31:0] data_out);
 
