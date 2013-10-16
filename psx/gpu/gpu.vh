@@ -21,8 +21,13 @@ typedef struct packed {
    logic [7:0] 			    r2, g2, b2;
    logic [7:0] 			    u0, u1, u2; // Texture page coords
    logic [7:0] 			    v0, v1, v2; //    "     "     "
-   logic [15:0] 		    clut;
-   logic [15:0] 		    text_page;
+   logic [5:0] 			    clut_x;
+   logic [7:0] 			    clut_y;
+   logic [1:0] 			    text_x;
+   logic 			    text_y;
+   logic [1:0] 			    semi_trans_mode;
+   logic [1:0] 			    text_mode;
+   logic 			    text_en;
    shape_t                          shape;
    trans_t                          transparency;
    shade_t                          shade;

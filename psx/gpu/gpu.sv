@@ -848,130 +848,214 @@ module gpu(
 	   end // if (~cmd_fifo_empty)
 	end // case: WAIT
 	GET_XY0: begin
-	   new_cmd.x0 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
-	   new_cmd.y0 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
-	   cmd_fifo_re = 1'b1;
-	   
-	   /* Now the command is in the hold register */
-	   case (cmd_hold)
-	     GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST: begin
-		/* Now to get the next coord */
-		decode_state_next = GET_XY1;
-	     end
-	     GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
-	       GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
-		  /* Now get the text coords and stuff */
-		  decode_state_next = GET_TX0;
-	       end
-	     GP0_B_P3_MC_OQ_SH, GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH: begin
-		/* Also get the text coords and stuff */
-		decode_state_next = GET_CL1;
-	     end
-	     GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH, 
-	       GP0_B_P4_TX_ST_BL_SH: begin
-		  /* New get text coords and stuff */
-		  decode_state_next = GET_TX0;
-	       end
-	     GP0_B_LN_MC_OQ, GP0_B_LN_MC_ST, GP0_B_PL_MC_OQ, GP0_B_PL_MC_ST: begin
-		/* These lines are just coords, get next one */
-		decode_state_next = GET_XY1;
-	     end
-	     GP0_B_LN_MC_OQ_SH, GP0_B_LN_MC_ST_SH, GP0_B_PL_MC_OQ_SH, GP0_B_PL_MC_ST_SH: begin
-		/* These lines have colors */
-		decode_state_next = GET_CL1;
-	     end
-	     GP0_B_RV_MC_OQ, GP0_B_RV_MC_ST: begin
-		/* These rectangles need size; use XY1 for size */
-		decode_state_next = GET_XY1;
-	     end
-	     GP0_B_R1_MC_OQ, GP0_B_R1_MC_ST: begin
-		/* These rectangles need nothing else, so start working! */
-		decode_state_next = DRAWING;
-
-		new_cmd.x1 = new_cmd.x0 + 'd1;
-		new_cmd.y1 = new_cmd.y0 + 'd1;
-	     end
-	     GP0_B_R8_MC_OQ, GP0_B_R8_MC_ST: begin
-		/* These rectangles need nothing else, so start working! */
-		decode_state_next = DRAWING;
-
-		new_cmd.x1 = new_cmd.x0 + 'd8;
-		new_cmd.y1 = new_cmd.y0 + 'd8;
-	     end
-	     GP0_B_R16_MC_OQ, GP0_B_R16_MC_ST: begin
-		/* These rectangles need nothing else, so start working! */
-		decode_state_next = DRAWING;
-
-		new_cmd.x1 = new_cmd.x0 + 'd16;
-		new_cmd.y1 = new_cmd.y0 + 'd16;
-	     end
-	     GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
-	       GP0_B_R1_TX_OQ_BL, GP0_B_R1_TX_OQ_RW, GP0_B_R1_TX_ST_BL, GP0_B_R1_TX_ST_RW,
-	       GP0_B_R8_TX_OQ_BL, GP0_B_R8_TX_OQ_RW, GP0_B_R8_TX_ST_BL, GP0_B_R8_TX_ST_RW,
-	       GP0_B_R16_TX_OQ_BL, GP0_B_R16_TX_OQ_RW, GP0_B_R16_TX_ST_BL, GP0_B_R16_TX_ST_RW: begin
-		  /* These rectangles need to get the texture now */
-		  decode_state_next = GET_TX0;
-	       end
-	     GP0_B_FILRECT, GP0_B_CPYRECT_V2V, GP0_B_CPYRECT_C2V, GP0_B_CPYRECT_V2C: begin
-		/* Memory copy commands need size or another coord */
-		decode_state_next = GET_XY1;
-	     end
-	   endcase // case (cmd_hold)
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.x0 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
+	      new_cmd.y0 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
+	      cmd_fifo_re = 1'b1;
+	      
+	      /* Now the command is in the hold register */
+	      case (cmd_hold)
+		GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST: begin
+		   /* Now to get the next coord */
+		   decode_state_next = GET_XY1;
+		end
+		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
+		  GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		     /* Now get the text coords and stuff */
+		     decode_state_next = GET_TX0;
+		  end
+		GP0_B_P3_MC_OQ_SH, GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH: begin
+		   /* Also get the text coords and stuff */
+		   decode_state_next = GET_CL1;
+		end
+		GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH, 
+		  GP0_B_P4_TX_ST_BL_SH: begin
+		     /* New get text coords and stuff */
+		     decode_state_next = GET_TX0;
+		  end
+		GP0_B_LN_MC_OQ, GP0_B_LN_MC_ST, GP0_B_PL_MC_OQ, GP0_B_PL_MC_ST: begin
+		   /* These lines are just coords, get next one */
+		   decode_state_next = GET_XY1;
+		end
+		GP0_B_LN_MC_OQ_SH, GP0_B_LN_MC_ST_SH, GP0_B_PL_MC_OQ_SH, GP0_B_PL_MC_ST_SH: begin
+		   /* These lines have colors */
+		   decode_state_next = GET_CL1;
+		end
+		GP0_B_RV_MC_OQ, GP0_B_RV_MC_ST: begin
+		   /* These rectangles need size; use XY1 for size */
+		   decode_state_next = GET_XY1;
+		end
+		GP0_B_R1_MC_OQ, GP0_B_R1_MC_ST: begin
+		   /* These rectangles need nothing else, so start working! */
+		   decode_state_next = DRAWING;
+		   
+		   new_cmd.x1 = new_cmd.x0 + 'd1;
+		   new_cmd.y1 = new_cmd.y0 + 'd1;
+		end
+		GP0_B_R8_MC_OQ, GP0_B_R8_MC_ST: begin
+		   /* These rectangles need nothing else, so start working! */
+		   decode_state_next = DRAWING;
+		   
+		   new_cmd.x1 = new_cmd.x0 + 'd8;
+		   new_cmd.y1 = new_cmd.y0 + 'd8;
+		end
+		GP0_B_R16_MC_OQ, GP0_B_R16_MC_ST: begin
+		   /* These rectangles need nothing else, so start working! */
+		   decode_state_next = DRAWING;
+		   
+		   new_cmd.x1 = new_cmd.x0 + 'd16;
+		   new_cmd.y1 = new_cmd.y0 + 'd16;
+		end
+		GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
+		  GP0_B_R1_TX_OQ_BL, GP0_B_R1_TX_OQ_RW, GP0_B_R1_TX_ST_BL, GP0_B_R1_TX_ST_RW,
+		  GP0_B_R8_TX_OQ_BL, GP0_B_R8_TX_OQ_RW, GP0_B_R8_TX_ST_BL, GP0_B_R8_TX_ST_RW,
+		  GP0_B_R16_TX_OQ_BL, GP0_B_R16_TX_OQ_RW, GP0_B_R16_TX_ST_BL,
+		  GP0_B_R16_TX_ST_RW: begin
+		     /* These rectangles need to get the texture now */
+		     decode_state_next = GET_TX0;
+		  end
+		GP0_B_FILRECT, GP0_B_CPYRECT_V2V, GP0_B_CPYRECT_C2V, GP0_B_CPYRECT_V2C: begin
+		   /* Memory copy commands need size or another coord */
+		   decode_state_next = GET_XY1;
+		end
+		
+	      endcase // case (cmd_hold)
+	   end // case: GET_XY0
 	end // case: GET_XY0
 	GET_XY1: begin
-	   new_cmd.x1 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
-           new_cmd.y1 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
-	   cmd_fifo_re = 1'b1;
-
-	   /* Now the command is in the hold register */
-	   case (cmd_hold)
-	     GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST: begin
-		/* Now to get the next coord */
-		decode_state_next = GET_XY2;
-	     end
-	     GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
-	       GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
-		  /* Now get the text coords and stuff */
-		  decode_state_next = GET_TX1;
-	       end
-	     GP0_B_P3_MC_OQ_SH, GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH: begin
-                /* Also get the text coords and stuff */
-		decode_state_next = GET_CL2;
-             end
-             GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH,
-               GP0_B_P4_TX_ST_BL_SH: begin
-                  /* New get text coords and stuff */
-                  decode_state_next = GET_TX0;
-               end
-             GP0_B_LN_MC_OQ, GP0_B_LN_MC_ST: begin
-		/* These lines are just 2 coords, so start drawing! */
-		decode_state_next = DRAWING;
-	     end
-             GP0_B_LN_MC_OQ_SH, GP0_B_LN_MC_ST_SH, GP0_B_PL_MC_OQ_SH, GP0_B_PL_MC_ST_SH: begin
-                /* These lines are also 2 lines and all colors have been gotten! */
-                decode_state_next = DRAWING;
-             end
-             GP0_B_RV_MC_OQ, GP0_B_RV_MC_ST, GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW,
-	       GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW: begin
-                /* These rectangles need size; use XY1 for size */
-                decode_state_next = DRAWING;
-		new_cmd.x1 = cmd.x0 + {1'b0, cmd_fifo_cmd[10:0]};
-		new_cmd.y1 = cmd.y0 + {1'b0, cmd_fifo_cmd[26:16]};
-             end
-	     GP0_B_FILRECT, GP0_B_CPYRECT_V2C: begin
-		/* Wait on mem transfer */
-		decode_state_next = WAIT_MEM;
-	     end
-	     GP0_B_CPYRECT_V2V: begin
-		/* Need 1 more coord */
-		decode_state_next = GET_XY2;
-	     end
-	     GP0_B_CPYRECT_C2V: begin
-		/* Memory copy commands now take take */
-		decode_state_next = SEND_DATA;
-	     end
-	   endcase
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.x1 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
+              new_cmd.y1 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
+	      cmd_fifo_re = 1'b1;
+	      
+	      /* Now the command is in the hold register */
+	      case (cmd_hold)
+		GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST: begin
+		   /* Now to get the next coord */
+		   decode_state_next = GET_XY2;
+		end
+		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
+		  GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		     /* Now get the text coords and stuff */
+		     decode_state_next = GET_TX1;
+		  end
+		GP0_B_P3_MC_OQ_SH, GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH: begin
+                   /* Also get the text coords and stuff */
+		   decode_state_next = GET_CL2;
+		end
+		GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH,
+		  GP0_B_P4_TX_ST_BL_SH: begin
+                     /* New get text coords and stuff */
+                     decode_state_next = GET_TX0;
+		  end
+		GP0_B_LN_MC_OQ, GP0_B_LN_MC_ST: begin
+		   /* These lines are just 2 coords, so start drawing! */
+		   decode_state_next = DRAWING;
+		end
+		GP0_B_LN_MC_OQ_SH, GP0_B_LN_MC_ST_SH, GP0_B_PL_MC_OQ_SH, GP0_B_PL_MC_ST_SH: begin
+                   /* These lines are also 2 lines and all colors have been gotten! */
+                   decode_state_next = DRAWING;
+		end
+		GP0_B_RV_MC_OQ, GP0_B_RV_MC_ST, GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW,
+		  GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW: begin
+                     /* These rectangles need size; use XY1 for size */
+                     decode_state_next = DRAWING;
+		     new_cmd.x1 = cmd.x0 + {1'b0, cmd_fifo_cmd[10:0]};
+		     new_cmd.y1 = cmd.y0 + {1'b0, cmd_fifo_cmd[26:16]};
+		  end
+		GP0_B_FILRECT, GP0_B_CPYRECT_V2C: begin
+		   /* Wait on mem transfer */
+		   decode_state_next = WAIT_MEM;
+		end
+		GP0_B_CPYRECT_V2V: begin
+		   /* Need 1 more coord */
+		   decode_state_next = GET_XY2;
+		end
+		GP0_B_CPYRECT_C2V: begin
+		   /* Memory copy commands now take take */
+		   decode_state_next = SEND_DATA;
+		end
+	      endcase
+	   end // case: GET_XY1
 	end // case: GET_XY1
+	GET_XY2: begin
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.x2 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
+	      new_cmd.y2 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
+	      cmd_fifo_re = 1'b1;
+
+	      /* Now the command is in the hold register */
+	      case (cmd_hold)
+		GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST: begin
+		   /* Dne, get ot drawing! */
+		   decode_state_next = DRAWING;
+		end
+		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
+		  GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		     /* Now get the text coords and stuff */
+		     decode_state_next = GET_TX2;
+		  end
+		GP0_B_P3_MC_OQ_SH, GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH: begin
+		   /* Done, get to drawing! */
+		   decode_state_next = DRAWING;
+		end
+		GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH,
+                  GP0_B_P4_TX_ST_BL_SH: begin
+                     /* New get text coords and stuff */
+                     decode_state_next = GET_TX2;
+                  end
+                GP0_B_CPYRECT_V2V: begin
+                   /* Need 1 more coord */
+                   decode_state_next = WAIT_MEM;
+                end
+              endcase
+	   end // if (~cmd_fifo_empty)
+	end // case: GET_XY2
+	GET_TX0: begin
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.u0 = cmd_fifo_cmd[7:0];
+	      new_cmd.v0 = cmd_fifo_cmd[15:8];
+	      new_cmd.clut_x = cmd_fifo_cmd[21:16] >> 'd4;
+	      new_cmd.clut_y = cmd_fifp_cmd[30:22];
+	      cmd_fifo_re = 1'b1;
+
+	      /* Now on to the command */
+	      case (cmd_hold)
+		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
+		GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		   /* Now get the next x-y coords and stuff */
+		   decode_state_next = GET_XY1;
+		end
+		GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH,
+		  GP0_B_P4_TX_ST_BL_SH: begin
+		     /* New get next colors and stuff */
+		     decode_state_next = GET_CL1;
+		  end
+		GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW: begin
+		   /* Variable size needs to get height width */
+		   decode_state_next = GET_XY1;
+		end
+		GP0_B_R1_TX_OQ_BL, GP0_B_R1_TX_OQ_RW, GP0_B_R1_TX_ST_BL, GP0_B_R1_TX_ST_RW,
+		  GP0_B_R8_TX_OQ_BL, GP0_B_R8_TX_OQ_RW, GP0_B_R8_TX_ST_BL, GP0_B_R8_TX_ST_RW,
+		  GP0_B_R16_TX_OQ_BL, GP0_B_R16_TX_OQ_RW, GP0_B_R16_TX_ST_BL,
+		  GP0_B_R16_TX_ST_RW: begin
+		     /* These rectangles need to draw now! */
+		     decode_state_next = DRAWING;
+		  end
+	      endcase // case (cmd_hold)
+	   end // if (~cmd_fifo_cmd)
+	end // case: GET_TX0
+	GET_TX1: begin
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.text_x = cmd_fifo_cmd[3:0];
+	      new_cmd.text_y = cmd_fifo_cmd[4];
+	      new_cmd.semi_trans_mode = cmd_fifo_cmd[6:5];
+	      new_cmd.text_mode = cmd_fifo_cmd[8:7];
+	      new_cmd.text_en = cmd_fifo_cmd[11];
+	      cmd_fifo_re = 1'b1;
+
+	   end
+	      
       endcase // case (decode_state)
    end
    
@@ -988,7 +1072,7 @@ module gpu(
       end
    end
    
-   /* CMD register - for storing all info for the current cmd */
+   /* Global CMD register - for storing all info for the current cmd */
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 cmd <= 'd0;
