@@ -40,8 +40,10 @@ typedef struct packed {
 /* Decode stage FSM states */
 typedef enum logic [4:0] {WAIT, GET_XY0, GET_XY1, GET_XY2, 
                           GET_TX0, GET_TX1, GET_TX2, GET_CL1,
-                          GET_CL2, SEND_DATA, WAIT_MEM, DRAWING,
-                          DONE_DRAWING} DECODE_t;
+                          GET_CL2, SEND_DATA, WAIT_MEM, DRAWING} DECODE_t;
+
+/* XY generator FSM states */
+typedef enum logic [1:0] {SIT_AROUND, CHURN_BUTTER, COMPLETE} XYGEN_t;
 
 
 /* GPU Status register struct */

@@ -107,7 +107,7 @@ module gpu(
 
    /* Some important constants */
    localparam GPU_STATUS_RST        = 'h14802000; // Reset status of GPU
-
+   localparam POLYLINE_TERM         = 'h55555555;
    
    /* Internal Lines */
    /* Status reg lines */
@@ -140,9 +140,23 @@ module gpu(
 
    DECODE_t decode_state, decode_state_next;
 
+   XYGEN_t xy_gen_state, xy_gen_state_next;
+
+   logic 		     on_fourth, on_fourth_new;
    logic [7:0] 		     cmd_hold, cmd_hold_new;
+   logic 		     draw_req;
+   logic 		     xy_gen_on;
+   
    
    logic [1:0] 		     side0, side1, side2;
+
+   logic [11:0] 	     min_x01, min_y01, min_x02, min_y02;
+   logic [11:0] 	     max_x01, max_y01, max_x02, max_y02;
+
+   logic [11:0] 	     xy_gen_min_x, xy_gen_max_x, xy_gen_min_y, xy_gen_max_y;
+   logic [11:0] 	     xy_gen_y, xy_gen_y_new;
+   logic [11:0] 	     xy_gen_block, xy_gen_block_new;
+   logic [11:0] 	     xy_gen_i;
 
    /* Stall */
    logic 		     pipeline_stall;
@@ -438,16 +452,29 @@ module gpu(
       end
    end
 
+   /* OnFourth Register - Determines if we're on the fourth vertex of a P4 */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 on_fourth <= 1'b0;
+      end
+      else begin
+	 on_fourth <= on_fourth_new;
+      end
+   end
+
    /* Command (and thus next decode state) logic */
    always_comb begin
       /* Defaults */
       decode_state_next = decode_state;
       new_cmd = cmd;
       cmd_hold_new = cmd_hold;
+      on_fourth_new = on_fourth;
       
       cmd_fifo_re = 1'b0;
 
       set_gpu_irq = 1'b0;
+
+      draw_req = 1'b0;
 
       clr_text_cache = 1'b0;
       clr_clut_cache = 1'b0;
@@ -473,11 +500,14 @@ module gpu(
       x_off_new = x_off;
       y_off_new = y_off;
 
+      xy_gen_on = 1'b0;
+      
       /* Process commands (or handle whats going on if in the middle of one) */
       case (decode_state)
 	WAIT: begin
 	   if (~cmd_fifo_empty) begin
 	      cmd_hold_new = cmd_fifo_cmd[31:24];
+	      on_fourth_new = 1'b0;
 	      
 	      /* Pick either move to getting next arg  or
 	         handle function immediately depending on type.
@@ -952,6 +982,15 @@ module gpu(
 		   /* These lines are just 2 coords, so start drawing! */
 		   decode_state_next = DRAWING;
 		end
+		GP0_B_PL_MC_OQ, GP0_B_PL_MC_ST: begin
+		   /* These lines are might be more than 2 lines and FSM will reenter here */
+		   if (cmd_fifo_cmd == POLYLINE_TERM) begin
+		      decode_state_next = WAIT;
+		   end
+		   else begin
+		      decode_state_next = DRAWING;
+		   end
+		end
 		GP0_B_LN_MC_OQ_SH, GP0_B_LN_MC_ST_SH, GP0_B_PL_MC_OQ_SH, GP0_B_PL_MC_ST_SH: begin
                    /* These lines are also 2 lines and all colors have been gotten! */
                    decode_state_next = DRAWING;
@@ -963,17 +1002,29 @@ module gpu(
 		     new_cmd.x1 = cmd.x0 + {1'b0, cmd_fifo_cmd[10:0]};
 		     new_cmd.y1 = cmd.y0 + {1'b0, cmd_fifo_cmd[26:16]};
 		  end
-		GP0_B_FILRECT, GP0_B_CPYRECT_V2C: begin
+		GP0_B_FILRECT: begin
+		   /* The seoncd param is a size, not a coord! */
+		   decode_state_next = WAIT_MEM;
+		   new_cmd.x1 = cmd.x0 + ((({1'b0, cmd_fifo_cmd[10:0]} & 'h3FF) + 'hF) & 'hFF0);
+		   new_cmd.y1 = cmd.y0 + ({1'b0, cmd_fifo_cmd[26:16]} & 'h1FF);
+		end
+		GP0_B_CPYRECT_V2C: begin
 		   /* Wait on mem transfer */
 		   decode_state_next = WAIT_MEM;
+		   new_cmd.x1 = cmd.x0 + ({1'b0, cmd_fifo_cmd[10:0]} & 'h3FF) + 'b1;
+		   new_cmd.y1 = cmd.y0 + ({1'b0, cmd_fifo_cmd[26:16]} & 'h1FF) + 'b1;
 		end
 		GP0_B_CPYRECT_V2V: begin
-		   /* Need 1 more coord */
+		   /* Need 1 more coord, but put this coord into x2,y2 so xy-gen works */
 		   decode_state_next = GET_XY2;
+		   new_cmd.x2 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
+		   new_cmd.y2 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
 		end
 		GP0_B_CPYRECT_C2V: begin
 		   /* Memory copy commands now take take */
 		   decode_state_next = SEND_DATA;
+		   new_cmd.x1 = cmd.x0 + ({1'b0, cmd_fifo_cmd[10:0]} & 'h3FF) + 'b1;
+		   new_cmd.y1 = cmd.y0 + ({1'b0, cmd_fifo_cmd[26:16]} & 'h1FF) + 'b1;
 		end
 	      endcase
 	   end // case: GET_XY1
@@ -1005,8 +1056,10 @@ module gpu(
                      decode_state_next = GET_TX2;
                   end
                 GP0_B_CPYRECT_V2V: begin
-                   /* Need 1 more coord */
+                   /* Done, remember, we put the other coord in x2, y2 */
                    decode_state_next = WAIT_MEM;
+		   new_cmd.x1 = cmd.x0 + ({1'b0, cmd_fifo_cmd[10:0]} & 'h3FF) + 'b1;
+		   new_cmd.y1 = cmd.y0 + ({1'b0, cmd_fifo_cmd[26:16]} & 'h1FF) + 'b1;
                 end
               endcase
 	   end // if (~cmd_fifo_empty)
@@ -1016,7 +1069,7 @@ module gpu(
 	      new_cmd.u0 = cmd_fifo_cmd[7:0];
 	      new_cmd.v0 = cmd_fifo_cmd[15:8];
 	      new_cmd.clut_x = cmd_fifo_cmd[21:16] >> 'd4;
-	      new_cmd.clut_y = cmd_fifp_cmd[30:22];
+	      new_cmd.clut_y = cmd_fifo_cmd[30:22];
 	      cmd_fifo_re = 1'b1;
 
 	      /* Now on to the command */
@@ -1047,30 +1100,252 @@ module gpu(
 	end // case: GET_TX0
 	GET_TX1: begin
 	   if (~cmd_fifo_empty) begin
-	      new_cmd.text_x = cmd_fifo_cmd[3:0];
-	      new_cmd.text_y = cmd_fifo_cmd[4];
-	      new_cmd.semi_trans_mode = cmd_fifo_cmd[6:5];
-	      new_cmd.text_mode = cmd_fifo_cmd[8:7];
-	      new_cmd.text_en = cmd_fifo_cmd[11];
+	      new_cmd.u1 = cmd_fifo_cmd[7:0];
+	      new_cmd.v1 = cmd_fifo_cmd[15:8];
+	      new_cmd.text_x = cmd_fifo_cmd[19:16];
+	      new_cmd.text_y = cmd_fifo_cmd[20];
+	      new_cmd.semi_trans_mode = cmd_fifo_cmd[22:21];
+	      new_cmd.text_mode = cmd_fifo_cmd[24:23];
+	      new_cmd.text_en = cmd_fifo_cmd[25];
+	      cmd_fifo_re = 1'b1;
+	      
+	      /* Now on to the command */
+	      case (cmd_hold)
+		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
+		GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		   /* Now get the next x-y coords and stuff */
+		   decode_state_next = GET_XY2;
+		end
+		GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH,
+		  GP0_B_P4_TX_ST_BL_SH: begin
+		     /* New get next colors and stuff */
+		     decode_state_next = GET_CL2;
+		  end
+	      endcase // case (cmd_hold)
+	   end // if (~cmd_fifo_empty)
+	end // case: GET_TX1
+	GET_TX2: begin
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.u2 = cmd_fifo_cmd[7:0];
+	      new_cmd.v2 = cmd_fifo_cmd[15:8];
+	      cmd_fifo_re = 1'b1;
+	      
+	      /* Now on to the command */
+	      case (cmd_hold)
+		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
+		GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		   /* Now get to drawing! (finally...) */
+		   decode_state_next = DRAWING;
+		end
+		GP0_B_P3_TX_OQ_BL_SH, GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH,
+		  GP0_B_P4_TX_ST_BL_SH: begin
+		     /* New get to drawing (really finally!) */
+		     decode_state_next = DRAWING;
+		  end
+	      endcase // case (cmd_hold)
+	   end // if (~cmd_fifo_empty)
+	end
+	GET_CL1: begin
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.b0 = cmd_fifo_cmd[23:16];
+	      new_cmd.g0 = cmd_fifo_cmd[15:8];
+	      new_cmd.r0 = cmd_fifo_cmd[7:0];
 	      cmd_fifo_re = 1'b1;
 
+	      /* All commands get the next coord after getting the 2nd color */
+	      decode_state_next = GET_XY1;
 	   end
+	end
+	GET_CL2: begin
+	   if (~cmd_fifo_empty) begin
+	      new_cmd.b0 = cmd_fifo_cmd[23:16];
+	      new_cmd.g0 = cmd_fifo_cmd[15:8];
+	      new_cmd.r0 = cmd_fifo_cmd[7:0];
+	      cmd_fifo_re = 1'b1;
 	      
+	      /* If polyline, check for termination code; otherwise, get next vertex */
+	      if ((cmd_hold == GP0_B_PL_MC_OQ_SH) | (cmd_hold == GP0_B_PL_MC_ST_SH) &
+		  (cmd_fifo_cmd == POLYLINE_TERM)) begin
+		 decode_state_next = WAIT;
+	      end
+	      else begin
+		 decode_state_next = GET_XY2;
+	      end
+	   end	  
+	end // case: GET_CL2
+	DRAWING: begin
+	   /* Go render pipeline, go! */
+	   xy_gen_on = 1'b1;
+	   draw_req = 1'b1;
+	   
+	   /* The drawing stage; pretty much just let the render pipeline do its thing.
+	      Once its done, decide where to go next */
+	   if (~wb_stage.valid && xy_gen_state == COMPLETE) begin
+	      case (cmd_hold)
+		GP0_B_P4_MC_OQ, GP0_B_P4_MC_ST, GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW,
+		GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
+		   /* There polys have next x-y coord; unless we've already finished them */
+		   if (on_fourth) begin
+		      decode_state_next = WAIT;
+		   end
+		   else begin
+		      decode_state_next = GET_XY2;
+		      on_fourth_new = 1'b1;
+		   end
+		end // case: GP0_B_P4_MC_OQ, GP0_B_P4_MC_ST, GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW,...
+		GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH, GP0_B_P4_TX_OQ_BL_SH, 
+		  GP0_B_P4_TX_ST_BL_SH: begin
+		     /* Just like above, but these re-enter at getting 3rd color */
+		     if (on_fourth) begin
+			decode_state_next = WAIT;
+		     end
+		     else begin
+			decode_state_next = GET_CL2;
+			on_fourth_new = 1'b1;
+		     end
+		  end // case: GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH, GP0_B_P4_TX_OQ_BL_SH,...
+		GP0_B_PL_MC_OQ, GP0_B_PL_MC_ST: begin
+		   /* Reenter at x-y coord (This state will check the term code */
+		   decode_state_next = GET_XY2;
+
+		   /* Also, shift the vertex into x0, y0 */
+		   new_cmd.x0 = cmd.x1;
+		   new_cmd.y0 = cmd.y1;
+		end
+		GP0_B_PL_MC_OQ_SH, GP0_B_PL_MC_ST_SH: begin
+		   /* Same as above, but reenter at color, also shift color */
+		   decode_state_next = GET_CL2;
+
+		   new_cmd.x0 = cmd.x1;
+		   new_cmd.y0 = cmd.y1;
+
+		   new_cmd.r0 = cmd.r1;
+		   new_cmd.g0 = cmd.g1;
+		   new_cmd.b0 = cmd.b1;
+		end // case: GP0_B_PL_MC_OQ_SH, GP0_B_PL_ST_SH
+		default: begin
+		   /* All others are done! */
+		   decode_state_next = WAIT;
+		end
+	      endcase // case (cmd_hold)
+	   end // if (~wb_stage.valid && xy_gen_state == COMPLETE)
+	end // case: DRAWING
+	
       endcase // case (decode_state)
-   end
+   end // always_comb
+
    
    
    
    /* X, Y generator */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 xy_gen_state <= SIT_AROUND;
+	 xy_gen_block <= 'd0;
+	 xy_gen_y <= 12'd0;
+      end
+      else begin
+	 xy_gen_state <= xy_gen_state_next;
+	 xy_gen_block <= xy_gen_block_new;
+	 xy_gen_y <= xy_gen_y_new;
+      end
+   end // always_ff @
+
+   /* Determine mins and maxs for given x-y coords */
+   assign min_x01 = (cmd.x0 > cmd.x1) ? cmd.x1 : cmd.x0;
+   assign min_y01 = (cmd.y0 > cmd.y1) ? cmd.y1 : cmd.y0;
+   assign min_x02 = (cmd.x2 > min_x01) ? min_x01 : cmd.x2;
+   assign min_y02 = (cmd.y2 > min_y01) ? min_y01 : cmd.y2;
+
+   assign max_x01 = (cmd.x0 < cmd.x1) ? cmd.x1 : cmd.x0;
+   assign max_y01 = (cmd.y0 < cmd.y1) ? cmd.y1 : cmd.y0;
+   assign max_x02 = (cmd.x2 < max_x01) ? min_x01 : cmd.x2;
+   assign max_y02 = (cmd.y2 < max_y01) ? min_y01 : cmd.y2;
+   
+
+   /* X, Y generator state and output logic */
    always_comb begin
       /* Defaults */
       next_draw_stage.x = 'd0;
       next_draw_stage.y = 'd0;
+      next_draw_stage.valid = 1'b0;
+      
+      xy_gen_state_next = xy_gen_state;
+      xy_gen_block_new = xy_gen_block;
+      xy_gen_y_new = xy_gen_y;
 
-      /* Use the block to determine x, y values */
-      if (next_draw_stage.valid) begin
+      xy_gen_min_x = 12'b0;
+      xy_gen_min_y = 12'b0;
+      xy_gen_max_x = 12'b0;
+      xy_gen_max_y = 12'b0;
+      
+      
+      /* Find the mins and maxes to use, ie if its a polygon, check between the three, 
+         else use the two */
+      case (cmd_hold)
+	GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST, GP0_B_P3_TX_OQ_BL, 
+	GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW, GP0_B_P4_TX_OQ_BL, 
+	GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW, GP0_B_P3_MC_OQ_SH, 
+	GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH, GP0_B_P3_TX_OQ_BL_SH, 
+	GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH, GP0_B_P4_TX_ST_BL_SH: begin
+	   xy_gen_min_x = min_x02;
+	   xy_gen_min_y = min_y02;
+	   xy_gen_max_x = max_x02;
+	   xy_gen_max_y = max_y02;
+	end
+	default: begin
+	   xy_gen_min_x = min_x01;
+	   xy_gen_min_y = min_y01;
+	   xy_gen_max_x = max_x01;
+	   xy_gen_max_y = max_y01;
+	end
+      endcase // case (cmd_hold)
+      
+      /* Decode FSM has told up to go! */
+      if (xy_gen_on && xy_gen_state != COMPLETE) begin
+
+	 /* If its a draw request, run the render pipeline. Otherwise, use it for storage */
+	 next_draw_stage.valid = draw_req & (xy_gen_state_next == COMPLETE);
+
+	 /* Determine new y and block values */
+	 if (xy_gen_state == SIT_AROUND) begin
+	    xy_gen_block_new = 'd0;
+	    xy_gen_y_new = xy_gen_min_y;
+	    xy_gen_state_next = CHURN_BUTTER;
+	 end
+	 else begin
+	    if (xy_gen_y < xy_gen_max_y) begin
+	       xy_gen_y_new = xy_gen_y + 12'b1;
+	    end
+	    else begin
+	       xy_gen_y_new = xy_gen_min_y;
+
+	       if (((xy_gen_block + 'd1) << $clog2(`GPU_PIPELINE_WIDTH)) < xy_gen_max_x) begin
+		  xy_gen_block_new = xy_gen_block + 'd1;
+	       end
+	       else begin
+		  xy_gen_block_new = 'd0;
+		  xy_gen_y_new = 'd0;
+		  xy_gen_state_next = COMPLETE;
+	       end
+	    end 
+	 end
+      end // if (xy_gen_on)
+      else begin
+	 /* If we are done generating and the request goes low, go to wait state */
+	 if (~xy_gen_on) begin
+	    xy_gen_state_next = SIT_AROUND;
+	 end
+      end // else: !if(xy_gen_on && xy_gen_state != COMPLETE)
+
+      /* Set all the draw_stage x-y coords */
+      for (xy_gen_i = 0; xy_gen_i < `GPU_PIPELINE_WIDTH; xy_gen_i = xy_gen_i + 1) begin
+	 next_draw_stage.x[xy_gen_i] = ((xy_gen_block << $clog2(`GPU_PIPELINE_WIDTH)) + 
+					xy_gen_i + xy_gen_min_x);
+	 next_draw_stage.y[xy_gen_i] = xy_gen_y_new;
       end
-   end
+   end // always_comb
+   
    
    /* Global CMD register - for storing all info for the current cmd */
    always_ff @(posedge clk, posedge rst) begin
@@ -1107,8 +1382,27 @@ module gpu(
 	   .x1({4'b0, cmd.x1}), .y1({4'b0, cmd.y1}),
 	   .x({4'b0, cmd.x2}), .y({4'b0, cmd.y2}),
 	   .result(side2));
-     
 
+   /* Interpolators for texture; note that *_trans_* is a fixed point number 24-bits wide:
+      [ 18 bits of integer | 6 bits fraction ] */
+   interp in_u(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
+	       .s0(cmd.u0), .s1(cmd.u1), .s2(cmd.u2),
+	       .cx(u_trans_x), .cy(u_trans_y), .cs(u_trans_c)),
+     in_v(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
+	  .s0(cmd.v0), .s1(cmd.v1), .s2(cmd.v2),
+	  .cx(v_trans_x), .cy(v_trans_y), .cs(v_trans_c));
+
+   /* Interpolators for shading */
+   interp in_r(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
+	       .s0(cmd.r0), .s1(cmd.r1), .s2(cmd.r2),
+	       .cx(r_trans_x), .cy(r_trans_y), .cs(r_trans_c)),
+     in_g(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
+	  .s0(cmd.g0), .s1(cmd.g1), .s2(cmd.g2),
+	  .cx(g_trans_x), .cy(g_trans_y), .cs(g_trans_c)),
+     in_b(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
+	  .s0(cmd.b0), .s1(cmd.b1), .s2(cmd.b2),
+	  .cx(b_trans_x), .cy(b_trans_y), .cs(b_trans_c));
+   
 
 
 
@@ -1222,8 +1516,6 @@ module gpu(
    assign next_shader_stage.y = color_stage.y;
    assign next_shader_stage.in_shape = color_stage.in_shape;
 
-   /* Texture unit */
-   /* ??? */
    
    /* Texture cache */
 /*   texture_cache text_cache(.data_in(vram_bus),
@@ -1243,9 +1535,11 @@ module gpu(
 
       /* If its textured, use results from texture unit */
       if (cmd.texture == TEXT) begin
-	 next_shader_stage.r = text_unit_r;
-	 next_shader_stage.g = text_unit_g;
-	 next_shader_stage.b = text_unit_b;
+	 for (text_i = 0; text_i < `GPU_PIPELINE_WIDTH; text_i = text_i + 1) begin
+	    next_shader_stage.r[text_i] = ;
+	    next_shader_stage.g[text_i] = ;
+	    next_shader_stage.b[text_i] = ;
+	 end
       end
    end // always_comb
 
@@ -1284,6 +1578,27 @@ module gpu(
    assign next_wb_stage.x = shader_stage.x;
    assign next_wb_stage.y = shader_stage.y;
 
+
+   /* Preform shading if requests by the cmd */
+   always_comb begin
+      /* Defaults */
+      next_wb_stage.r = shader_stage.r;
+      next_wb_stage.g = shader_stage.g;
+      next_wb_stage.b = shader_stage.b;
+
+      /* Determine is we need to shader */
+      if (cmd.shade == SHADE) begin
+	 /* Determine shading type */
+	 if (GPU_status[27]) begin
+	    /* Gouraud */
+	 end
+	 else begin
+	    /* Flat */
+	 end
+      end
+   end
+   
+   
    /* Writeback stage pipeline barrier */
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
