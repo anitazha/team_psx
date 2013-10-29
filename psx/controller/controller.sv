@@ -1,6 +1,7 @@
 
 module controller_io(input logic        clk, rst, start,
-		     input logic 	DATA, //ACK,
+		     input logic 	DATA, ACK,
+		     output logic 	err,
 		     output logic 	COMMAND, ATT, 
 		     output logic 	c_clk,
 		     output logic 	SLCT, STRT, UP, RGHT, DOWN, LEFT,
@@ -67,6 +68,8 @@ module controller_io(input logic        clk, rst, start,
    reg [7:0] 	  rx_data;
    reg [7:0] 	  tx_data, next_tx_data;
 
+   reg 		  error_out;
+
    wire 	  last_byte;
 
    /* DEBUG LINES */
@@ -96,6 +99,8 @@ module controller_io(input logic        clk, rst, start,
    assign c_clk   = c_clk_out;
    assign ATT     = ATT_out;
    assign COMMAND = COMMAND_out;
+
+   assign err = err_out;
    
    /* determine if we are on the last byte of the transmission */
    assign last_byte = (c_type == TYPE_DI && byte_no == 5'd5) ||
@@ -113,35 +118,35 @@ module controller_io(input logic        clk, rst, start,
    end
 
    /* DEBUG LOGIC */
-   /**/always @ (posedge clk, posedge rst) begin
-      /**/if (rst) begin
-	 /**/ACK <= 1'b1;
-	 /**/end
-      /**/else if (curr_state == ACK_FALL) begin
-	 /**/ACK <= 1'b0;
-	 /**/end
-      /**/else if (curr_state == ACK_RISE) begin
-	 /**/ACK <= 1'b1;
-	 /**/end
-      /**/else begin
-	 /**/ACK <= 1'b1;
-	 /**/end
-      /**/end
+   //always @ (posedge clk, posedge rst) begin
+      //if (rst) begin
+	 //ACK <= 1'b1;
+	 //end
+      //else if (curr_state == ACK_FALL) begin
+	 //ACK <= 1'b0;
+	 //end
+      //else if (curr_state == ACK_RISE) begin
+	 //ACK <= 1'b1;
+	 //end
+      //else begin
+	 //ACK <= 1'b1;
+	 //end
+      //end
    
    
    /* sample DATA line */
-   always @ (posedge c_clk, /**/ negedge ACK /**/) begin
-      /**/if (c_clk && ACK) begin
-	 rx_data[curr_index] <= DATA;
-      /**/end
-      /**/else if (~ACK) begin
-	 /**/if (byte_no == 'd2) begin
-	    /**/rx_data <= ID_ANALOGR;
-	 /**/end
-	 /**/if (byte_no == 'd3) begin
-	    /**/rx_data <= DATA_READY;
-	 /**/end
-      /**/end
+   always @ (posedge c_clk /* negedge ACK */) begin
+      //if (c_clk && ACK) begin
+      rx_data[curr_index] <= DATA;
+      //end
+      //else if (~ACK) begin
+	 //if (byte_no == 'd2) begin
+	    //rx_data <= ID_ANALOGR;
+	 //end
+	 //if (byte_no == 'd3) begin
+	    //rx_data <= DATA_READY;
+	 //end
+      //end
    end
    
    /* FSM next state logic */
@@ -155,7 +160,7 @@ module controller_io(input logic        clk, rst, start,
 	 curr_index  <= 4'd0;
 	 byte_no     <= 5'd1;
 	 c_type      <= 4'd0;
-
+	 
 	 /* button values */
 	 STRT_out    <= 1'b1;
 	 SLCT_out    <= 1'b1;
@@ -248,7 +253,8 @@ module controller_io(input logic        clk, rst, start,
       load_CIR    = CIR_out;
       load_c_type = c_type;
       
-      rst_count    = 1'b0;
+      rst_count   = 1'b0;
+      err_out     = 1'b0;  
  
       case (curr_state)
 	/* wait for system to start communication */
@@ -485,6 +491,7 @@ module controller_io(input logic        clk, rst, start,
 	ERROR: begin
 	   next_state = ERROR;
 	   next_ATT = 1'b1;
+	   err_out = 1'b1;
 	end
       endcase // case (curr_state)
    end // always_comb
