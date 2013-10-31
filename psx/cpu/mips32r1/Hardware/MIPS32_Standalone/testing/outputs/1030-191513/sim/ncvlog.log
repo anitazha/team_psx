@@ -1,0 +1,106 @@
+ncvlog: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+TOOL:	ncvlog	08.20-s015: Started on Oct 30, 2013 at 19:15:13 EDT
+ncvlog
+    -linedebug
+    -messages
+    -incdir src
+    src/Add.v
+    src/ALU.v
+    src/Compare.v
+    src/Control.v
+    src/CPZero.v
+    src/Divide.v
+    src/exception_unit.v
+    src/EXMEM_Stage.v
+    src/Hazard_Detection.v
+    src/IDEX_Stage.v
+    src/IFID_Stage.v
+    src/MemControl.v
+    src/MEMWB_Stage.v
+    src/mips_mem.v
+    src/multiply_coprocessor.v
+    src/Mux2.v
+    src/Mux4.v
+    src/Processor.v
+    src/regfile.v
+    src/RegisterFile.v
+    src/Register.v
+    src/syscall_unit.v
+    src/testbench.v
+    src/TrapDetect.v
+
+file: src/Add.v
+	module worklib.Add
+		errors: 0, warnings: 0
+file: src/ALU.v
+	module worklib.ALU
+		errors: 0, warnings: 0
+file: src/Compare.v
+	module worklib.Compare
+		errors: 0, warnings: 0
+file: src/Control.v
+	module worklib.Control
+		errors: 0, warnings: 0
+file: src/CPZero.v
+	module worklib.CPZero
+		errors: 0, warnings: 0
+file: src/Divide.v
+	module worklib.Divide
+		errors: 0, warnings: 0
+file: src/exception_unit.v
+	module worklib.exception_unit
+		errors: 0, warnings: 0
+file: src/EXMEM_Stage.v
+	module worklib.EXMEM_Stage
+		errors: 0, warnings: 0
+file: src/Hazard_Detection.v
+	module worklib.Hazard_Detection
+		errors: 0, warnings: 0
+file: src/IDEX_Stage.v
+	module worklib.IDEX_Stage
+		errors: 0, warnings: 0
+file: src/IFID_Stage.v
+	module worklib.IFID_Stage
+		errors: 0, warnings: 0
+file: src/MemControl.v
+	module worklib.MemControl
+		errors: 0, warnings: 0
+file: src/MEMWB_Stage.v
+	module worklib.MEMWB_Stage
+		errors: 0, warnings: 0
+file: src/mips_mem.v
+	module worklib.mips_mem
+		errors: 0, warnings: 0
+file: src/multiply_coprocessor.v
+	module worklib.multiply_coprocessor
+		errors: 0, warnings: 0
+file: src/Mux2.v
+	module worklib.Mux2
+		errors: 0, warnings: 0
+file: src/Mux4.v
+	module worklib.Mux4
+		errors: 0, warnings: 0
+file: src/Processor.v
+	module worklib.Processor
+		errors: 0, warnings: 0
+file: src/regfile.v
+	module worklib.regfile
+		errors: 0, warnings: 0
+file: src/RegisterFile.v
+	module worklib.RegisterFile
+		errors: 0, warnings: 0
+file: src/Register.v
+	module worklib.Register
+		errors: 0, warnings: 0
+file: src/syscall_unit.v
+	module worklib.syscall_unit
+		errors: 0, warnings: 0
+file: src/testbench.v
+	module worklib.testbench
+		errors: 0, warnings: 0
+	module worklib.clock
+		errors: 0, warnings: 0
+file: src/TrapDetect.v
+	module worklib.TrapDetect
+		errors: 0, warnings: 0
+TOOL:	ncvlog	08.20-s015: Exiting on Oct 30, 2013 at 19:15:13 EDT  (total: 00:00:00)
