@@ -116,8 +116,8 @@ module gpu(
    GPU_status_t GPU_status, GPU_status_new;
    logic 		      GPU_status_clr;
    
-   logic [31:0] 	      GPU_read_reg, GPU_read_reg_new;
-   logic 		      GPU_read_reg_ld;
+   logic [31:0] 	      GPU_read_reg, GPU_read_reg_new_NB, GPU_read_reg_new_V2C;
+   logic 		      GPU_read_reg_ld_NB, GPU_read_reg_ld_V2C;
    
    logic [9:0] 		      display_start_x, display_start_x_new;
    logic [8:0] 		      display_start_y, display_start_y_new;
@@ -155,8 +155,16 @@ module gpu(
    
    logic 		     on_fourth, on_fourth_new;
    logic [7:0] 		     cmd_hold, cmd_hold_new;
+   logic 		     decode_fifo_re;
    logic 		     draw_req;
    logic 		     xy_gen_on;
+   logic 		     clut_on;
+   logic 		     txpg_on;
+   logic 		     fill_on;
+   logic 		     v2v_on;
+   logic 		     v2c_on;
+   logic 		     c2v_on;
+   
    
    
    logic [1:0] 		     side0, side1, side2;
@@ -172,13 +180,48 @@ module gpu(
    logic [255:0][16:0] 	     clut;
    logic 		     clut_rdy, clut_rdy_next;
    logic [8:0] 		     clut_count, clut_count_next;
+   logic [18:0] 	     clut_vram_addr;
+   logic 		     clut_vram_re;
    logic 		     clut_ld;
 
    logic 		     txpg_rdy, txpg_rdy_next;
    logic [8:0] 		     txpg_count_x, txpg_count_x_next;
    logic [8:0] 		     txpg_count_y, txpg_count_y_next;
+   logic [3:0] 		     txpg_base_x, txpg_base_x_next;
+   logic 		     txpg_base_y, txpg_base_y_next;
+   logic [18:0] 	     txpg_vram_addr;
+   logic 		     txpg_vram_re;
    logic 		     txpg_ld;
    logic [3:0][15:0] 	     txpg_val;
+
+   logic 		     fill_rdy, fill_rdy_next;
+   logic [11:0] 	     fill_x, fill_y, fill_x_next, fill_y_next;
+   logic [15:0] 	     fill_hold, fill_hold_next;
+   logic [18:0] 	     fill_vram_addr;
+   logic [15:0] 	     fill_vram_data;
+   logic 		     fill_vram_we;
+
+   logic                     v2v_rdy, v2v_rdy_next;
+   logic [11:0] 	     v2v_x0, v2v_y0, v2v_x0_next, v2v_y0_next;
+   logic [11:0] 	     v2v_x1, v2v_y1, v2v_x1_next, v2v_y1_next;
+   logic [15:0] 	     v2v_hold, v2v_hold_next;
+   logic [18:0] 	     v2v_vram_addr;
+   logic [15:0] 	     v2v_vram_data;
+   logic                     v2v_vram_we, v2v_vram_re;
+
+   logic                     c2v_rdy, c2v_rdy_next;
+   logic [11:0] 	     c2v_x, c2v_y, c2v_x_next, c2v_y_next;
+   logic [15:0] 	     c2v_hold, c2v_hold_next;
+   logic [18:0] 	     c2v_vram_addr;
+   logic [15:0] 	     c2v_vram_data;
+   logic                     c2v_vram_we, c2v_vram_re;
+   logic 		     c2v_fifo_re;
+
+   logic                     v2c_rdy, v2c_rdy_next;
+   logic [11:0] 	     v2c_x, v2c_y, v2c_x_next, v2c_y_next;
+   logic [15:0] 	     v2c_hold, v2c_hold_next;
+   logic [18:0] 	     v2c_vram_addr;
+   logic                     v2c_vram_re;   
    
    logic [23:0] 	     u_trans_x, u_trans_y, u_trans_c;
    logic [23:0] 	     v_trans_x, v_trans_y, v_trans_c;
@@ -199,16 +242,17 @@ module gpu(
    logic [`GPU_PIPELINE_WIDTH-1:0] 	 in_rect;
    genvar 				 triangles, lines, rects;
 
+   
    /* COLOR STAGE */
    color_stage_t color_stage, next_color_stage;
-
    
+   logic [23:0] 			 f_u, f_v;
 
    /* Texture unit lines */
    logic [255:0][255:0][15:0] 		 txpg;
    
    integer 				 text_i;
-   
+     
 
    /* SHADER STAGE */
    shader_stage_t shader_stage, next_shader_stage;
@@ -225,6 +269,13 @@ module gpu(
    WB_t wb_state, wb_state_next;
    
    logic 				 wb_stall;
+
+   logic [18:0] 			 wb_vram_addr;
+   logic [15:0] 			 wb_vram_data;
+   logic 				 wb_vram_re, wb_vram_we;
+   logic [7:0] 				 wb_count, wb_count_next;
+   logic [15:0] 			 wb_hold, wb_hold_next;
+   logic [7:0] 				 wb_r, wb_g, wb_b;
    
 
 
@@ -331,11 +382,13 @@ module gpu(
 
    /* VRAM/Main memory access signal logic */
    assign vram_addr = (clut_vram_addr | txpg_vram_addr | wb_vram_addr |
-		       fill_vram_addr | v2v_vram_addr | v2c_vram_adrr |
+		       fill_vram_addr | v2v_vram_addr | v2c_vram_addr |
 		       c2v_vram_addr);
-   assign vram_bus = (vram_we) ? (wb_data | v2v_data | c2v_data | fill_data) : 'dz;
-   assign vram_we = (wb_we | v2v_we | c2v_we | fill_we);
-   assign vram_re = (wb_re | v2v_we | c2v_re | v2c_re | clut_re | txpg_re);
+   assign vram_bus = ((vram_we) ? (wb_vram_data | v2v_vram_data | 
+				   c2v_vram_data | fill_vram_data) : 'dz);
+   assign vram_we = (wb_vram_we | v2v_vram_we | c2v_vram_we | fill_vram_we);
+   assign vram_re = (wb_vram_re | v2v_vram_we | c2v_vram_re | v2c_vram_re | 
+		     clut_vram_re | txpg_vram_re);
    
    /* Command FIFO */
    fifo_16x32 cmd_fifo(.data_in(main_bus),
@@ -474,7 +527,7 @@ module gpu(
       ##################################################### */
 
    /* Pipeline stall logic */
-   assign pipeline_stall = text_mem_stall | clut_mem_stall;
+   assign pipeline_stall = wb_stall;
 
    /* New CMD module, an FSM for filling the cmd register and starting drawing,
       mem transfers, and doing other GP0 cmds */
@@ -1255,7 +1308,7 @@ module gpu(
 	   
 	   /* The drawing stage; pretty much just let the render pipeline do its thing.
 	      Once its done, decide where to go next */
-	   if (~wb_stage.valid && xy_gen_state == COMPLETE) begin
+	   if (~wb_stage.valid & (xy_gen_state == COMPLETE) & ~pipeline_stall) begin
 	      case (cmd_hold)
 		GP0_B_P4_MC_OQ, GP0_B_P4_MC_ST, GP0_B_P4_TX_OQ_BL, GP0_B_P4_TX_OQ_RW,
 		GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW: begin
@@ -1305,7 +1358,7 @@ module gpu(
 	      endcase // case (cmd_hold)
 	   end // if (~wb_stage.valid && xy_gen_state == COMPLETE)
 	end // case: DRAWING
-	WAITMEM: begin
+	WAIT_MEM: begin
 	   /* Determine the waiting and activation conditions */
 	   case (cmd_hold)
 	     GP0_B_FILRECT: begin
@@ -1322,7 +1375,7 @@ module gpu(
 		   decode_state_next = WAIT;
 		end
 	     end
-	     GP0_B_CPY_RECT_V2C: begin
+	     GP0_B_CPYRECT_V2C: begin
 		v2c_on = 1'b1;
 
 		if (v2c_rdy) begin
@@ -1399,15 +1452,15 @@ module gpu(
       
       /* Find the mins and maxes to use, ie if its a polygon, check between the three, 
          else use the two. At this point also clip to drawing area */
-      if (cmd.shape == POLY) begin
-	 xy_gen_min_x = (x_lt > min_x02) ? x_lt : min_x02;
-	 xy_gen_min_y = (y_lt > min_y02) ? y_lt : min_y02;
+      if (cmd.shape == TRI) begin
+	 xy_gen_min_x = (x_tl > min_x02) ? x_tl : min_x02;
+	 xy_gen_min_y = (y_tl > min_y02) ? y_tl : min_y02;
 	 xy_gen_max_x = (x_br < max_x02) ? x_br : max_x02;
 	 xy_gen_max_y = (y_br < max_y02) ? y_br : max_y02;
       end
       else begin
-	 xy_gen_min_x = (x_lt > min_x01) ? x_lt : min_x01;
-	 xy_gen_min_y = (y_lt > min_y01) ? y_lt : min_y01;
+	 xy_gen_min_x = (x_tl > min_x01) ? x_tl : min_x01;
+	 xy_gen_min_y = (y_tl > min_y01) ? y_tl : min_y01;
 	 xy_gen_max_x = (x_br < max_x01) ? x_br : max_x01;
 	 xy_gen_max_y = (y_br < max_y01) ? y_br : max_y01;
       end
@@ -1572,7 +1625,7 @@ module gpu(
 	      txpg_state_next = GETMEM_TXPG;
 
 	      /* Get Textpage bases from cmd or status depending on command */
-	      if (cmd.shape = RECT) begin
+	      if (cmd.shape == RECT) begin
 		 txpg_base_x_next = GPU_status.text_x;
 		 txpg_base_y_next = GPU_status.text_y;
 	      end
@@ -1591,7 +1644,7 @@ module gpu(
 	      txpg_vram_addr = {((cmd.text_y << 8) + txpg_count_y), 
 				((cmd.text_x << 6) + txpg_count_x)};
 	      txpg_vram_re = 1'b1;
-	      txpg_state_next = READINGMEM_CLUT;
+	      txpg_state_next = READINGMEM_TXPG;
 	   end
 	end // case: GETMEM_TXPG
 	READINGMEM_TXPG: begin
@@ -1638,14 +1691,14 @@ module gpu(
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 fill_state <= WAIT_FILL;
-	 fill_count_x <= 12'd0;
-	 fill_count_y <= 12'd0;
+	 fill_x <= 12'd0;
+	 fill_y <= 12'd0;
 	 fill_rdy <= 1'b1;
       end
       else begin
 	 fill_state <= fill_state_next;
-	 fill_count_x <= fill_count_x_next;
-	 fill_count_y <= fill_count_y_next;
+	 fill_x <= fill_x_next;
+	 fill_y <= fill_y_next;
 	 fill_rdy <= fill_rdy_next;
       end // else: !if(rst)
    end // always_ff @
@@ -1677,9 +1730,9 @@ module gpu(
 	      fill_state_next = WAIT_FILL;
 	   end
 	   else begin
-	      fill_state_next = WRITINGMEM_WB;
-	      fill_we = 1'b1;
-	      fill_vram_bus = {1'b0, cmd.r0[7:3], cmd.g0[7:3], cmd.b0[7:3]};
+	      fill_state_next = WRITINGMEM_FILL;
+	      fill_vram_we = 1'b1;
+	      fill_vram_data = {1'b0, cmd.r0[7:3], cmd.g0[7:3], cmd.b0[7:3]};
 	      fill_vram_addr = {fill_y[8:0], fill_x[9:0]};
 	   end
 	end
@@ -1846,8 +1899,8 @@ module gpu(
 	WAIT_C2V: begin
 	   if (c2v_on) begin
 	      c2v_rdy_next = 1'b0;
-	      c2v_x = cmd.x0;
-	      c2v_y = cmd.y0;
+	      c2v_x_next = cmd.x0;
+	      c2v_y_next = cmd.y0;
 	      c2v_state_next = GETMEM_C2V;
 	   end
 	end
@@ -1864,7 +1917,7 @@ module gpu(
 	end // case: GETMEM_C2V
 	READINGMEM_C2V: begin
 	   if (vram_rdy) begin
-	      c2v_state_next = TOMEM_C2V;
+	      c2v_state_next = TOMEM1_C2V;
 	      c2v_hold_next = vram_bus;
 	   end
 	end
@@ -1898,7 +1951,7 @@ module gpu(
 	      c2v_state_next = TOMEM2_C2V;
 	   end // if (vram_rdy)
 	end // case: WRITINGMEM1_C2V
-	TOMEM2_C2v: begin
+	TOMEM2_C2V: begin
 	   c2v_vram_addr = {c2v_y[8:0], c2v_x[9:0]};
 	   c2v_vram_we = 1'b1;
 	   c2v_vram_data = cmd_fifo_cmd[31:16];
@@ -2062,10 +2115,10 @@ module gpu(
    /* Interpolators for texture; note that *_trans_* is a fixed point number 24-bits wide:
       [ 18 bits of integer | 6 bits fraction ] */
    interp in_u(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
-	       .s0(cmd.u0), .s1(cmd.u1), .s2(cmd.u2),
+	       .s0({4'b0, cmd.u0}), .s1({4'b0, cmd.u1}), .s2({4'b0, cmd.u2}),
 	       .cx(u_trans_x), .cy(u_trans_y), .cs(u_trans_c)),
      in_v(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
-	  .s0(cmd.v0), .s1(cmd.v1), .s2(cmd.v2),
+	  .s0({4'b0, cmd.v0}), .s1({4'b0, cmd.v1}), .s2({4'b0, cmd.v2}),
 	  .cx(v_trans_x), .cy(v_trans_y), .cs(v_trans_c));
 
    /* Interpolators for shading */
@@ -2230,7 +2283,7 @@ module gpu(
       /* If its textured, use results from texture unit */
       if (cmd.texture == TEXT) begin
 	 for (text_i = 0; text_i < `GPU_PIPELINE_WIDTH; text_i = text_i + 1) begin
-	    if (cmd.shape == POLY) begin
+	    if (cmd.shape == TRI) begin
 	       /* f_* are in the for [18  | 6] */
 	       f_u = (u_trans_x * color_stage.x[text_i] + 
 		      u_trans_y * color_stage.y[text_i] + u_trans_c);
@@ -2391,7 +2444,7 @@ module gpu(
       wb_stall = 1'b0;
 
       wb_vram_addr = 'd0;
-      wb_data = 16'd0;
+      wb_vram_data = 16'd0;
       wb_vram_re = 1'b0;
       wb_vram_we = 1'b0;
 
@@ -2401,7 +2454,7 @@ module gpu(
       
       case (wb_state)
 	WAIT_WB: begin
-	   if (wb_stage.v) begin
+	   if (wb_stage.valid) begin
 	      wb_stall = 1'b1;
 	      wb_count_next = 8'd0;
 	      wb_state_next = GETMEM_WB;
@@ -2427,39 +2480,39 @@ module gpu(
 		    wb_hold_next[15] = 1'b1;
 		 end
 		 
-		 if (cmd.shade == POLY) begin
+		 if (cmd.shade == TRI) begin
 		    if (cmd.transparency == SEMI) begin
 		       case (cmd.semi_trans_mode)
 			 2'd0: begin
-			    wb_r = ((vram[4:0] >> 'd1) + 
+			    wb_r = ((vram_bus[4:0] >> 'd1) + 
 				    (wb_stage.r[wb_count][7:3] >> 'd1));
-			    wb_g = ((vram[9:5] >> 'd1) + 
+			    wb_g = ((vram_bus[9:5] >> 'd1) + 
 				    (wb_stage.g[wb_count][7:3] >> 'd1));
-			    wb_b = ((vram[14:10] >> 'd1) + 
+			    wb_b = ((vram_bus[14:10] >> 'd1) + 
 				    (wb_stage.b[wb_count][7:3] >> 'd1));
 			 end
 			 2'd1: begin
-			    wb_r = ((vram[4:0]) +
+			    wb_r = ((vram_bus[4:0]) +
 				    (wb_stage.r[wb_count][7:3]));
-			    wb_b = ((vram[9:5]) +
+			    wb_b = ((vram_bus[9:5]) +
 				    (wb_stage.g[wb_count][7:3]));
-			    wb_g = ((vram[14:10]) +
+			    wb_g = ((vram_bus[14:10]) +
 				    (wb_stage.b[wb_count][7:3]));
 			 end
 			 2'd2: begin
-			    wb_r = ((vram[4:0]) -
+			    wb_r = ((vram_bus[4:0]) -
 				    (wb_stage.r[wb_count][7:3]));
-			    wb_b = ((vram[9:5]) -
+			    wb_b = ((vram_bus[9:5]) -
 				    (wb_stage.g[wb_count][7:3]));
-			    wb_g = ((vram[14:10]) -
+			    wb_g = ((vram_bus[14:10]) -
 				    (wb_stage.b[wb_count][7:3]));
 			 end
 			 2'd3: begin
-			    wb_r = ((vram[4:0]) +
+			    wb_r = ((vram_bus[4:0]) +
 				    (wb_stage.r[wb_count][7:3] >> 'd2));
-			    wb_g = ((vram[9:5]) +
+			    wb_g = ((vram_bus[9:5]) +
 				    (wb_stage.g[wb_count][7:3] >> 'd2));
-			    wb_b = ((vram[14:10]) +
+			    wb_b = ((vram_bus[14:10]) +
 				    (wb_stage.b[wb_count][7:3] >> 'd2));
 			 end
 		       endcase // case (cmd.semi_trans_mode)
@@ -2474,35 +2527,35 @@ module gpu(
 		    if (cmd.transparency == SEMI) begin
 		       case (GPU_status.semi_trans_mode)
 			 2'd0: begin
-			    wb_r = ((vram[4:0] >> 'd1) +
+			    wb_r = ((vram_bus[4:0] >> 'd1) +
 				    (wb_stage.r[wb_count][7:3] >> 'd1));
-			    wb_g = ((vram[9:5] >> 'd1) +
+			    wb_g = ((vram_bus[9:5] >> 'd1) +
 				    (wb_stage.g[wb_count][7:3] >> 'd1));
-			    wb_b = ((vram[14:10] >> 'd1) +
+			    wb_b = ((vram_bus[14:10] >> 'd1) +
 				    (wb_stage.b[wb_count][7:3] >> 'd1));
 			 end // case: 2'b0
 			 2'd1: begin
-			    wb_r = ((vram[4:0]) +
+			    wb_r = ((vram_bus[4:0]) +
 				    (wb_stage.r[wb_count][7:3]));
-			    wb_b = ((vram[9:5]) +
+			    wb_b = ((vram_bus[9:5]) +
 				    (wb_stage.g[wb_count][7:3]));
-			    wb_g = ((vram[14:10]) +
+			    wb_g = ((vram_bus[14:10]) +
 				    (wb_stage.b[wb_count][7:3]));
 			 end // case: 2'b1
 			 2'd2: begin
-			    wb_r = ((vram[4:0]) -
+			    wb_r = ((vram_bus[4:0]) -
 				    (wb_stage.r[wb_count][7:3]));
-			    wb_b = ((vram[9:5]) -
+			    wb_b = ((vram_bus[9:5]) -
 				    (wb_stage.g[wb_count][7:3]));
-			    wb_g = ((vram[14:10]) -
+			    wb_g = ((vram_bus[14:10]) -
 				    (wb_stage.b[wb_count][7:3]));
 			 end // case: 2'd2
 			 2'd3: begin
-			    wb_r = ((vram[4:0]) +
+			    wb_r = ((vram_bus[4:0]) +
 				    (wb_stage.r[wb_count][7:3] >> 'd2));
-			    wb_g = ((vram[9:5]) +
+			    wb_g = ((vram_bus[9:5]) +
 				    (wb_stage.g[wb_count][7:3] >> 'd2));
-			    wb_b = ((vram[14:10]) +
+			    wb_b = ((vram_bus[14:10]) +
 				    (wb_stage.b[wb_count][7:3] >> 'd2));
 			 end // case: 2'b0
 		       endcase
@@ -2515,9 +2568,9 @@ module gpu(
 		 end // else: !if(cmd.shade == POLY)
 
 		 /* Now set the hold register (saturating if needed) */
-		 wb_hold_next[4:0] = (wb_r[7]) ? 5'd0 : ((wb_r > 8'd31) ? 5'd31 : w_r[4:0]);
-		 wb_hold_next[9:5] = (wb_g[7]) ? 5'd0 : ((wb_g > 8'd31) ? 5'd31 : w_g[4:0]);
-		 wb_hold_next[14:10] = (wb_b[7]) ? 5'd0 : ((wb_b > 8'd31) ? 5'd31 : w_b[4:0]);
+		 wb_hold_next[4:0] = (wb_r[7]) ? 5'd0 : ((wb_r > 8'd31) ? 5'd31 : wb_r[4:0]);
+		 wb_hold_next[9:5] = (wb_g[7]) ? 5'd0 : ((wb_g > 8'd31) ? 5'd31 : wb_g[4:0]);
+		 wb_hold_next[14:10] = (wb_b[7]) ? 5'd0 : ((wb_b > 8'd31) ? 5'd31 : wb_b[4:0]);
 	      end // if (~vram_bus[15])
 	      else begin
 		 wb_hold_next = vram_bus;
@@ -2532,13 +2585,13 @@ module gpu(
 	   /* Be sure the address is in VRAM and in the drawing area, otherwise
 	      just ignore this one and move on */
 	   if ((wb_stage.x[wb_count][11:10] == 2'd1) && 
-	       (wb_stage.x[wb_count][9:0] > x_lt) &&
+	       (wb_stage.x[wb_count][9:0] > x_tl) &&
 	       (wb_stage.x[wb_count][9:0] < x_br) &&
 	       (wb_stage.y[wb_count][11:9] == 3'd2) &&
-	       (wb_stage.y[wb_count][8:0] > y_lt) &&
+	       (wb_stage.y[wb_count][8:0] > y_tl) &&
 	       (wb_stage.y[wb_count][8:0] < y_br)) begin
-	      wb_we = 1'b1;
-	      wb_vram_bus = wb_hold;
+	      wb_vram_we = 1'b1;
+	      wb_vram_data = wb_hold;
 	      wb_vram_addr = {wb_stage.y[wb_count][8:0], wb_stage.x[wb_count][9:0]};
 	      wb_state_next = WRITINGMEM_WB;
 	   end
