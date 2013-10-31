@@ -4,12 +4,14 @@
 
 module gpu(
 	   input wire 	      clk, rst,
-	   input wire 	      to_gp0, to_gp1,
+	   input wire 	      to_gp0, to_gp1, 
+	   input wire 	      main_bus_re,
 	   input wire 	      vram_rdy,
 	   input wire [31:0]  main_bus,
 	   inout wire [15:0]  vram_bus,
-	   output reg [19:0]  vram_addr,
+	   output reg [18:0]  vram_addr,
 	   output wire [31:0] gpu_stat, gpu_read,
+	   output reg 	      main_bus_rdy,
 	   output reg 	      vram_re, vram_we);
 
    /* Parameters */
@@ -142,6 +144,15 @@ module gpu(
 
    XYGEN_t xy_gen_state, xy_gen_state_next;
 
+   CLUT_t clut_state, clut_state_next;
+
+   TXPG_t txpg_state, txpg_state_next;
+
+   FILL_t fill_state, fill_state_next;
+   V2V_t v2v_state, v2v_state_next;
+   V2C_t v2c_state, v2c_state_next;
+   C2V_t c2v_state, c2v_state_next;
+   
    logic 		     on_fourth, on_fourth_new;
    logic [7:0] 		     cmd_hold, cmd_hold_new;
    logic 		     draw_req;
@@ -158,6 +169,24 @@ module gpu(
    logic [11:0] 	     xy_gen_block, xy_gen_block_new;
    logic [11:0] 	     xy_gen_i;
 
+   logic [255:0][16:0] 	     clut;
+   logic 		     clut_rdy, clut_rdy_next;
+   logic [8:0] 		     clut_count, clut_count_next;
+   logic 		     clut_ld;
+
+   logic 		     txpg_rdy, txpg_rdy_next;
+   logic [8:0] 		     txpg_count_x, txpg_count_x_next;
+   logic [8:0] 		     txpg_count_y, txpg_count_y_next;
+   logic 		     txpg_ld;
+   logic [3:0][15:0] 	     txpg_val;
+   
+   logic [23:0] 	     u_trans_x, u_trans_y, u_trans_c;
+   logic [23:0] 	     v_trans_x, v_trans_y, v_trans_c;
+   logic [23:0] 	     r_trans_x, r_trans_y, r_trans_c;
+   logic [23:0] 	     g_trans_x, g_trans_y, g_trans_c;
+   logic [23:0] 	     b_trans_x, b_trans_y, b_trans_c;
+   
+
    /* Stall */
    logic 		     pipeline_stall;
    
@@ -172,25 +201,31 @@ module gpu(
 
    /* COLOR STAGE */
    color_stage_t color_stage, next_color_stage;
+
    
-   logic 				 text_mem_stall; // Stall if Texture Cache miss
-   logic 				 clut_mem_stall; // Stall if CLUT cache miss
 
    /* Texture unit lines */
-   logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  text_unit_r, text_unit_g, text_unit_b;
-   logic 				 text_mem_wb;
-   logic 				 clr_text_cache;
-
-   logic 				 clut_mem_wb;
-   logic 				 clr_clut_cache;
+   logic [255:0][255:0][15:0] 		 txpg;
+   
+   integer 				 text_i;
+   
 
    /* SHADER STAGE */
    shader_stage_t shader_stage, next_shader_stage;
 
-   /* WRITEBACK STAGE */
-   wb_stage_t wb_stage, next_wb_stage;
+   logic [23:0] 			 int_r, int_g, int_b;
+   logic [23:0] 			 f_r, f_g, f_b;
+
+   integer 				 color_i;
    
 
+   /* WRITEBACK STAGE */
+   wb_stage_t wb_stage, next_wb_stage;
+
+   WB_t wb_state, wb_state_next;
+   
+   logic 				 wb_stall;
+   
 
 
 
@@ -228,8 +263,11 @@ module gpu(
 	 GPU_read_reg <= 32'b0;
       end
       else begin
-	 if (GPU_read_reg_ld) begin
-	    GPU_read_reg <= GPU_read_reg_new;
+	 if (GPU_read_reg_ld_NB) begin
+	    GPU_read_reg <= GPU_read_reg_new_NB;
+	 end
+	 else if (GPU_read_reg_ld_V2C) begin
+	    GPU_read_reg <= GPU_read_reg_new_V2C;
 	 end
       end
    end
@@ -290,6 +328,14 @@ module gpu(
       #                 "FETCH" STAGE                     #
       #                                                   #
       ##################################################### */
+
+   /* VRAM/Main memory access signal logic */
+   assign vram_addr = (clut_vram_addr | txpg_vram_addr | wb_vram_addr |
+		       fill_vram_addr | v2v_vram_addr | v2c_vram_adrr |
+		       c2v_vram_addr);
+   assign vram_bus = (vram_we) ? (wb_data | v2v_data | c2v_data | fill_data) : 'dz;
+   assign vram_we = (wb_we | v2v_we | c2v_we | fill_we);
+   assign vram_re = (wb_re | v2v_we | c2v_re | v2c_re | clut_re | txpg_re);
    
    /* Command FIFO */
    fifo_16x32 cmd_fifo(.data_in(main_bus),
@@ -302,14 +348,15 @@ module gpu(
 		       .*);
 
    assign GPU_status_new.cmd_rdy = ~cmd_fifo_full;
+   assign cmd_fifo_re = decode_fifo_re | c2v_fifo_re;
    
    /* Process Non-buffer commands immediately */
    always_comb begin
       /* Defaults */
       cmd_fifo_clr = 1'b0;
       
-      GPU_read_reg_ld = 1'b0;
-      GPU_read_reg_new = 32'b0;
+      GPU_read_reg_ld_NB = 1'b0;
+      GPU_read_reg_new_NB = 32'b0;
 
       GPU_status_clr = 1'b0;
       GPU_status_new.irq = set_gpu_irq | GPU_status.irq;
@@ -378,32 +425,32 @@ module gpu(
 	   case (main_bus[3:0])
 	     'h02: begin
 		/* Texture window setting */
-		GPU_read_reg_ld = 1'b1;
+		GPU_read_reg_ld_NB = 1'b1;
 		
 	     end
 	     'h03: begin
 		/* Draw area top-left */
-		GPU_read_reg_ld = 1'b1;
+		GPU_read_reg_ld_NB = 1'b1;
 		
 	     end
 	     'h04: begin
 		/* Draw area bottom-right */
-		GPU_read_reg_ld = 1'b1;
+		GPU_read_reg_ld_NB = 1'b1;
 		
 	     end
 	     'h05: begin
 		/* Draw area offset */
-		GPU_read_reg_ld = 1'b1;
+		GPU_read_reg_ld_NB = 1'b1;
 		
 	     end
 	     'h07: begin
 		/* GPU Version */
-		GPU_read_reg_ld = 1'b1;
-		GPU_read_reg_new = 32'h2;
+		GPU_read_reg_ld_NB = 1'b1;
+		GPU_read_reg_new_NB = 32'h2;
 	     end
 	     'h08: begin
 		/* 0s (?) */
-		GPU_read_reg_ld = 1'b1;
+		GPU_read_reg_ld_NB = 1'b1;
 	     end
 	   endcase // case (data_in[3:0])
 	   end // case: GP1_NB_GETINFO
@@ -470,14 +517,11 @@ module gpu(
       cmd_hold_new = cmd_hold;
       on_fourth_new = on_fourth;
       
-      cmd_fifo_re = 1'b0;
+      decode_fifo_re = 1'b0;
 
       set_gpu_irq = 1'b0;
 
       draw_req = 1'b0;
-
-      clr_text_cache = 1'b0;
-      clr_clut_cache = 1'b0;
 
       GPU_status_new.text_x = GPU_status.text_x;
       GPU_status_new.text_y = GPU_status.text_y;
@@ -501,6 +545,14 @@ module gpu(
       y_off_new = y_off;
 
       xy_gen_on = 1'b0;
+
+      clut_on = 1'b0;
+      txpg_on = 1'b0;
+
+      fill_on = 1'b0;
+      v2v_on = 1'b0;
+      v2c_on = 1'b0;
+      c2v_on = 1'b0;
       
       /* Process commands (or handle whats going on if in the middle of one) */
       case (decode_state)
@@ -515,18 +567,18 @@ module gpu(
 	      case (cmd_fifo_cmd[31:24])
 		GP0_B_NOP: begin
 		   /* nop */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		end
 		GP0_B_INTREQ: begin
 		   /* Interrupt request */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   set_gpu_irq = 1'b1;
 		end
 		GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ: begin
 		   /* Monochrome, opaque */
 		   decode_state_next = GET_XY0;
 		   
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -539,7 +591,7 @@ module gpu(
 		   /* Monochrome, semi-trans */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -552,7 +604,7 @@ module gpu(
 		   /* Textured, opaque, blended */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -566,7 +618,7 @@ module gpu(
 		   /* Textured, opaque, raw */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -580,7 +632,7 @@ module gpu(
 		   /* Textured, semi-trans, blended */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -594,7 +646,7 @@ module gpu(
 		   /* Textured, semi-trans, raw */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -608,7 +660,7 @@ module gpu(
 		   /* Shaded, opaque */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = SHADE;
@@ -621,7 +673,7 @@ module gpu(
 		   /* Shaded, semi-trans */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = SHADE;
@@ -634,7 +686,7 @@ module gpu(
 		   /* Textured, shaded, opaque, blended */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = SHADE;
@@ -648,7 +700,7 @@ module gpu(
 		   /* Textured, shaded, semi-trans, blended */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = TRI;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = SHADE;
@@ -662,7 +714,7 @@ module gpu(
 		   /* Monochrome, line, opaque */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -675,7 +727,7 @@ module gpu(
 		   /* Monochrome, line, semi-trans */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -688,7 +740,7 @@ module gpu(
 		   /* Shaded, line, opaque */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = SHADE;
@@ -701,7 +753,7 @@ module gpu(
 		   /* Shaded, line, semi-trans */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = LINE;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = SHADE;
@@ -714,7 +766,7 @@ module gpu(
 		   /* Monochrome, rect, opaque */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -727,7 +779,7 @@ module gpu(
 		   /* Monochrome, rect, semi-trans */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -740,7 +792,7 @@ module gpu(
 		   /* Textured, rect, opaque, blended */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -754,7 +806,7 @@ module gpu(
 		   /* Textured, rect, semi-trans, blended */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -768,7 +820,7 @@ module gpu(
 		   /* Textured, rect, opaque, raw */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = OPAQ;
 		   new_cmd.shade = NONE;
@@ -782,7 +834,7 @@ module gpu(
 		   /* Textured, rect, semi-trans, raw */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.shape = RECT;
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
@@ -794,7 +846,7 @@ module gpu(
 		end // case: GP0_B_RV_TX_ST_BL, GP0_B_R1_TX_ST_BL, GP0_B_R8_TX_ST_BL,
 		GP0_B_DRWMODE: begin
 		   /* Set various drawing params */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   GPU_status_new.text_x = cmd_fifo_cmd[3:0];
 		   GPU_status_new.text_y = cmd_fifo_cmd[4];
 		   GPU_status_new.semi_trans_mode = cmd_fifo_cmd[6:5];
@@ -807,43 +859,41 @@ module gpu(
 		end // case: GP0_B_DRWMODE
 		GP0_B_TEXTWND: begin
 		   /* Set texture window */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		end
 		GP0_B_DRWWND_TL: begin
 		   /* Set top-left of drawing window */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   x_tl_new = {2'b01, cmd_fifo_cmd[9:0]};
 		   y_tl_new = {2'b01, cmd_fifo_cmd[19:10]};
 		end
 		GP0_B_DRWWND_BR: begin
 		   /* Set bottom-right of drawing window */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   x_br_new = {2'b01, cmd_fifo_cmd[9:0]};
 		   y_br_new = {2'b01, cmd_fifo_cmd[19:10]};
 		end
 		GP0_B_DRWWND_OS: begin
 		   /* Set drawing window offset */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   x_off_new = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]};
 		   y_off_new = {cmd_fifo_cmd[21], cmd_fifo_cmd[21:11]};
 		end
 		GP0_B_MSK: begin
 		   /* Set mask handle */
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   GPU_status_new.mask_en = cmd_fifo_cmd[1];
 		   GPU_status_new.set_mask = cmd_fifo_cmd[0];
 		end
 		GP0_B_CLRC: begin
-		   /* Clear texture and clut caches */
-		   cmd_fifo_re = 1'b1;
-		   clr_text_cache = 1'b1;
-		   clr_clut_cache = 1'b1;
+		   /* Clear texture and clut caches (not point, just nop) */
+		   decode_fifo_re = 1'b1;
 		end
 		GP0_B_FILRECT: begin
 		   /* Fill VRAM rect */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -854,7 +904,7 @@ module gpu(
 		   /* Copy rect VRAM to VRAM */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.mem_src = VRAM;
 		   new_cmd.mem_dest = VRM;
 		end
@@ -862,7 +912,7 @@ module gpu(
 		   /* Copy rect VRAM to CPU */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.mem_src = VRAM;
 		   new_cmd.mem_dest = GPUREAD;
 		end // case: GP0_B_CPYRECT_V2C
@@ -870,7 +920,7 @@ module gpu(
 		   /* Copy rect CPU to VRAM */
 		   decode_state_next = GET_XY0;
 
-		   cmd_fifo_re = 1'b1;
+		   decode_fifo_re = 1'b1;
 		   new_cmd.mem_src = FIFO;
 		   new_cmd.mem_dest = VRM;
 		end
@@ -881,7 +931,7 @@ module gpu(
 	   if (~cmd_fifo_empty) begin
 	      new_cmd.x0 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
 	      new_cmd.y0 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
-	      cmd_fifo_re = 1'b1;
+	      decode_fifo_re = 1'b1;
 	      
 	      /* Now the command is in the hold register */
 	      case (cmd_hold)
@@ -956,7 +1006,7 @@ module gpu(
 	   if (~cmd_fifo_empty) begin
 	      new_cmd.x1 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
               new_cmd.y1 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
-	      cmd_fifo_re = 1'b1;
+	      decode_fifo_re = 1'b1;
 	      
 	      /* Now the command is in the hold register */
 	      case (cmd_hold)
@@ -998,7 +1048,7 @@ module gpu(
 		GP0_B_RV_MC_OQ, GP0_B_RV_MC_ST, GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW,
 		  GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW: begin
                      /* These rectangles need size; use XY1 for size */
-                     decode_state_next = DRAWING;
+                     decode_state_next = GET_TXPG;
 		     new_cmd.x1 = cmd.x0 + {1'b0, cmd_fifo_cmd[10:0]};
 		     new_cmd.y1 = cmd.y0 + {1'b0, cmd_fifo_cmd[26:16]};
 		  end
@@ -1022,7 +1072,7 @@ module gpu(
 		end
 		GP0_B_CPYRECT_C2V: begin
 		   /* Memory copy commands now take take */
-		   decode_state_next = SEND_DATA;
+		   decode_state_next = WAIT_MEM;
 		   new_cmd.x1 = cmd.x0 + ({1'b0, cmd_fifo_cmd[10:0]} & 'h3FF) + 'b1;
 		   new_cmd.y1 = cmd.y0 + ({1'b0, cmd_fifo_cmd[26:16]} & 'h1FF) + 'b1;
 		end
@@ -1033,7 +1083,7 @@ module gpu(
 	   if (~cmd_fifo_empty) begin
 	      new_cmd.x2 = {cmd_fifo_cmd[10], cmd_fifo_cmd[10:0]} + x_off;
 	      new_cmd.y2 = {cmd_fifo_cmd[26], cmd_fifo_cmd[26:16]} + y_off;
-	      cmd_fifo_re = 1'b1;
+	      decode_fifo_re = 1'b1;
 
 	      /* Now the command is in the hold register */
 	      case (cmd_hold)
@@ -1068,10 +1118,19 @@ module gpu(
 	   if (~cmd_fifo_empty) begin
 	      new_cmd.u0 = cmd_fifo_cmd[7:0];
 	      new_cmd.v0 = cmd_fifo_cmd[15:8];
-	      new_cmd.clut_x = cmd_fifo_cmd[21:16] >> 'd4;
+	      new_cmd.clut_x = cmd_fifo_cmd[21:16] << 'd4;
 	      new_cmd.clut_y = cmd_fifo_cmd[30:22];
-	      cmd_fifo_re = 1'b1;
+	      decode_fifo_re = 1'b1;
 
+	      /* Now go get the CLUT */
+	      decode_state_next = GET_CLUT;
+	   end
+	end // case: GET_TX0
+	GET_CLUT: begin
+	   clut_on = 1'b1;
+
+	   /* Wait on the CLUT to be retrieved */
+	   if (clut_rdy) begin
 	      /* Now on to the command */
 	      case (cmd_hold)
 		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
@@ -1092,8 +1151,8 @@ module gpu(
 		  GP0_B_R8_TX_OQ_BL, GP0_B_R8_TX_OQ_RW, GP0_B_R8_TX_ST_BL, GP0_B_R8_TX_ST_RW,
 		  GP0_B_R16_TX_OQ_BL, GP0_B_R16_TX_OQ_RW, GP0_B_R16_TX_ST_BL,
 		  GP0_B_R16_TX_ST_RW: begin
-		     /* These rectangles need to draw now! */
-		     decode_state_next = DRAWING;
+		     /* These rectangles need to get textpage now */
+		     decode_state_next = GET_TXPG;
 		  end
 	      endcase // case (cmd_hold)
 	   end // if (~cmd_fifo_cmd)
@@ -1107,8 +1166,17 @@ module gpu(
 	      new_cmd.semi_trans_mode = cmd_fifo_cmd[22:21];
 	      new_cmd.text_mode = cmd_fifo_cmd[24:23];
 	      new_cmd.text_en = cmd_fifo_cmd[25];
-	      cmd_fifo_re = 1'b1;
-	      
+	      decode_fifo_re = 1'b1;
+
+	      /* Now get the textpage */
+	      decode_state_next = GET_TXPG;
+	   end // if (~cmd_fifo_empty)
+	end // case: GET_TX1
+	GET_TXPG: begin
+	   txpg_on = 1'b1;
+
+	   /* Wait until the textpage is retrieved */
+	   if (txpg_rdy) begin
 	      /* Now on to the command */
 	      case (cmd_hold)
 		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
@@ -1121,6 +1189,13 @@ module gpu(
 		     /* New get next colors and stuff */
 		     decode_state_next = GET_CL2;
 		  end
+		GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
+		  GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
+		  GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
+		  GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW: begin
+		     /* Start drawing now that the textpage is loaded */
+		     decode_state_next = DRAWING;
+		  end
 	      endcase // case (cmd_hold)
 	   end // if (~cmd_fifo_empty)
 	end // case: GET_TX1
@@ -1128,7 +1203,7 @@ module gpu(
 	   if (~cmd_fifo_empty) begin
 	      new_cmd.u2 = cmd_fifo_cmd[7:0];
 	      new_cmd.v2 = cmd_fifo_cmd[15:8];
-	      cmd_fifo_re = 1'b1;
+	      decode_fifo_re = 1'b1;
 	      
 	      /* Now on to the command */
 	      case (cmd_hold)
@@ -1150,7 +1225,7 @@ module gpu(
 	      new_cmd.b0 = cmd_fifo_cmd[23:16];
 	      new_cmd.g0 = cmd_fifo_cmd[15:8];
 	      new_cmd.r0 = cmd_fifo_cmd[7:0];
-	      cmd_fifo_re = 1'b1;
+	      decode_fifo_re = 1'b1;
 
 	      /* All commands get the next coord after getting the 2nd color */
 	      decode_state_next = GET_XY1;
@@ -1161,7 +1236,7 @@ module gpu(
 	      new_cmd.b0 = cmd_fifo_cmd[23:16];
 	      new_cmd.g0 = cmd_fifo_cmd[15:8];
 	      new_cmd.r0 = cmd_fifo_cmd[7:0];
-	      cmd_fifo_re = 1'b1;
+	      decode_fifo_re = 1'b1;
 	      
 	      /* If polyline, check for termination code; otherwise, get next vertex */
 	      if ((cmd_hold == GP0_B_PL_MC_OQ_SH) | (cmd_hold == GP0_B_PL_MC_ST_SH) &
@@ -1230,12 +1305,52 @@ module gpu(
 	      endcase // case (cmd_hold)
 	   end // if (~wb_stage.valid && xy_gen_state == COMPLETE)
 	end // case: DRAWING
-	
+	WAITMEM: begin
+	   /* Determine the waiting and activation conditions */
+	   case (cmd_hold)
+	     GP0_B_FILRECT: begin
+		fill_on = 1'b1;
+		
+		if (fill_rdy) begin
+		   decode_state_next = WAIT;
+		end
+	     end
+	     GP0_B_CPYRECT_V2V: begin
+		v2v_on = 1'b1;
+
+		if (v2v_rdy) begin
+		   decode_state_next = WAIT;
+		end
+	     end
+	     GP0_B_CPY_RECT_V2C: begin
+		v2c_on = 1'b1;
+
+		if (v2c_rdy) begin
+		   decode_state_next = WAIT;
+		end
+	     end
+	     GP0_B_CPYRECT_C2V: begin
+		c2v_on = 1'b1;
+
+		if (c2v_rdy) begin
+		   decode_state_next = WAIT;
+		end
+	     end
+	   endcase // case (cmd_hold)
+	end // case: WAITMEM
       endcase // case (decode_state)
    end // always_comb
 
    
+
+
    
+   /* ###################################################### */   
+
+
+
+
+
    
    /* X, Y generator */
    always_ff @(posedge clk, posedge rst) begin
@@ -1245,9 +1360,11 @@ module gpu(
 	 xy_gen_y <= 12'd0;
       end
       else begin
-	 xy_gen_state <= xy_gen_state_next;
-	 xy_gen_block <= xy_gen_block_new;
-	 xy_gen_y <= xy_gen_y_new;
+	 if (~pipeline_stall) begin
+	    xy_gen_state <= xy_gen_state_next;
+	    xy_gen_block <= xy_gen_block_new;
+	    xy_gen_y <= xy_gen_y_new;
+	 end
       end
    end // always_ff @
 
@@ -1281,25 +1398,19 @@ module gpu(
       
       
       /* Find the mins and maxes to use, ie if its a polygon, check between the three, 
-         else use the two */
-      case (cmd_hold)
-	GP0_B_P3_MC_OQ, GP0_B_P4_MC_OQ, GP0_B_P3_MC_ST, GP0_B_P4_MC_ST, GP0_B_P3_TX_OQ_BL, 
-	GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW, GP0_B_P4_TX_OQ_BL, 
-	GP0_B_P4_TX_OQ_RW, GP0_B_P4_TX_ST_BL, GP0_B_P4_TX_ST_RW, GP0_B_P3_MC_OQ_SH, 
-	GP0_B_P3_MC_ST_SH, GP0_B_P4_MC_OQ_SH, GP0_B_P4_MC_ST_SH, GP0_B_P3_TX_OQ_BL_SH, 
-	GP0_B_P3_TX_ST_BL_SH, GP0_B_P4_TX_OQ_BL_SH, GP0_B_P4_TX_ST_BL_SH: begin
-	   xy_gen_min_x = min_x02;
-	   xy_gen_min_y = min_y02;
-	   xy_gen_max_x = max_x02;
-	   xy_gen_max_y = max_y02;
-	end
-	default: begin
-	   xy_gen_min_x = min_x01;
-	   xy_gen_min_y = min_y01;
-	   xy_gen_max_x = max_x01;
-	   xy_gen_max_y = max_y01;
-	end
-      endcase // case (cmd_hold)
+         else use the two. At this point also clip to drawing area */
+      if (cmd.shape == POLY) begin
+	 xy_gen_min_x = (x_lt > min_x02) ? x_lt : min_x02;
+	 xy_gen_min_y = (y_lt > min_y02) ? y_lt : min_y02;
+	 xy_gen_max_x = (x_br < max_x02) ? x_br : max_x02;
+	 xy_gen_max_y = (y_br < max_y02) ? y_br : max_y02;
+      end
+      else begin
+	 xy_gen_min_x = (x_lt > min_x01) ? x_lt : min_x01;
+	 xy_gen_min_y = (y_lt > min_y01) ? y_lt : min_y01;
+	 xy_gen_max_x = (x_br < max_x01) ? x_br : max_x01;
+	 xy_gen_max_y = (y_br < max_y01) ? y_br : max_y01;
+      end
       
       /* Decode FSM has told up to go! */
       if (xy_gen_on && xy_gen_state != COMPLETE) begin
@@ -1345,7 +1456,572 @@ module gpu(
 	 next_draw_stage.y[xy_gen_i] = xy_gen_y_new;
       end
    end // always_comb
+
+
+
+   /* ################################################################## */
+
+
+   /* CLUT getting FSM */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 clut_state <= WAIT_CLUT;
+	 clut_count <= 9'b0;
+	 clut_rdy <= 1'b1;
+      end
+      else begin
+	 clut_state <= clut_state_next;
+	 clut_count <= clut_count_next;
+	 clut_rdy <= clut_rdy_next;
+      end
+   end
+
+   /* CLUT getting next state + output logic */
+   always_comb begin
+      /* Defaults */
+      clut_state_next = clut_state;
+      clut_count_next = clut_count;
+      clut_rdy_next = clut_rdy;
+      clut_vram_addr = 'd0;
+      clut_vram_re = 1'b0;
+      clut_ld = 1'b0;
+      
+      case (clut_state)
+	WAIT_CLUT: begin
+	   if (clut_on) begin
+	      clut_rdy_next = 1'b0;
+	      clut_count_next = 9'd0;
+	      clut_state_next = GETMEM_CLUT;
+	   end
+	end
+	GETMEM_CLUT: begin
+	   if (clut_count > 9'd255) begin
+	      clut_rdy_next = 1'b1;
+	      clut_state_next = WAIT_CLUT;
+	   end
+	   else begin
+	      clut_vram_addr = {cmd.clut_y, (cmd.clut_x + clut_count)};
+	      clut_vram_re = 1'b1;
+	      clut_state_next = READINGMEM_CLUT;
+	   end
+	end
+	READINGMEM_CLUT: begin
+	   if (vram_rdy) begin
+	      clut_count_next = clut_count + 9'd1;
+	      clut_ld = 1'b1;
+	      clut_state_next = GETMEM_CLUT;
+	   end
+	end
+      endcase
+   end // always_comb
    
+   /* CLUT */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 clut <= 'd0;
+      end
+      else begin
+	 if (clut_ld) begin
+	    clut[clut_count] <= vram_bus;
+	 end
+      end
+   end
+
+   /* Textpage getting FSM */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 txpg_state <= WAIT_TXPG;
+	 txpg_count_x <= 9'd0;
+	 txpg_count_y <= 9'd0;
+	 txpg_base_x <= 4'b0;
+	 txpg_base_y <= 1'b0;
+	 txpg_rdy <= 1'b1;
+      end
+      else begin
+	 txpg_state <= txpg_state_next;
+	 txpg_count_x <= txpg_count_x_next;
+	 txpg_count_y <= txpg_count_y_next;
+	 txpg_base_x <= txpg_base_x_next;
+	 txpg_base_y <= txpg_base_y_next;
+	 txpg_rdy <= txpg_rdy_next;
+      end // else: !if(rst)
+   end // always_ff @
+
+   /* Textpage getting next state + output logic */
+   always_comb begin
+      /* Defaults */
+      txpg_state_next = txpg_state;
+      txpg_count_x_next = txpg_count_x;
+      txpg_count_y_next = txpg_count_y;
+      txpg_base_x_next = txpg_base_x;
+      txpg_base_y_next = txpg_base_y;
+      txpg_rdy_next = txpg_rdy;
+      
+      txpg_ld = 1'b0;
+      txpg_val = 'd0;
+      
+      txpg_vram_addr = 'd0;
+      txpg_vram_re = 1'b0;
+      
+      case (txpg_state)
+	WAIT_TXPG: begin
+	   if (txpg_on) begin
+	      txpg_rdy_next = 1'b0;
+	      txpg_count_x_next = 9'd0;
+	      txpg_count_y_next = 9'd0;
+	      txpg_state_next = GETMEM_TXPG;
+
+	      /* Get Textpage bases from cmd or status depending on command */
+	      if (cmd.shape = RECT) begin
+		 txpg_base_x_next = GPU_status.text_x;
+		 txpg_base_y_next = GPU_status.text_y;
+	      end
+	      else begin
+		 txpg_base_x_next = cmd.text_x;
+		 txpg_base_y_next = cmd.text_y;
+	      end
+	   end
+	end
+	GETMEM_TXPG: begin
+	   if (txpg_count_y > 9'd255) begin
+	      txpg_rdy_next = 1'b1;
+	      txpg_state_next = WAIT_TXPG;
+	   end
+	   else begin
+	      txpg_vram_addr = {((cmd.text_y << 8) + txpg_count_y), 
+				((cmd.text_x << 6) + txpg_count_x)};
+	      txpg_vram_re = 1'b1;
+	      txpg_state_next = READINGMEM_CLUT;
+	   end
+	end // case: GETMEM_TXPG
+	READINGMEM_TXPG: begin
+	   if (vram_rdy) begin
+	      if (txpg_count_x == 9'd255) begin
+		 txpg_count_x_next = 9'd0;
+		 txpg_count_y_next = txpg_count_y + 9'd1;
+	      end
+	      else begin
+		 txpg_count_x_next = txpg_count_x + 9'd1;
+	      end
+	      txpg_ld = 1'b1;
+
+	      /* Check color mode and generate the values accordingly */
+	      case (GPU_status.text_mode)
+		2'd0: begin
+		   txpg_val[0] = clut[vram_bus[3:0]];
+		   txpg_val[1] = clut[vram_bus[7:4]];
+		   txpg_val[2] = clut[vram_bus[11:8]];
+		   txpg_val[3] = clut[vram_bus[15:12]];
+		end
+		2'd1: begin
+		   txpg_val[0] = clut[vram_bus[7:0]];
+		   txpg_val[1] = clut[vram_bus[15:8]];
+		end
+		default: begin
+		   txpg_val[0] = vram_bus;
+		end
+	      endcase // case (GPU_status.text_mode)
+
+	      txpg_state_next = GETMEM_TXPG;
+	   end // if (vram_rdy)
+	end // case: READINGMEM_TXPG
+      endcase // case (txpg_state)
+   end // always_comb
+      
+   
+
+   /* ######################################################## */
+	 
+
+
+   /* FILL FSM */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 fill_state <= WAIT_FILL;
+	 fill_count_x <= 12'd0;
+	 fill_count_y <= 12'd0;
+	 fill_rdy <= 1'b1;
+      end
+      else begin
+	 fill_state <= fill_state_next;
+	 fill_count_x <= fill_count_x_next;
+	 fill_count_y <= fill_count_y_next;
+	 fill_rdy <= fill_rdy_next;
+      end // else: !if(rst)
+   end // always_ff @
+
+   /* FILL FSM next state + output logic */
+   always_comb begin
+      /* Defaults */
+      fill_state_next = fill_state;
+      fill_x_next = fill_x;
+      fill_y_next = fill_y;
+      fill_rdy_next = fill_rdy;
+
+      fill_vram_data = 16'd0;
+      fill_vram_addr = 'd0;
+      fill_vram_we = 1'b0;
+
+      case (fill_state)
+	WAIT_FILL: begin
+	   if (fill_on) begin
+	      fill_rdy_next = 1'b0;
+	      fill_x_next = cmd.x0;
+	      fill_y_next = cmd.y0;
+	      fill_state_next = TOMEM_FILL;
+	   end
+	end
+	TOMEM_FILL: begin
+	   if (fill_y > cmd.y1) begin
+	      fill_rdy_next = 1'b1;
+	      fill_state_next = WAIT_FILL;
+	   end
+	   else begin
+	      fill_state_next = WRITINGMEM_WB;
+	      fill_we = 1'b1;
+	      fill_vram_bus = {1'b0, cmd.r0[7:3], cmd.g0[7:3], cmd.b0[7:3]};
+	      fill_vram_addr = {fill_y[8:0], fill_x[9:0]};
+	   end
+	end
+	WRITINGMEM_FILL: begin
+	   if (vram_rdy) begin
+	      if (fill_x == cmd.x1) begin
+		 fill_x_next = cmd.x0;
+		 fill_y_next = fill_y + 12'd1;
+	      end
+	      else begin
+		 fill_x_next = fill_x_next + 12'd1;
+	      end
+
+	      fill_state_next = TOMEM_FILL;
+	   end // if (vram_rdy)
+	end // case: WRITINGMEM_FILL
+      endcase // case (fill_state)
+   end // always_comb
+   
+
+   /* V2V FSM */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 v2v_state <= WAIT_V2V;
+	 v2v_x0 <= 12'd0;
+	 v2v_y0 <= 12'd0;
+	 v2v_x1 <= 12'd0;
+	 v2v_y1 <= 12'd0;
+	 v2v_rdy <= 1'b1;
+	 v2v_hold <= 16'd0;
+      end
+      else begin
+	 v2v_state <= v2v_state_next;
+	 v2v_x0 <= v2v_x0_next;
+	 v2v_y0 <= v2v_y0_next;
+	 v2v_x1 <= v2v_x1_next;
+	 v2v_y1 <= v2v_y1_next;
+	 v2v_rdy <= v2v_rdy_next;
+	 v2v_hold <= v2v_hold_next;
+      end // else: !if(rst)
+   end // always_ff @
+
+   /* V2V FSM next state + output logic */
+   always_comb begin
+      /* Defaults */
+      v2v_state_next = v2v_state;
+      v2v_x0_next = v2v_x0;
+      v2v_y0_next = v2v_y0;
+      v2v_x1_next = v2v_x1;
+      v2v_y1_next = v2v_y1;
+      v2v_rdy_next = v2v_rdy;
+      v2v_hold_next = v2v_hold;
+
+      v2v_vram_addr = 19'd0;
+      v2v_vram_data = 16'd0;
+      v2v_vram_re = 1'b0;
+      v2v_vram_we = 1'b0;
+
+      case (v2v_state)
+	WAIT_V2V: begin
+	   if (v2v_on) begin
+	      v2v_rdy_next = 1'b0;
+	      v2v_x0_next = cmd.x0;
+	      v2v_y0_next = cmd.y0;
+	      v2v_x1_next = cmd.x1;
+	      v2v_y1_next = cmd.y1;
+	      v2v_state_next = GETMEM1_V2V;
+	   end
+	end
+	GETMEM1_V2V: begin
+	   if (v2v_y0_next > cmd.y2) begin
+	      v2v_rdy_next = 1'b1;
+	      v2v_state_next = WAIT_V2V;
+	   end
+	   else begin
+	      v2v_vram_addr = {v2v_y0[8:0], v2v_x0[9:0]};
+	      v2v_vram_re = 1'b1;
+	      v2v_state_next = READINGMEM1_V2V;
+	   end
+	end // case: GETMEM_V2V
+	READINGMEM1_V2V: begin
+	   if (vram_rdy) begin
+	      v2v_state_next = GETMEM2_V2V;
+	      v2v_hold_next = vram_bus;
+	      /* Handle the mask bit */
+	      v2v_hold_next[15] |= GPU_status.set_mask;
+	   end
+	end
+	GETMEM2_V2V: begin
+	   v2v_vram_addr = {v2v_y1[8:0], v2v_x1[9:0]};
+	   v2v_vram_re = 1'b1;
+	   v2v_state_next = READINGMEM2_V2V;
+	end
+	READINGMEM2_V2V: begin
+	   if (vram_rdy) begin
+	      /* If masked, use this as the new writeback value */
+	      if (vram_bus[15]) begin
+		 v2v_hold_next = vram_bus;
+	      end
+	      v2v_state_next = TOMEM_V2V;
+	   end
+	end
+	TOMEM_V2V: begin
+	   v2v_vram_addr = {v2v_y1[8:0], v2v_x1[9:0]};
+	   v2v_vram_data = v2v_hold;
+	   v2v_vram_we = 1'b1;
+	   v2v_state_next = WRITINGMEM_V2V;
+	end
+	WRITINGMEM_V2V: begin
+	   if (vram_rdy) begin
+	      if (v2v_x0 == cmd.x2) begin
+		 v2v_x0_next = cmd.x0;
+		 v2v_x1_next = cmd.x1;
+		 v2v_y0_next = v2v_y0 + 12'd1;
+		 v2v_y1_next = v2v_y1 + 12'd1;
+	      end
+	      else begin
+		 v2v_x0_next = v2v_x0 + 12'd1;
+		 v2v_x1_next = v2v_x1 + 12'd1;
+	      end
+
+	      v2v_state_next = GETMEM1_V2V;
+	   end
+	end	
+      endcase // case (v2v_state)
+   end // always_comb
+
+
+   /* C2V FSM */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+         c2v_state <= WAIT_C2V;
+         c2v_x <= 12'd0;
+         c2v_y <= 12'd0;
+         c2v_rdy <= 1'b1;
+         c2v_hold <= 16'd0;
+      end
+      else begin
+         c2v_state <= c2v_state_next;
+         c2v_x <= c2v_x_next;
+         c2v_y <= c2v_y_next;
+         c2v_rdy <= c2v_rdy_next;
+         c2v_hold <= c2v_hold_next;
+      end // else: !if(rst)
+   end // always_ff @//       
+
+   /* C2V FSM next state + output logic */
+   always_comb begin
+      /* Defaults */
+      c2v_state_next = c2v_state;
+      c2v_x_next = c2v_x;
+      c2v_y_next = c2v_y;
+      c2v_rdy_next = c2v_rdy;
+      c2v_hold_next = c2v_hold;
+
+      c2v_vram_addr = 19'd0;
+      c2v_vram_data = 16'd0;
+      c2v_vram_we = 1'b0;
+      c2v_vram_re = 1'b0;
+
+      c2v_fifo_re = 1'b0;
+
+      case (c2v_state)
+	WAIT_C2V: begin
+	   if (c2v_on) begin
+	      c2v_rdy_next = 1'b0;
+	      c2v_x = cmd.x0;
+	      c2v_y = cmd.y0;
+	      c2v_state_next = GETMEM_C2V;
+	   end
+	end
+	GETMEM_C2V: begin
+	   if (c2v_y > cmd.y1) begin
+	      c2v_rdy_next = 1'b1;
+	      c2v_state_next = WAIT_C2V;
+	   end
+	   else begin
+	      c2v_vram_addr = {c2v_y[8:0], c2v_x[9:0]};
+	      c2v_vram_re = 1'b1;
+	      c2v_state_next = READINGMEM_C2V;
+	   end
+	end // case: GETMEM_C2V
+	READINGMEM_C2V: begin
+	   if (vram_rdy) begin
+	      c2v_state_next = TOMEM_C2V;
+	      c2v_hold_next = vram_bus;
+	   end
+	end
+	TOMEM1_C2V: begin
+	   if (~cmd_fifo_empty) begin
+	      c2v_vram_addr = {c2v_y[8:0], c2v_x[9:0]};
+	      c2v_vram_we = 1'b1;
+	      
+	      if (GPU_status.mask_en & c2v_hold[15]) begin
+		 c2v_vram_data = c2v_hold;
+		 c2v_state_next = WRITINGMEM2_C2V;
+	      end
+	      else begin
+		 c2v_vram_data = cmd_fifo_cmd[15:0];
+		 c2v_state_next = WRITINGMEM1_C2V;
+	      end
+
+	      c2v_vram_data[15] |= GPU_status.mask_en;
+	   end // if (~cmd_fifo_empty)
+	end // case: TOMEM1_C2V
+	WRITINGMEM1_C2V: begin
+	   if (vram_rdy) begin
+	      if (c2v_x == cmd.x1) begin
+		 c2v_x_next = cmd.x0;
+		 c2v_y_next = c2v_y + 12'd1;
+	      end
+	      else begin
+		 c2v_x_next = c2v_x + 12'd1;
+	      end // else: !if(v2v_x0 == cmd.x2)
+	      
+	      c2v_state_next = TOMEM2_C2V;
+	   end // if (vram_rdy)
+	end // case: WRITINGMEM1_C2V
+	TOMEM2_C2v: begin
+	   c2v_vram_addr = {c2v_y[8:0], c2v_x[9:0]};
+	   c2v_vram_we = 1'b1;
+	   c2v_vram_data = cmd_fifo_cmd[31:16];
+	   c2v_fifo_re = 1'b1;
+	   c2v_state_next = WRITINGMEM2_C2V;
+	end
+	WRITINGMEM2_C2V: begin
+	   if (vram_rdy) begin
+	      if (c2v_x == cmd.x1) begin
+		 c2v_x_next = cmd.x0;
+		 c2v_y_next = c2v_y + 12'd1;
+	      end
+	      else begin
+		 c2v_x_next = c2v_x + 12'd1;
+	      end
+
+	      c2v_state_next = GETMEM_C2V;
+	   end // if (vram_rdy)
+	end // case: WRITINGMEM2_C2V
+      endcase // case (c2v_state)
+   end // always_comb
+
+   /* V2C FSM */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 v2c_state <= WAIT_V2C;
+	 v2c_x <= 12'd0;
+	 v2c_y <= 12'd0;
+	 v2c_rdy <= 1'b1;
+      end // if (rst)
+      else begin
+	 v2c_state <= v2c_state_next;
+	 v2c_x <= v2c_x_next;
+	 v2c_y <= v2c_y_next;
+	 v2c_rdy <= v2c_rdy_next;
+      end // else: !if(rst)
+   end // always_ff @
+
+   /* V2C FSM next state + output logic */
+   always_comb begin
+      /* Defaults */
+      v2c_state_next = v2c_state;
+      v2c_x_next = v2c_x;
+      v2c_y_next = v2c_y;
+      v2c_rdy_next = v2c_rdy;
+
+      v2c_vram_addr = 19'd0;
+      v2c_vram_re = 1'b1;
+
+      GPU_read_reg_ld_V2C = 1'b0;
+      GPU_read_reg_new_V2C = GPU_read_reg;
+
+      main_bus_rdy = 1'b0;
+      
+      case (v2c_state)
+	WAIT_V2C: begin
+	   if (v2c_on) begin
+	      v2c_rdy_next = 1'b0;
+	      v2c_x_next = cmd.x0;
+	      v2c_y_next = cmd.y0;
+	      v2c_state_next = GETMEM1_V2C;
+	   end
+	end
+	GETMEM1_V2C: begin
+	   if (v2c_y > cmd.y1) begin
+	      v2c_rdy_next = 1'b1;
+	      v2c_state_next = WAIT_V2C;
+	   end
+	   else if (main_bus_re) begin
+	      v2c_vram_addr = {v2c_y[8:0], v2c_x[9:0]};
+	      v2c_vram_re = 1'b1;
+	      v2c_state_next = READINGMEM1_V2C;
+	   end
+	   else if ((v2c_y > cmd.y0) | (v2c_x > cmd.x0)) begin
+	      main_bus_rdy = 1'b1;
+	   end
+	end // case: GETMEM1_V2C
+	READINGMEM2_V2C: begin
+	   if (vram_rdy) begin
+	      GPU_read_reg_ld_V2C = 1'b1;
+	      GPU_read_reg_new_V2C[15:0] = vram_bus;
+	      
+	      if (v2c_x == cmd.x1) begin
+		 v2c_x_next = cmd.x0;
+		 v2c_y_next = v2c_y + 12'd1;
+	      end
+	      else begin
+		 v2c_x_next = v2c_x + 12'd1;
+              end
+
+	      v2c_state_next = GETMEM2_V2C;
+	   end // if (vram_rdy)
+	end // case: READINGMEM2_V2C
+	GETMEM2_V2C: begin
+	   v2c_vram_addr = {v2c_y[8:0], v2c_x[9:0]};
+	   v2c_vram_re = 1'b1;
+	   v2c_state_next = READINGMEM2_V2C;
+	end
+	READINGMEM2_V2C: begin
+	   if (vram_rdy) begin
+	      GPU_read_reg_ld_V2C = 1'b1;
+	      GPU_read_reg_new_V2C[31:16] = vram_bus;
+	      
+	      if (v2c_x == cmd.x1) begin
+		 v2c_x_next = cmd.x0;
+		 v2c_y_next = v2c_y + 12'd1;
+	      end
+	      else begin
+		 v2c_x_next = v2c_x + 12'd1;
+	      end
+
+	      v2c_state_next = GETMEM1_V2C;
+	   end // if (vram_rdy)
+	end // case: READINGMEM2_V2C
+      endcase // case (v2c_state)
+   end // always_comb
+
+   
+	      
+
+   /* ######################################################### */
+
+
    
    /* Global CMD register - for storing all info for the current cmd */
    always_ff @(posedge clk, posedge rst) begin
@@ -1394,13 +2070,13 @@ module gpu(
 
    /* Interpolators for shading */
    interp in_r(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
-	       .s0(cmd.r0), .s1(cmd.r1), .s2(cmd.r2),
+	       .s0({4'b0, cmd.r0}), .s1({4'b0, cmd.r1}), .s2({4'b0, cmd.r2}),
 	       .cx(r_trans_x), .cy(r_trans_y), .cs(r_trans_c)),
      in_g(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
-	  .s0(cmd.g0), .s1(cmd.g1), .s2(cmd.g2),
+	  .s0({4'b0, cmd.g0}), .s1({4'b0, cmd.g1}), .s2({4'b0, cmd.g2}),
 	  .cx(g_trans_x), .cy(g_trans_y), .cs(g_trans_c)),
      in_b(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
-	  .s0(cmd.b0), .s1(cmd.b1), .s2(cmd.b2),
+	  .s0({4'b0, cmd.b0}), .s1({4'b0, cmd.b1}), .s2({4'b0, cmd.b2}),
 	  .cx(b_trans_x), .cy(b_trans_y), .cs(b_trans_c));
    
 
@@ -1516,15 +2192,33 @@ module gpu(
    assign next_shader_stage.y = color_stage.y;
    assign next_shader_stage.in_shape = color_stage.in_shape;
 
-   
-   /* Texture cache */
-/*   texture_cache text_cache(.data_in(vram_bus),
-			    .
-			    .data_out(texture_data),
-			    .clear(clear_text_cache),
-			    .*);
-*/
-   /* CLUT cache */
+   /* Texture Page cache */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 txpg = 'd0;
+      end
+      else begin
+	 if (txpg_ld) begin
+
+	    /* Select based on color mode */
+	    case (GPU_status.text_mode)
+	      2'd0: begin
+		 txpg[(txpg_count_x << 'd2) | 9'h0][txpg_count_y] <= txpg_val[0];
+		 txpg[(txpg_count_x << 'd2) | 9'h1][txpg_count_y] <= txpg_val[1];
+		 txpg[(txpg_count_x << 'd2) | 9'h2][txpg_count_y] <= txpg_val[2];
+		 txpg[(txpg_count_x << 'd2) | 9'h3][txpg_count_y] <= txpg_val[3];
+	      end
+	      2'd1: begin
+		 txpg[(txpg_count_x << 'd1) | 9'h0][txpg_count_y] <= txpg_val[0];
+		 txpg[(txpg_count_x << 'd1) | 9'h1][txpg_count_y] <= txpg_val[1];
+	      end
+	      default: begin
+		 txpg[txpg_count_x][txpg_count_y] <= txpg_val[0];
+	      end
+	    endcase // case (GPU_status.text_mode)
+	 end
+      end
+   end
    
    /* Fill color logic */
    always_comb begin
@@ -1536,9 +2230,21 @@ module gpu(
       /* If its textured, use results from texture unit */
       if (cmd.texture == TEXT) begin
 	 for (text_i = 0; text_i < `GPU_PIPELINE_WIDTH; text_i = text_i + 1) begin
-	    next_shader_stage.r[text_i] = ;
-	    next_shader_stage.g[text_i] = ;
-	    next_shader_stage.b[text_i] = ;
+	    if (cmd.shape == POLY) begin
+	       /* f_* are in the for [18  | 6] */
+	       f_u = (u_trans_x * color_stage.x[text_i] + 
+		      u_trans_y * color_stage.y[text_i] + u_trans_c);
+	       f_v = (v_trans_x * color_stage.x[text_i] + 
+		      v_trans_y * color_stage.y[text_i] + v_trans_c);
+	    end
+	    else begin
+	       f_u = color_stage.x[text_i] - cmd.x0;
+	       f_v = color_stage.y[text_i] - cmd.y0;
+	    end // else: !if(cmd.shape == POLY)
+	    
+	    next_shader_stage.r[text_i] = txpg[f_u[13:6]][f_v[13:6]];
+	    next_shader_stage.g[text_i] = txpg[f_u[13:6]][f_v[13:6]];
+	    next_shader_stage.b[text_i] = txpg[f_u[13:6]][f_v[13:6]];
 	 end
       end
    end // always_comb
@@ -1591,9 +2297,41 @@ module gpu(
 	 /* Determine shading type */
 	 if (GPU_status[27]) begin
 	    /* Gouraud */
+	    for (color_i = 0; color_i < `GPU_PIPELINE_WIDTH; color_i = color_i + 1) begin
+	       /* First get the color: int_* = [18 | 6]  */
+	       int_r = (r_trans_x * shader_stage.x[color_i] + 
+			r_trans_y * shader_stage.y[color_i] + r_trans_c);
+	       int_g = (g_trans_x * shader_stage.x[color_i] +
+			g_trans_y * shader_stage.y[color_i] + g_trans_c);
+	       int_b = (b_trans_x * shader_stage.x[color_i] +
+			b_trans_y * shader_stage.y[color_i] + b_trans_c);
+
+	       f_r = (int_r * shader_stage.r[color_i]) >> 'd7;
+	       f_g = (int_g * shader_stage.g[color_i]) >> 'd7;
+	       f_b = (int_b * shader_stage.b[color_i]) >> 'd7;
+
+	       next_wb_stage.r[color_i] = ((f_r[23]) ? 8'b0 : 
+					   (((f_r[23:6] + f_r[5]) > 18'd255) ? 8'd255 : 
+					    (f_r[13:6] + f_r[5])));
+	       next_wb_stage.g[color_i] = ((f_g[23]) ? 8'b0 :
+					   (((f_g[23:6] + f_g[5]) > 18'd255) ? 8'd255 : 
+					    (f_g[13:6] + f_g[5])));
+	       next_wb_stage.b[color_i] = ((f_b[23]) ? 8'b0 :
+					   (((f_b[23:6] + f_b[5]) > 18'd255) ? 8'd255 : 
+					    (f_b[13:6] + f_b[5])));
+	    end 
 	 end
 	 else begin
 	    /* Flat */
+	    for (color_i = 0; color_i < `GPU_PIPELINE_WIDTH; color_i = color_i + 1) begin
+	       f_r = (cmd.r0 * shader_stage.r[color_i]) >> 'd7;
+	       f_g = (cmd.g0 * shader_stage.g[color_i]) >> 'd7;
+	       f_b = (cmd.b0 * shader_stage.b[color_i]) >> 'd7;
+
+	       next_wb_stage.r[color_i] = (f_r > 24'd255) ? 8'd255 : f_r[7:0];
+	       next_wb_stage.g[color_i] = (f_g > 24'd255) ? 8'd255 : f_g[7:0];
+	       next_wb_stage.b[color_i] = (f_b > 24'd255) ? 8'd255 : f_b[7:0];
+	    end
 	 end
       end
    end
@@ -1628,5 +2366,201 @@ module gpu(
       ##################################################### */
 
 
+
+   /* WB FSM */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 wb_state <= WAIT_WB;
+	 wb_count <= 8'd0;
+	 wb_hold <= 16'd0;
+      end
+      else begin
+	 wb_state <= wb_state_next;
+	 wb_count <= wb_count_next;
+	 wb_hold <= wb_hold_next;
+      end
+   end
+
+   /* WB FSM next state + output logic */
+   always_comb begin
+      /* Defaults */
+      wb_state_next = wb_state;
+      wb_count_next = wb_count;
+      wb_hold_next = wb_hold;
+      
+      wb_stall = 1'b0;
+
+      wb_vram_addr = 'd0;
+      wb_data = 16'd0;
+      wb_vram_re = 1'b0;
+      wb_vram_we = 1'b0;
+
+      wb_r = 8'd0;
+      wb_g = 8'd0;
+      wb_b = 8'd0;
+      
+      case (wb_state)
+	WAIT_WB: begin
+	   if (wb_stage.v) begin
+	      wb_stall = 1'b1;
+	      wb_count_next = 8'd0;
+	      wb_state_next = GETMEM_WB;
+	   end
+	end
+	GETMEM_WB: begin
+	   if (wb_count >= `GPU_PIPELINE_WIDTH) begin
+	      wb_state_next = WAIT_WB;
+	   end
+	   else begin
+	      wb_stall = 1'b1;
+	      wb_vram_addr = {wb_stage.y[wb_count][8:0], wb_stage.x[wb_count][9:0]};
+	      wb_vram_re = 1'b1;
+	      wb_state_next = READINGMEM_WB;
+	   end
+	end // case: GETMEM_WB
+	READINGMEM_WB: begin
+	   wb_stall = 1'b1;
+	   
+	   if (vram_rdy) begin
+	      if (~vram_bus[15] | ~GPU_status.mask_en) begin
+		 if (GPU_status.set_mask) begin
+		    wb_hold_next[15] = 1'b1;
+		 end
+		 
+		 if (cmd.shade == POLY) begin
+		    if (cmd.transparency == SEMI) begin
+		       case (cmd.semi_trans_mode)
+			 2'd0: begin
+			    wb_r = ((vram[4:0] >> 'd1) + 
+				    (wb_stage.r[wb_count][7:3] >> 'd1));
+			    wb_g = ((vram[9:5] >> 'd1) + 
+				    (wb_stage.g[wb_count][7:3] >> 'd1));
+			    wb_b = ((vram[14:10] >> 'd1) + 
+				    (wb_stage.b[wb_count][7:3] >> 'd1));
+			 end
+			 2'd1: begin
+			    wb_r = ((vram[4:0]) +
+				    (wb_stage.r[wb_count][7:3]));
+			    wb_b = ((vram[9:5]) +
+				    (wb_stage.g[wb_count][7:3]));
+			    wb_g = ((vram[14:10]) +
+				    (wb_stage.b[wb_count][7:3]));
+			 end
+			 2'd2: begin
+			    wb_r = ((vram[4:0]) -
+				    (wb_stage.r[wb_count][7:3]));
+			    wb_b = ((vram[9:5]) -
+				    (wb_stage.g[wb_count][7:3]));
+			    wb_g = ((vram[14:10]) -
+				    (wb_stage.b[wb_count][7:3]));
+			 end
+			 2'd3: begin
+			    wb_r = ((vram[4:0]) +
+				    (wb_stage.r[wb_count][7:3] >> 'd2));
+			    wb_g = ((vram[9:5]) +
+				    (wb_stage.g[wb_count][7:3] >> 'd2));
+			    wb_b = ((vram[14:10]) +
+				    (wb_stage.b[wb_count][7:3] >> 'd2));
+			 end
+		       endcase // case (cmd.semi_trans_mode)
+		    end // if (cmd.transparency == SEMI)
+		    else begin
+		       wb_r = wb_stage.r[wb_count][7:3];
+		       wb_g = wb_stage.g[wb_count][7:3];
+		       wb_b = wb_stage.b[wb_count][7:3];
+		    end
+		 end // if (cmd.shade == POLY)
+		 else begin
+		    if (cmd.transparency == SEMI) begin
+		       case (GPU_status.semi_trans_mode)
+			 2'd0: begin
+			    wb_r = ((vram[4:0] >> 'd1) +
+				    (wb_stage.r[wb_count][7:3] >> 'd1));
+			    wb_g = ((vram[9:5] >> 'd1) +
+				    (wb_stage.g[wb_count][7:3] >> 'd1));
+			    wb_b = ((vram[14:10] >> 'd1) +
+				    (wb_stage.b[wb_count][7:3] >> 'd1));
+			 end // case: 2'b0
+			 2'd1: begin
+			    wb_r = ((vram[4:0]) +
+				    (wb_stage.r[wb_count][7:3]));
+			    wb_b = ((vram[9:5]) +
+				    (wb_stage.g[wb_count][7:3]));
+			    wb_g = ((vram[14:10]) +
+				    (wb_stage.b[wb_count][7:3]));
+			 end // case: 2'b1
+			 2'd2: begin
+			    wb_r = ((vram[4:0]) -
+				    (wb_stage.r[wb_count][7:3]));
+			    wb_b = ((vram[9:5]) -
+				    (wb_stage.g[wb_count][7:3]));
+			    wb_g = ((vram[14:10]) -
+				    (wb_stage.b[wb_count][7:3]));
+			 end // case: 2'd2
+			 2'd3: begin
+			    wb_r = ((vram[4:0]) +
+				    (wb_stage.r[wb_count][7:3] >> 'd2));
+			    wb_g = ((vram[9:5]) +
+				    (wb_stage.g[wb_count][7:3] >> 'd2));
+			    wb_b = ((vram[14:10]) +
+				    (wb_stage.b[wb_count][7:3] >> 'd2));
+			 end // case: 2'b0
+		       endcase
+		    end // if (cmd.transparency == SEMI)
+		    else begin
+		       wb_r = wb_stage.r[wb_count][7:3];
+		       wb_g = wb_stage.g[wb_count][7:3];
+		       wb_b = wb_stage.b[wb_count][7:3];
+		    end // else: !if(cmd.transparency == SEMI)
+		 end // else: !if(cmd.shade == POLY)
+
+		 /* Now set the hold register (saturating if needed) */
+		 wb_hold_next[4:0] = (wb_r[7]) ? 5'd0 : ((wb_r > 8'd31) ? 5'd31 : w_r[4:0]);
+		 wb_hold_next[9:5] = (wb_g[7]) ? 5'd0 : ((wb_g > 8'd31) ? 5'd31 : w_g[4:0]);
+		 wb_hold_next[14:10] = (wb_b[7]) ? 5'd0 : ((wb_b > 8'd31) ? 5'd31 : w_b[4:0]);
+	      end // if (~vram_bus[15])
+	      else begin
+		 wb_hold_next = vram_bus;
+	      end // else: !if(~vram_bus[15])
+
+	      wb_state_next = TOMEM_WB;
+	   end // if (vram_rdy)
+	end // case: READINGMEM_WB
+	TOMEM_WB: begin
+	   wb_stall = 1'b1;
+
+	   /* Be sure the address is in VRAM and in the drawing area, otherwise
+	      just ignore this one and move on */
+	   if ((wb_stage.x[wb_count][11:10] == 2'd1) && 
+	       (wb_stage.x[wb_count][9:0] > x_lt) &&
+	       (wb_stage.x[wb_count][9:0] < x_br) &&
+	       (wb_stage.y[wb_count][11:9] == 3'd2) &&
+	       (wb_stage.y[wb_count][8:0] > y_lt) &&
+	       (wb_stage.y[wb_count][8:0] < y_br)) begin
+	      wb_we = 1'b1;
+	      wb_vram_bus = wb_hold;
+	      wb_vram_addr = {wb_stage.y[wb_count][8:0], wb_stage.x[wb_count][9:0]};
+	      wb_state_next = WRITINGMEM_WB;
+	   end
+	   else begin
+	      wb_count_next = wb_count + 8'd1;
+	      wb_state_next = GETMEM_WB;
+	   end // else: !if((wb_stage.x[wb_count][11:10] == 2'd1) &&...
+	end
+	WRITINGMEM_WB: begin
+	   wb_stall = 1'b1;
+
+	   if (vram_rdy) begin
+	      wb_count_next = wb_count + 8'd1;
+	      wb_state_next = GETMEM_WB;
+	   end
+	end
+      endcase // case (wb_state)
+   end // always_comb
+	    
+		 
+	
+	 
+	 
    
 endmodule // gpu

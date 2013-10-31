@@ -1,20 +1,20 @@
 
 
 module interp(
-	      input wire [11:0]  x0, y0, x1, y1, x2, y2,
-	      input wire [11:0]  s0, s1, s2,
-	      output wire [23:0] cx, cy, cs);
+	      input logic [11:0]  x0, y0, x1, y1, x2, y2,
+	      input logic [11:0]  s0, s1, s2,
+	      output logic [23:0] cx, cy, cs);
    
    /* Internal lines */
-   wire [63:0] 			 x0_64, y0_64, x1_64, y1_64, x2_64, y2_64;
-   wire [63:0] 			 s0_64, s1_64, s2_64;
+   logic [63:0] 		  x0_64, y0_64, x1_64, y1_64, x2_64, y2_64;
+   logic [63:0] 		  s0_64, s1_64, s2_64;
    
-   wire [63:0] 			 det;
-   wire [63:0] 			 ndiv_cx, ndiv_cy;
-   wire [63:0] 			 part1, part2, part3;
-   wire [63:0] 			 ndiv_cs;
+   logic [63:0] 		  det;
+   logic [63:0] 		  ndiv_cx, ndiv_cy;
+   logic [63:0] 		  part1, part2, part3;
+   logic [63:0] 		  ndiv_cs;
    
-   wire [71:0] 			 r_cx, r_cy, r_cs;
+   logic [71:0] 		  r_cx, r_cy, r_cs;
    
 
    /* Expand inputs to 64-bits */
@@ -29,7 +29,7 @@ module interp(
    assign s2_64 = {52'b0, s2};
    
    /* Determinant */
-   assign det = x0_64 * (y1_64 - y2_64) + x1_64 * (y2_64 - y0_64) + x2_64 * (y_64 - y1_64);
+   assign det = x0_64 * (y1_64 - y2_64) + x1_64 * (y2_64 - y0_64) + x2_64 * (y0_64 - y1_64);
 
    /* Non-div c's */
    always_comb begin

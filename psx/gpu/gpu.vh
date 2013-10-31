@@ -11,7 +11,6 @@ typedef enum logic {BLEND, RAW} text_mode_t;
 typedef enum logic {VRM, GPUREAD} mem_dest_t;
 typedef enum logic [1:0] {FIFO, VRAM, CLR} mem_src_t;
 
-
 /* CMD struct */
 typedef struct packed {
    logic [11:0]                     x0, x1, x2;
@@ -21,9 +20,9 @@ typedef struct packed {
    logic [7:0] 			    r2, g2, b2;
    logic [7:0] 			    u0, u1, u2; // Texture page coords
    logic [7:0] 			    v0, v1, v2; //    "     "     "
-   logic [5:0] 			    clut_x;
-   logic [7:0] 			    clut_y;
-   logic [1:0] 			    text_x;
+   logic [9:0] 			    clut_x;
+   logic [8:0] 			    clut_y;
+   logic [3:0] 			    text_x;
    logic 			    text_y;
    logic [1:0] 			    semi_trans_mode;
    logic [1:0] 			    text_mode;
@@ -38,13 +37,37 @@ typedef struct packed {
 } CMD_t;
    
 /* Decode stage FSM states */
-typedef enum logic [4:0] {WAIT, GET_XY0, GET_XY1, GET_XY2, 
+typedef enum logic [5:0] {WAIT, GET_XY0, GET_XY1, GET_XY2, 
                           GET_TX0, GET_TX1, GET_TX2, GET_CL1,
-                          GET_CL2, SEND_DATA, WAIT_MEM, DRAWING} DECODE_t;
+                          GET_CL2, GET_CLUT, GET_TXPG, WAIT_MEM, 
+			  DRAWING} DECODE_t;
 
 /* XY generator FSM states */
 typedef enum logic [1:0] {SIT_AROUND, CHURN_BUTTER, COMPLETE} XYGEN_t;
 
+/* CLUT getting FSM states */
+typedef enum logic [1:0] {WAIT_CLUT, GETMEM_CLUT, READINGMEM_CLUT} CLUT_t;
+
+/* Textpage getting FSM states */
+typedef enum logic [1:0] {WAIT_TXPG, GETMEM_TXPG, READINGMEM_TXPG} TXPG_t;
+
+/* Fill FSM states */
+typedef enum logic [1:0] {WAIT_FILL, TOMEM_FILL, WRITINGMEM_FILL} FILL_t;
+
+/* V2V FSM states */
+typedef enum logic [2:0] {WAIT_V2V, GETMEM1_V2V, READINGMEM1_V2V, 
+			  GETMEM2_V2V, READINGMEM2_V2V, TOMEM_V2V, WRITINGMEM_V2V} V2V_t;
+
+/* V2C FSM states */
+typedef enum logic [1:0] {WAIT_V2C, GETMEM1_V2C, READINGMEM1_V2C,
+			  GETMEM2_V2C, READINGMEM2_V2C} V2C_t;
+
+/* C2V FSM states */
+typedef enum logic [2:0] {WAIT_C2V, GETMEM_C2V, READINGMEM_C2V, 
+			  TOMEM1_C2V, WRITINGMEM1_C2V, TOMEM2_C2V, WRITINGMEM2_C2V}} C2V_t;
+
+/* WB FSM states */
+typedef enum logic [2:0] {WAIT_WB, GETMEM_WB, READINGMEM_WB, TOMEM_WB, WRITINGMEM_WB} WB_t;
 
 /* GPU Status register struct */
 typedef struct packed {
