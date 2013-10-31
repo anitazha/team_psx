@@ -1,0 +1,6 @@
+.__afs*
+csrc/
+simv*
+DVEfiles/
+ucli.key
+inter.vpd

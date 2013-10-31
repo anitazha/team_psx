@@ -29,7 +29,7 @@ module video(
     
     assign HDMI_HSYNC = (h_sum < `HSYNC_LEN) ? `HSYNC_ON : `HSYNC_OFF;
     assign HDMI_VSYNC = (v_sum < `VSYNC_LEN) ? `VSYNC_ON : `VSYNC_OFF;
-    assign HDMI_DATA  = out_pixel;
+    assign HDMI_DATA  = {{12{1'b0}}, data};
     assign HDMI_CLK   = clk_pix;
     assign HDMI_EN    = hdmi_en;
 
