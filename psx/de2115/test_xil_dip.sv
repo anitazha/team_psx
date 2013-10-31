@@ -13,7 +13,7 @@ module test_xil_dip(input logic clk, rst
    reg [7:0] 				data_in_o;
 
    assign data_rdy = data_rdy_o;
-   assign data_in = data_in_o;
+   assign data_in = {data_in_o, 24'h123456};
    
    /* FSM next state logic */
    always @ (posedge clk, posedge rst) begin
