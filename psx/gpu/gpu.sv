@@ -118,15 +118,18 @@ module gpu(
    
    logic [31:0] 	      GPU_read_reg, GPU_read_reg_new_NB, GPU_read_reg_new_V2C;
    logic 		      GPU_read_reg_ld_NB, GPU_read_reg_ld_V2C;
-   
-   logic [9:0] 		      display_start_x, display_start_x_new;
-   logic [8:0] 		      display_start_y, display_start_y_new;
 
    logic [1:0] 		      xy_flip_reg, xy_flip_reg_new;
 
    logic [11:0] 	      x_tl, y_tl, x_br, y_br, x_off, y_off;
    logic [11:0] 	      x_tl_new, y_tl_new, x_br_new, y_br_new, x_off_new, y_off_new;
 
+   logic [7:0] 		      text_mask_x, text_mask_y, text_mask_x_new, text_mask_y_new;
+   logic [7:0] 		      text_off_x, text_off_y, text_off_x_new, text_off_y_new;
+
+   logic [9:0] 		      dis_x_tl, dis_y_tl, dis_x_tl_new, dis_y_tl_new;
+   logic [9:0] 		      dis_x_br, dis_y_br, dis_x_br_new, dis_y_br_new;
+   
    /* FETCH STAGE */
    /* FIFO lines */
    logic [31:0] 	     cmd_fifo_cmd;
@@ -163,9 +166,7 @@ module gpu(
    logic 		     fill_on;
    logic 		     v2v_on;
    logic 		     v2c_on;
-   logic 		     c2v_on;
-   
-   
+   logic 		     c2v_on;   
    
    logic [1:0] 		     side0, side1, side2;
 
@@ -247,6 +248,7 @@ module gpu(
    color_stage_t color_stage, next_color_stage;
    
    logic [23:0] 			 f_u, f_v;
+   logic [7:0] 				 m_u, m_v;
 
    /* Texture unit lines */
    logic [255:0][255:0][15:0] 		 txpg;
@@ -324,18 +326,6 @@ module gpu(
    end
 
    assign gpu_read = GPU_read_reg;
-
-   /* Display start registers */
-   always_ff @(posedge clk, posedge rst) begin
-      if (rst) begin
-	 display_start_x <= 10'b0;
-	 display_start_y <= 9'b0;
-      end
-      else begin
-	 display_start_x <= display_start_x_new;
-	 display_start_y <= display_start_y_new;
-      end
-   end
    
    /* XY flip register (bit0 is x flip, bit1 is y flip*/
    always_ff @(posedge clk, posedge rst) begin
@@ -365,9 +355,41 @@ module gpu(
 	 x_off <= x_off_new;
 	 y_off <= y_off_new;
       end // else: !if(rst)
-   end
-   
+   end // always_ff @
 
+   /* Texture window register */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 text_mask_x <= 8'd0;
+	 text_mask_y <= 8'd0;
+	 text_off_x <= 8'd0;
+	 text_off_y <= 8'd0;
+      end
+      else begin
+	 text_mask_x <= text_mask_x_new;
+	 text_mask_y <= text_mask_y_new;
+	 text_off_x <= text_off_x_new;
+	 text_off_y <= text_off_y_new;
+      end // else: !if(rst)
+   end // always_ff @
+   
+   /* Display area register */
+   always_ff @(posedge clk, posedge rst) begin
+     if (rst) begin
+	dis_x_tl <= 10'd0;
+	dis_y_tl <= 10'd0;
+	dis_x_br <= 10'd0;
+	dis_y_br <= 10'd0;
+     end
+     else begin
+	dis_x_tl <= dis_x_tl_new;
+	dis_y_tl <= dis_y_tl_new;
+	dis_x_br <= dis_x_br_new;
+	dis_y_br <= dis_y_br_new;
+     end // else: !if(rst)
+   end // always_ff @
+   
+	
 
 
 
@@ -424,8 +446,10 @@ module gpu(
       GPU_status_new.reverse = GPU_status.reverse;
       gp1_text_en = GPU_status.text_en;
       
-      display_start_x_new = display_start_x;
-      display_start_y_new = display_start_y;
+      dis_x_tl_new = dis_x_tl;
+      dis_y_tl_new = dis_y_tl;
+      dis_x_br_new = dis_x_br;
+      dis_y_br_new = dis_y_br;
       
       /* Process all GP1 commands (only non-buffered GP0 command is a nop... */
       if (to_gp1) begin
@@ -451,14 +475,16 @@ module gpu(
 	   end
 	   GP1_NB_DIS_TL: begin
 	      /* Display area VRAM */
-	      display_start_x_new = main_bus[9:0];
-	      display_start_y_new = main_bus[18:10];
+	      dis_x_tl_new = main_bus[9:0];
+	      dis_y_tl_new = main_bus[18:10];
 	   end
 	   GP1_NB_DIS_HZ: begin
-	      /* Display width (hsync) */
+	      /* Display width (hsync); converted into a xy coord */
+	      dis_y_br_new = (((main_bus[23:12] - main_bus[11:0]) / 10'd53) & 10'h3F8);
 	   end
 	   GP1_NB_DIS_VR: begin
-	      /* Display height (vsync) */
+	      /* Display height (vsync); converted into a xy coord */
+	      dis_x_br_new = (main_bus[19:10] - main[9:0]);
 	   end
 	   GP1_NB_DIS_MODE: begin
 	      /* Display mode */
@@ -479,22 +505,23 @@ module gpu(
 	     'h02: begin
 		/* Texture window setting */
 		GPU_read_reg_ld_NB = 1'b1;
-		
+		GPU_read_reg_new_NB = {12'b0, text_off_y[4:0], text_off_x[4:0], 
+				       text_mask_y[4:0], text_mask_x[4:0]};
 	     end
 	     'h03: begin
 		/* Draw area top-left */
 		GPU_read_reg_ld_NB = 1'b1;
-		
+		GPU_read_reg_new_NB = {12'b0, y_tl[9:0], x_tl[9:0]}; 
 	     end
 	     'h04: begin
 		/* Draw area bottom-right */
 		GPU_read_reg_ld_NB = 1'b1;
-		
+		GPU_read_reg_new_NB = {12'b0, y_br[9:0], x_br[9:0]};
 	     end
 	     'h05: begin
 		/* Draw area offset */
 		GPU_read_reg_ld_NB = 1'b1;
-		
+		GPU_read_reg_new_NB = {10'b0, y_off[10:0], x_off[10:0]};
 	     end
 	     'h07: begin
 		/* GPU Version */
@@ -596,6 +623,11 @@ module gpu(
       y_br_new = y_br;
       x_off_new = x_off;
       y_off_new = y_off;
+
+      text_mask_x_new = text_mask_x;
+      text_mask_y_new = text_mask_y;
+      text_off_x_new = text_off_x;
+      text_off_y_new = text_off_y;
 
       xy_gen_on = 1'b0;
 
@@ -913,6 +945,10 @@ module gpu(
 		GP0_B_TEXTWND: begin
 		   /* Set texture window */
 		   decode_fifo_re = 1'b1;
+		   text_mask_x_new = cmd_fifo_cmd[4:0];
+		   text_mask_y_new = cmd_fifo_cmd[9:5];
+		   text_off_x_new = cmd_fifo_cmd[14:10];
+		   text_off_y_new = cmd_fifo_cmd[19:15];
 		end
 		GP0_B_DRWWND_TL: begin
 		   /* Set top-left of drawing window */
@@ -1468,31 +1504,38 @@ module gpu(
       /* Decode FSM has told up to go! */
       if (xy_gen_on && xy_gen_state != COMPLETE) begin
 
-	 /* If its a draw request, run the render pipeline. Otherwise, use it for storage */
-	 next_draw_stage.valid = draw_req & (xy_gen_state_next == COMPLETE);
-
-	 /* Determine new y and block values */
-	 if (xy_gen_state == SIT_AROUND) begin
-	    xy_gen_block_new = 'd0;
-	    xy_gen_y_new = xy_gen_min_y;
-	    xy_gen_state_next = CHURN_BUTTER;
+	 /* If the shape is too big, give up */
+	 if ((xy_gen_max_x > (xy_gen_min_x + 12'd1023)) |
+	     (xy_gen_max_y > (xy_gen_min_y + 12'd512))) begin
+	    xy_gen_state_next = COMPLETE;
 	 end
 	 else begin
-	    if (xy_gen_y < xy_gen_max_y) begin
-	       xy_gen_y_new = xy_gen_y + 12'b1;
+	    /* If its a draw request, run the render pipeline. Otherwise, use it for storage */
+	    next_draw_stage.valid = draw_req & (xy_gen_state_next == COMPLETE);
+	    
+	    /* Determine new y and block values */
+	    if (xy_gen_state == SIT_AROUND) begin
+	       xy_gen_block_new = 'd0;
+	       xy_gen_y_new = xy_gen_min_y;
+	       xy_gen_state_next = CHURN_BUTTER;
 	    end
 	    else begin
-	       xy_gen_y_new = xy_gen_min_y;
-
-	       if (((xy_gen_block + 'd1) << $clog2(`GPU_PIPELINE_WIDTH)) < xy_gen_max_x) begin
-		  xy_gen_block_new = xy_gen_block + 'd1;
+	       if (xy_gen_y < xy_gen_max_y) begin
+		  xy_gen_y_new = xy_gen_y + 12'b1;
 	       end
 	       else begin
-		  xy_gen_block_new = 'd0;
-		  xy_gen_y_new = 'd0;
-		  xy_gen_state_next = COMPLETE;
-	       end
-	    end 
+		  xy_gen_y_new = xy_gen_min_y;
+		  
+		  if (((xy_gen_block + 'd1) << $clog2(`GPU_PIPELINE_WIDTH)) < xy_gen_max_x) begin
+		     xy_gen_block_new = xy_gen_block + 'd1;
+		  end
+		  else begin
+		     xy_gen_block_new = 'd0;
+		     xy_gen_y_new = 'd0;
+		     xy_gen_state_next = COMPLETE;
+		  end
+	       end 
+	    end // else: !if(xy_gen_state == SIT_AROUND)
 	 end
       end // if (xy_gen_on)
       else begin
@@ -1501,7 +1544,7 @@ module gpu(
 	    xy_gen_state_next = SIT_AROUND;
 	 end
       end // else: !if(xy_gen_on && xy_gen_state != COMPLETE)
-
+      
       /* Set all the draw_stage x-y coords */
       for (xy_gen_i = 0; xy_gen_i < `GPU_PIPELINE_WIDTH; xy_gen_i = xy_gen_i + 1) begin
 	 next_draw_stage.x[xy_gen_i] = ((xy_gen_block << $clog2(`GPU_PIPELINE_WIDTH)) + 
@@ -2294,10 +2337,13 @@ module gpu(
 	       f_u = color_stage.x[text_i] - cmd.x0;
 	       f_v = color_stage.y[text_i] - cmd.y0;
 	    end // else: !if(cmd.shape == POLY)
+
+	    m_u = ((f_u[13:6] & (~(text_mask_x << 'd3))) | ((text_off_x & text_mask_x) << 'd3));
+	    m_v = ((f_u[13:6] & (~(text_mask_y << 'd3))) | ((text_off_y & text_mask_y) << 'd3));
 	    
-	    next_shader_stage.r[text_i] = txpg[f_u[13:6]][f_v[13:6]];
-	    next_shader_stage.g[text_i] = txpg[f_u[13:6]][f_v[13:6]];
-	    next_shader_stage.b[text_i] = txpg[f_u[13:6]][f_v[13:6]];
+	    next_shader_stage.r[text_i] = txpg[m_u][m_v];
+	    next_shader_stage.g[text_i] = txpg[m_u][m_v];
+	    next_shader_stage.b[text_i] = txpg[m_u][m_v];
 	 end
       end
    end // always_comb
