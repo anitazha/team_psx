@@ -1,0 +1,13 @@
+ncelab: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+TOOL:	ncelab	08.20-s015: Started on Oct 30, 2013 at 19:16:27 EDT
+ncelab
+    +access+rwc
+    -messages
+    worklib.testbench
+
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+    Register #(1,0) Halt(.Q(halted),
+                                 |
+ncelab: *E,CUVMOT (./src/Processor.v,194|33): illegal output port specification.
+TOOL:	ncelab	08.20-s015: Exiting on Oct 30, 2013 at 19:16:27 EDT  (total: 00:00:00)

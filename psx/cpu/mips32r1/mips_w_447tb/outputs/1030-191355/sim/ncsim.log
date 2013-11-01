@@ -1,0 +1,11 @@
+ncsim: 08.20-s015: (c) Copyright 1995-2009 Cadence Design Systems, Inc.
+ncsim> #database -open -shm -default waveforms
+ncsim> #probe -shm -create -depth all -all 
+ncsim> run 
+[End of program at 0x0040001c]
+[End of program at 0x0040001c]
+[End of program at 0x0040001c]
+[End of program at 0x0040001c]
+Simulation interrupted at 294261550 NS + 7
+./src/Control.v:443                 default     : ALUOp <= AluOp_Addu;
+ncsim> exit
