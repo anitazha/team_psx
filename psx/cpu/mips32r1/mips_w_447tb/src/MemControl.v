@@ -25,6 +25,8 @@
 module MemControl(
     input  clock,
     input  reset,
+    input  Swc2,                    // Is this memory access for an Swc2 cmd?
+    input  [31:0] CP2Out,           // Data from CP2
     input  [31:0] DataIn,           // Data from CPU
     input  [31:0] Address,          // From CPU
     input  [31:0] MReadData,        // Data from Memory
@@ -176,10 +178,10 @@ module MemControl(
     end
     
     // Data Going to Memory
-    assign MWriteData[31:24] = (Byte) ? DataIn[7:0] : ((Half) ? DataIn[15:8] : DataIn[31:24]);
-    assign MWriteData[23:16] = (Byte | Half) ? DataIn[7:0] : DataIn[23:16];
-    assign MWriteData[15:8]  = (Byte) ? DataIn[7:0] : DataIn[15:8];
-    assign MWriteData[7:0]   = DataIn[7:0];
+    assign MWriteData[31:24] = (Swc2) ? CP2Out[31:24] : (Byte) ? DataIn[7:0] : ((Half) ? DataIn[15:8] : DataIn[31:24]);
+    assign MWriteData[23:16] = (Swc2) ? CP2Out[23:16] : (Byte | Half) ? DataIn[7:0] : DataIn[23:16];
+    assign MWriteData[15:8]  = (Swc2) ? CP2Out[15:8]  : (Byte) ? DataIn[7:0] : DataIn[15:8];
+    assign MWriteData[7:0]   = (Swc2) ? CP2Out[7:0]   : DataIn[7:0];
     
     // Data Read from Memory
     always @(*) begin

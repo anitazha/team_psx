@@ -90,7 +90,7 @@ module mips_mem(addr1,data_in1,data_out1,we1,excpt1,allow_kernel1,kernel1,
 
 	    // Text segment
 	    text_start   = 32'h00400000,
-	    text_words   = 'h10000, /* 256 K */
+	    text_words   = 'h1000000, /* 256 K */
     	    text_length  = text_words * 4,
 	    text_top = text_start + text_length,
     	    text_start_w = text_start >> 2,
@@ -219,11 +219,11 @@ module mips_mem(addr1,data_in1,data_out1,we1,excpt1,allow_kernel1,kernel1,
 	  kdata_seg[i] = 32'hdeadbeef;
 	  
 	  // Grab initial memory values
-	  $readmemh("mem.text.dat", text_seg);
-	  $readmemh("mem.data.dat", data_seg);
-	  $readmemh("mem.stack.dat", stack_seg);
-	  $readmemh("mem.ktext.dat", ktext_seg);
-	  $readmemh("mem.kdata.dat", kdata_seg);
+	  $readmemh("bios.dat", text_seg);
+	  //$readmemh("mem.data.dat", data_seg);
+	  //$readmemh("mem.stack.dat", stack_seg);
+	  //$readmemh("mem.ktext.dat", ktext_seg);
+	  //$readmemh("mem.kdata.dat", kdata_seg);
        end
 
    // Handle Port 1 Read

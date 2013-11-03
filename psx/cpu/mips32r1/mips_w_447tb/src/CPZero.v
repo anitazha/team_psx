@@ -96,7 +96,7 @@ module CPZero(
        have normally made and convert itself to a NOP for the next pipeline stage. Furthermore,
        it must flush all previous pipeline stages as well in order to retain program order.
        
-     - Instructions reading CP0 (mtc0) read in ID without further action. Writes to CP0 (mtc0,
+     - Instructions reading CP0 (mfc0) read in ID without further action. Writes to CP0 (mtc0,
        eret) also write in ID, but only after forward pipeline stages have been cleared
        of possible exceptions. This prevents many insidious bugs, such as switching to User Mode
        in ID when a legitimate memory access in kernel mode is processing in MEM, or conversely
@@ -264,7 +264,7 @@ module CPZero(
     assign IP = Cause_IP;
 
     /*** Coprocessor Unusable Exception ***/
-    assign EXC_CpU = COP1 | COP2 | COP3 | ((Mtc0 | Mfc0 | ERET) & ~(Status_CU_0 | KernelMode));
+    assign EXC_CpU = COP1 | COP3 | ((Mtc0 | Mfc0 | ERET) & ~(Status_CU_0 | KernelMode));
 
     /*** Kernel Mode Signal ***/
     assign KernelMode = ~Status_UM | Status_EXL | Status_ERL;
@@ -432,7 +432,7 @@ module CPZero(
             // MEM stage
             if (M_Exception_Ready) begin
                 Cause_BD <= (Status_EXL) ? Cause_BD : M_IsBD;
-                Cause_CE <= (COP3) ? 2'b11 : ((COP2) ? 2'b10 : ((COP1) ? 2'b01 : 2'b00));
+                Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
                 Status_EXL <= 1;
                 EPC <= (Status_EXL) ? EPC : M_RestartPC;
@@ -441,7 +441,7 @@ module CPZero(
             // EX stage
             else if (EX_Exception_Ready) begin
                 Cause_BD <= (Status_EXL) ? Cause_BD : EX_IsBD;
-                Cause_CE <= (COP3) ? 2'b11 : ((COP2) ? 2'b10 : ((COP1) ? 2'b01 : 2'b00));
+                Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
                 Status_EXL <= 1;
                 EPC <= (Status_EXL) ? EPC : EX_RestartPC;
@@ -450,7 +450,7 @@ module CPZero(
             // ID stage
             else if (ID_Exception_Ready) begin
                 Cause_BD <= (Status_EXL) ? Cause_BD : ID_IsBD;
-                Cause_CE <= (COP3) ? 2'b11 : ((COP2) ? 2'b10 : ((COP1) ? 2'b01 : 2'b00));
+                Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
                 Status_EXL <= 1;
                 EPC <= (Status_EXL) ? EPC : ID_RestartPC;
@@ -459,7 +459,7 @@ module CPZero(
             // IF stage
             else if (IF_Exception_Ready) begin
                 Cause_BD <= (Status_EXL) ? Cause_BD : IF_IsBD;
-                Cause_CE <= (COP3) ? 2'b11 : ((COP2) ? 2'b10 : ((COP1) ? 2'b01 : 2'b00));
+                Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
                 Status_EXL <= 1;
                 EPC <= (Status_EXL) ? EPC : BadAddr_IF;

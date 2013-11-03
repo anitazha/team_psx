@@ -1,9 +1,10 @@
 #
-# ECE 18-447 Makefile.
+# Team PSX CPU Makefile. Modified from the ECE 18-447 Makefile.
 #
 # - History: 
 #   - 2011: Joshua Wise
 #   - 2013: Yoongu Kim
+#   - 2013: Anita Zhang
 #
 
 
@@ -38,7 +39,7 @@ g=\e[1;32m
 r=\e[1;31m
 
 # debug message
-m=$g18-477 Makefile: $n
+m=$gTeam PSX: $n
 
 
 ###################################################################
@@ -76,6 +77,11 @@ default:
 	@echo -e "\t    automatically \"wires\" up Verilog modules found in $usrc/*.v$n;"
 	@echo -e "\t    (not mandatory -- merely for your convenience)"
 	@echo -e ""
+	@echo -e "\t$bbios$n"
+	@echo -e "\t    compiles Verilog found in $usrc$n directory;"
+	@echo -e "\t    simulates Verilog using $bsrc/bios.dat$n as input;"
+	@echo -e "\t    places all outputs (logs, waveforms, regdump, etc.) in $bOUTPUT$n"
+	@echo -e ""
 	@echo -e ""
 	@echo -e "$bVARIABLE:$n"
 	@echo -e "\t$bINPUT$n=$uASSEMBLY$n"
@@ -100,6 +106,7 @@ default:
 	@echo -e "\tmake batch-verify BATCH=447inputs/*.s OUTPUT=outputs/myoutput"
 	@echo -e "\tmake synth"
 	@echo -e "\tmake synth OUTPUT=outputs/myoutput"
+	@echo -e "\tmake bios"
 	@echo -e ""
 	@echo -e ""
 	@echo -e "(END)"
@@ -152,6 +159,22 @@ sim: compile assemble
 	@echo -e "$mSimulation of $(INPUT) has completed in $(OUTPUT)."
 	@echo -e "$mTo view waveforms, execute the following command: $bsimvision $(OUTPUT)/sim/waveforms.shm$n"
 
+###################################################################
+### Simulate Verilog
+###################################################################
+
+bios: compile
+	@echo -e "$mCopying NCSim configuration into $(OUTPUT)..."
+	@mkdir -p $(OUTPUT)/sim
+	@cp ncsim/* $(OUTPUT)/sim
+	@cp 447ncsim/* $(OUTPUT)/sim
+	@cp `find src -iname '*.dat'` $(OUTPUT)/sim/
+	@echo -e "$mSimulating Verilog in $(OUTPUT)..."
+	cd $(OUTPUT)/sim; ncsim worklib.$(TB):module -input 447ncsim.tcl -input ncsim.tcl
+	@if grep '*W' $(OUTPUT)/sim/ncsim.log >/dev/null; \
+		then echo -e '$m$rSimulator log has warnings!$n'; fi
+	@echo -e "$mSimulation of $(INPUT) has completed in $(OUTPUT)."
+	@echo -e "$mTo view waveforms, execute the following command: $bsimvision $(OUTPUT)/sim/waveforms.shm$n"
 
 ###################################################################
 ### Verify Simulation

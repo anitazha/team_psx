@@ -76,6 +76,7 @@ module Processor(
     wire ID_LLSC;
     wire ID_RegDst, ID_ALUSrcImm, ID_MemWrite, ID_MemRead, ID_MemByte, ID_MemHalf, ID_MemSignExtend, ID_RegWrite, ID_MemtoReg;
     wire [4:0] ID_ALUOp;
+    wire ID_Cfc2, ID_Ctc2, ID_Mfc2, ID_Mtc2, ID_Lwc2, ID_Swc2;
     wire ID_Mfc0, ID_Mtc0, ID_Eret;
     wire ID_NextIsDelay;
     wire ID_CanErr, ID_ID_CanErr, ID_EX_CanErr, ID_M_CanErr;
@@ -103,6 +104,8 @@ module Processor(
     wire ID_IsFlushed;
 
     /*** EX (Execute) Signals ***/
+    wire EX_Lwc2, EX_Swc2;
+    wire [31:0] EX_CP2Out;
     wire EX_ALU_Stall, EX_Stall;
     wire [1:0] EX_RsFwdSel, EX_RtFwdSel;
     wire EX_Link;
@@ -132,6 +135,8 @@ module Processor(
 
     /*** MEM (Memory) Signals ***/
     wire M_Stall, M_Stall_Controller;
+    wire M_Lwc2, M_Swc2;
+    wire [31:0] M_CP2Out;
     wire M_LLSC;
     wire M_MemRead, M_MemWrite, M_MemByte, M_MemHalf, M_MemSignExtend;
     wire M_RegWrite, M_MemtoReg;
@@ -156,10 +161,21 @@ module Processor(
     wire WB_Stall, WB_RegWrite;
     wire [31:0] WB_ReadData, WB_ALUResult;
     wire [4:0]  WB_RtRd;
+    wire        WB_Gte;
     wire [31:0] WB_WriteData;
 
     /*** Other Signals ***/
-    wire [7:0] ID_DP_Hazards, HAZ_DP_Hazards;
+    wire  [7:0] ID_DP_Hazards, HAZ_DP_Hazards;
+
+    /*** GTE Signals ***/
+    wire [31:0] CP2_RegIn = ((ID_Ctc2 | ID_Mtc2) ? ID_ReadData2_End : ((WB_Gte) ? WB_ReadData : 32'h0));
+    wire  [1:0] CP2_mx    = Instruction[18:17];
+    wire  [1:0] CP2_vx    = Instruction[16:15];
+    wire  [1:0] CP2_tx    = Instruction[14:13];
+    wire        CP2_lm    = Instruction[10];
+    wire  [5:0] CP2_cmd   = (ID_Cfc2 | ID_Ctc2 | ID_Mfc2 | ID_Mtc2 | ID_Lwc2 | ID_Swc2) ? 6'h0 : Instruction[5:0];
+    wire  CP2_RegIn_Ready = (ID_CP2) ? 1'h1 : (WB_Gte);
+    wire  CP2_avail;
 
     /*** Assignments ***/
     assign IF_Instruction = (IF_Stall) ? 32'h00000000 : InstMem_In;
@@ -210,10 +226,6 @@ module Processor(
         end
     end
 
-    //always @(posedge clock) begin
-    //    $display("WHAT IS PC: %x and INPUT: %x", InstMem_Address, InstMem_In);
-    //end
-
     /*** Datapath Controller ***/
     Control Controller (
         .ID_Stall       (ID_Stall),
@@ -235,6 +247,12 @@ module Processor(
         .Movz           (ID_Movz),
         .Mfc0           (ID_Mfc0),
         .Mtc0           (ID_Mtc0),
+        .Cfc2           (ID_Cfc2),
+        .Ctc2           (ID_Ctc2),
+        .Mfc2           (ID_Mfc2),
+        .Mtc2           (ID_Mtc2),
+        .Lwc2           (ID_Lwc2),
+        .Swc2           (ID_Swc2),
         .CP1            (ID_CP1),
         .CP2            (ID_CP2),
         .CP3            (ID_CP3),
@@ -282,6 +300,12 @@ module Processor(
         .InstMem_Read        (InstMem_Read),
         .InstMem_Ready       (InstMem_Ready),
         .Mfc0                (ID_Mfc0),
+        .Cfc2                (ID_Cfc2),
+        .Mfc2                (ID_Mfc2),
+        .CP2_free            (CP2_avail),
+        .CP2_Lwc2            (ID_Lwc2),
+        .CP2                 (ID_CP2),
+        .WB_Gte              (WB_Gte),
         .IF_Exception_Stall  (IF_Exception_Stall),
         .ID_Exception_Stall  (ID_Exception_Stall),
         .EX_Exception_Stall  (EX_Exception_Stall),
@@ -353,6 +377,32 @@ module Processor(
         .IP                  (IP)
     );
 
+    /*** Coprocessor 2: PSX GTE ***/
+    gte CP2 (
+        .clk            (clock),
+        .rst            (reset),
+        .cfc2           (ID_Cfc2),
+        .ctc2           (ID_Ctc2),        
+        .mfc2           (ID_Mfc2),        
+        .mtc2           (ID_Mtc2),        
+        .lwc2           (ID_Lwc2),        
+        .swc2           (ID_Swc2),        
+        .gte_mx         (CP2_mx),
+        .gte_vx         (CP2_vx),
+        .gte_tx         (CP2_tx),
+        .gte_lm         (CP2_lm),
+        .gte_cmd        (CP2_cmd),
+        .reg_in         (CP2_RegIn), // add mem wb data
+        .reg_in_rdy     (CP2_RegIn_Ready),
+        .rd             (Rd),
+        .inst_rdy       ((ID_CP2 & ~(ID_Cfc2 | ID_Ctc2 | ID_Mfc2 | ID_Mtc2))),
+        .mem_re         (),
+        .mem_we         (WB_RegWrite),
+        .mem_rdy        (WB_ReadData),
+        .reg_out        (CP2_RegOut),
+        .avail          (CP2_avail)
+    );
+
     /*** PC Source Non-Exception Mux ***/
     Mux4 #(.WIDTH(32)) PCSrcStd_Mux (
         .sel  (ID_PCSrc),
@@ -415,7 +465,7 @@ module Processor(
         .ReadReg2   (Rt),
         .WriteReg   (WB_RtRd),
         .WriteData  (WB_WriteData),
-        .RegWrite   (WB_RegWrite),
+        .RegWrite   (WB_RegWrite & (~WB_Gte)),
         .ReadData1  (ID_ReadData1_RF),
         .ReadData2  (ID_ReadData2_RF)
     );
@@ -436,7 +486,7 @@ module Processor(
         .in0  (ID_ReadData2_RF),
         .in1  (M_ALUResult),
         .in2  (WB_WriteData),
-        .in3  (CP0_RegOut),
+        .in3  (((ID_Mfc0) ? CP0_RegOut : CP2_RegOut)),
         .out  (ID_ReadData2_End)
     );
 
@@ -462,6 +512,9 @@ module Processor(
     IDEX_Stage IDEX (
         .clock             (clock),
         .reset             (reset),
+        .ID_Lwc2           (ID_Lwc2),
+        .ID_Swc2           (ID_Swc2),
+        .ID_CP2Out         (CP2_RegOut),
         .ID_Flush          (ID_Exception_Flush),
         .ID_Stall          (ID_Stall),
         .EX_Stall          (EX_Stall),
@@ -498,6 +551,9 @@ module Processor(
         .ID_ReadData1      (ID_ReadData1_End),
         .ID_ReadData2      (ID_ReadData2_End),
         .ID_SignExtImm     (ID_SignExtImm[16:0]),
+        .EX_Lwc2           (EX_Lwc2),
+        .EX_Swc2           (EX_Swc2),
+        .EX_CP2Out         (EX_CP2Out),
         .EX_Link           (EX_Link),
         .EX_LinkRegDst     (EX_LinkRegDst),
         .EX_ALUSrcImm      (EX_ALUSrcImm),
@@ -596,6 +652,9 @@ module Processor(
         .EX_Flush          (EX_Exception_Flush),
         .EX_Stall          (EX_Stall),
         .M_Stall           (M_Stall),
+        .EX_Lwc2           (EX_Lwc2),
+        .EX_Swc2           (EX_Swc2),
+        .EX_CP2Out         (EX_CP2Out),
         .EX_Movn           (EX_Movn),
         .EX_Movz           (EX_Movz),
         .EX_BZero          (EX_BZero),
@@ -619,6 +678,9 @@ module Processor(
         .EX_ALU_Result     (EX_ALUResult),
         .EX_ReadData2      (EX_ReadData2_Fwd),
         .EX_RtRd           (EX_RtRd),
+        .M_Lwc2            (M_Lwc2),
+        .M_Swc2            (M_Swc2),
+        .M_CP2Out          (M_CP2Out),
         .M_RegWrite        (M_RegWrite),
         .M_MemtoReg        (M_MemtoReg),
         .M_ReverseEndian   (M_ReverseEndian),
@@ -661,6 +723,8 @@ module Processor(
     MemControl DataMem_Controller (
         .clock         (clock),
         .reset         (reset),
+        .Swc2          (M_Swc2),
+        .CP2Out        (M_CP2Out),
         .DataIn        (M_WriteData_Pre),
         .Address       (M_ALUResult),
         .MReadData     (DataMem_In),
@@ -701,11 +765,13 @@ module Processor(
         .M_ReadData     (M_MemReadData),
         .M_ALU_Result   (M_ALUResult),
         .M_RtRd         (M_RtRd),
+        .M_Gte          (M_Lwc2),
         .WB_RegWrite    (WB_RegWrite),
         .WB_MemtoReg    (WB_MemtoReg),
         .WB_ReadData    (WB_ReadData),
         .WB_ALU_Result  (WB_ALUResult),
-        .WB_RtRd        (WB_RtRd)
+        .WB_RtRd        (WB_RtRd),
+        .WB_Gte         (WB_Gte)
     );
 
     /*** WB MemtoReg Mux ***/

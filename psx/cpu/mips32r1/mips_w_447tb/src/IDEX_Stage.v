@@ -19,6 +19,9 @@
 module IDEX_Stage(
     input  clock,
     input  reset,
+    input  ID_Lwc2,
+    input  ID_Swc2,
+    input  [31:0] ID_CP2Out,
     input  ID_Flush,
     input  ID_Stall,
     input  EX_Stall,
@@ -60,6 +63,9 @@ module IDEX_Stage(
     input  [31:0] ID_ReadData2,
     input  [16:0] ID_SignExtImm, // ID_Rd, ID_Shamt included here
     // ----------------
+    output reg EX_Lwc2,
+    output reg EX_Swc2,
+    output reg [31:0] EX_CP2Out,
     output reg EX_Link,
     output [1:0] EX_LinkRegDst,
     output reg EX_ALUSrcImm,
@@ -120,6 +126,9 @@ module IDEX_Stage(
     assign EX_SignExtImm = (EX_SignExtImm_pre[16]) ? {15'h7fff, EX_SignExtImm_pre[16:0]} : {15'h0000, EX_SignExtImm_pre[16:0]};
     
     always @(posedge clock) begin
+        EX_Lwc2           <= (reset) ? 0     : ((EX_Stall) ? EX_Lwc2          : ((ID_Stall | ID_Flush) ? 5'b0 : ID_Lwc2));
+        EX_Swc2           <= (reset) ? 0     : ((EX_Stall) ? EX_Swc2          : ((ID_Stall | ID_Flush) ? 5'b0 : ID_Swc2));
+        EX_CP2Out         <= (reset) ? 0     : ((EX_Stall) ? EX_CP2Out        : ((ID_Stall | ID_Flush) ? 5'b0 : ID_CP2Out));
         EX_Link           <= (reset) ? 0     : ((EX_Stall) ? EX_Link                                       : ID_Link);
         EX_RegDst         <= (reset) ? 0     : ((EX_Stall) ? EX_RegDst                                     : ID_RegDst);
         EX_ALUSrcImm      <= (reset) ? 0     : ((EX_Stall) ? EX_ALUSrcImm                                  : ID_ALUSrcImm);

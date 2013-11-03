@@ -39,6 +39,12 @@ module Control(
     output Movz,
     output Mfc0,
     output Mtc0,
+    output Cfc2,
+    output Ctc2,
+    output Mfc2,
+    output Mtc2,
+    output Lwc2,
+    output Swc2,
     output CP1,
     output CP2,
     output CP3,
@@ -201,6 +207,17 @@ module Control(
                             default   : Datapath <= DP_None;
                         endcase
                     end
+                // Coprocessor 2
+                Op_Type_CP2 :
+                    begin
+                        case (Rs)
+                            OpRs_CF   : Datapath <= DP_Cfc2;
+                            OpRs_CT   : Datapath <= DP_Ctc2;
+                            OpRs_MF   : Datapath <= DP_Mfc2;
+                            OpRs_MT   : Datapath <= DP_Mtc2;
+                            default   : Datapath <= DP_None;
+                        endcase
+                    end
                 // Memory
                 Op_Lb   : Datapath <= DP_Lb;
                 Op_Lbu  : Datapath <= DP_Lbu;
@@ -209,12 +226,14 @@ module Control(
                 Op_Ll   : Datapath <= DP_Ll;
                 Op_Lui  : Datapath <= DP_Lui;
                 Op_Lw   : Datapath <= DP_Lw;
+                Op_Lwc2 : Datapath <= DP_Lwc2;
                 Op_Lwl  : Datapath <= DP_Lwl;
                 Op_Lwr  : Datapath <= DP_Lwr;
                 Op_Sb   : Datapath <= DP_Sb;
                 Op_Sc   : Datapath <= DP_Sc;
                 Op_Sh   : Datapath <= DP_Sh;
                 Op_Sw   : Datapath <= DP_Sw;
+                Op_Swc2 : Datapath <= DP_Swc2;
                 Op_Swl  : Datapath <= DP_Swl;
                 Op_Swr  : Datapath <= DP_Swr;
                 default : Datapath <= DP_None;
@@ -325,6 +344,17 @@ module Control(
                         default   : begin DP_Hazards <= 8'hxx;    DP_Exceptions <= 3'bxxx;   end
                     endcase
                 end
+            // Coprocessor 2
+            Op_Type_CP2 :
+                begin
+                    case (Rs)
+                        OpRs_CF   : begin DP_Hazards <= HAZ_Cfc2; DP_Exceptions <= EXC_Cfc2; end
+                        OpRs_CT   : begin DP_Hazards <= HAZ_Ctc2; DP_Exceptions <= EXC_Ctc2; end
+                        OpRs_MF   : begin DP_Hazards <= HAZ_Mfc2; DP_Exceptions <= EXC_Mfc2; end
+                        OpRs_MT   : begin DP_Hazards <= HAZ_Mtc2; DP_Exceptions <= EXC_Mtc2; end
+                        default   : begin DP_Hazards <= 8'hxx;    DP_Exceptions <= 3'bxxx;   end
+                    endcase
+                end
             // Memory
             Op_Lb   : begin DP_Hazards <= HAZ_Lb;  DP_Exceptions <= EXC_Lb;  end
             Op_Lbu  : begin DP_Hazards <= HAZ_Lbu; DP_Exceptions <= EXC_Lbu; end
@@ -333,12 +363,14 @@ module Control(
             Op_Ll   : begin DP_Hazards <= HAZ_Ll;  DP_Exceptions <= EXC_Ll;  end
             Op_Lui  : begin DP_Hazards <= HAZ_Lui; DP_Exceptions <= EXC_Lui; end
             Op_Lw   : begin DP_Hazards <= HAZ_Lw;  DP_Exceptions <= EXC_Lw;  end
+            Op_Lwc2 : begin DP_Hazards <= HAZ_Lwc2;DP_Exceptions <= EXC_Lwc2;end
             Op_Lwl  : begin DP_Hazards <= HAZ_Lwl; DP_Exceptions <= EXC_Lwl; end
             Op_Lwr  : begin DP_Hazards <= HAZ_Lwr; DP_Exceptions <= EXC_Lwr; end
             Op_Sb   : begin DP_Hazards <= HAZ_Sb;  DP_Exceptions <= EXC_Sb;  end
             Op_Sc   : begin DP_Hazards <= HAZ_Sc;  DP_Exceptions <= EXC_Sc;  end
             Op_Sh   : begin DP_Hazards <= HAZ_Sh;  DP_Exceptions <= EXC_Sh;  end
             Op_Sw   : begin DP_Hazards <= HAZ_Sw;  DP_Exceptions <= EXC_Sw;  end
+            Op_Swc2 : begin DP_Hazards <= HAZ_Swc2;DP_Exceptions <= EXC_Swc2;end
             Op_Swl  : begin DP_Hazards <= HAZ_Swl; DP_Exceptions <= EXC_Swl; end
             Op_Swr  : begin DP_Hazards <= HAZ_Swr; DP_Exceptions <= EXC_Swr; end
             default : begin DP_Hazards <= 8'hxx;   DP_Exceptions <= 3'bxxx;  end
@@ -428,6 +460,7 @@ module Control(
                 Op_Ll       : ALUOp <= AluOp_Addu;
                 Op_Lui      : ALUOp <= AluOp_Sllc;
                 Op_Lw       : ALUOp <= AluOp_Addu;
+                Op_Lwc2     : ALUOp <= AluOp_Addu;
                 Op_Lwl      : ALUOp <= AluOp_Addu;
                 Op_Lwr      : ALUOp <= AluOp_Addu;
                 Op_Ori      : ALUOp <= AluOp_Or;
@@ -437,6 +470,7 @@ module Control(
                 Op_Slti     : ALUOp <= AluOp_Slt;
                 Op_Sltiu    : ALUOp <= AluOp_Sltu;
                 Op_Sw       : ALUOp <= AluOp_Addu;
+                Op_Swc2     : ALUOp <= AluOp_Addu;
                 Op_Swl      : ALUOp <= AluOp_Addu;
                 Op_Swr      : ALUOp <= AluOp_Addu;
                 Op_Xori     : ALUOp <= AluOp_Xor;
@@ -488,11 +522,19 @@ module Control(
     assign Mtc0 = ((OpCode == Op_Type_CP0) && (Rs == OpRs_MT));
     assign Eret = ((OpCode == Op_Type_CP0) && (Rs == OpRs_ERET) && (Funct == Funct_ERET));
     
-    // Coprocessor 1,2,3 accesses (not implemented)
+    // Coprocessor 2 (Cfc2, Ctc2, Mfc2, Mtc2) control signals.
+    assign Cfc2 = ((OpCode == Op_Type_CP2) && (Rs == OpRs_CF));
+    assign Ctc2 = ((OpCode == Op_Type_CP2) && (Rs == OpRs_CT));
+    assign Mfc2 = ((OpCode == Op_Type_CP2) && (Rs == OpRs_MF));
+    assign Mtc2 = ((OpCode == Op_Type_CP2) && (Rs == OpRs_MT));
+    assign Lwc2 = (OpCode == Op_Lwc2);
+    assign Swc2 = (OpCode == Op_Swc2);
+
+    // Coprocessor 1,3 accesses (1,3 not implemented)
     assign CP1 = (OpCode == Op_Type_CP1);
-    assign CP2 = (OpCode == Op_Type_CP2);
+    assign CP2 = ((OpCode == Op_Type_CP2) | (OpCode == Op_Lwc2) | (OpCode == Op_Swc2));
     assign CP3 = (OpCode == Op_Type_CP3);
-    
+
     // Exceptions found in ID
     assign EXC_Sys = ((OpCode == Op_Type_R) && (Funct == Funct_Syscall));
     assign EXC_Bp  = ((OpCode == Op_Type_R) && (Funct == Funct_Break));

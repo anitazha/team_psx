@@ -24,6 +24,7 @@ module MEMWB_Stage(
     // Control Signals
     input  M_RegWrite,
     input  M_MemtoReg,
+    input  M_Gte,
     // Data Signals
     input  [31:0] M_ReadData,
     input  [31:0] M_ALU_Result,
@@ -33,7 +34,8 @@ module MEMWB_Stage(
     output reg WB_MemtoReg,
     output reg [31:0] WB_ReadData,
     output reg [31:0] WB_ALU_Result,
-    output reg [4:0]  WB_RtRd
+    output reg [4:0]  WB_RtRd,
+    output reg        WB_Gte
     );
     
     
@@ -68,6 +70,7 @@ module MEMWB_Stage(
         WB_ReadData   <= (reset) ? 32'b0 : ((WB_Stall) ? WB_ReadData                              : M_ReadData);
         WB_ALU_Result <= (reset) ? 32'b0 : ((WB_Stall) ? WB_ALU_Result                            : M_ALU_Result);
         WB_RtRd       <= (reset) ? 5'b0  : ((WB_Stall) ? WB_RtRd                                  : M_RtRd);
+        WB_Gte        <= (reset) ? 5'b0  : ((WB_Stall) ? WB_Gte                                   : M_Gte);
     end
 
 endmodule

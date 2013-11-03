@@ -93,9 +93,10 @@ module testbench;
     always @(halted) begin
         #0;
         if(halted === 1'b1)
-            #1000 $finish;
+            $finish;
     end
 
+    // Fake the handshake needed for OpenCores MIPS
     always @(posedge clk) begin
         if (inst_read)
             inst_ready <= 1'b1;

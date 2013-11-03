@@ -22,6 +22,9 @@ module EXMEM_Stage(
     input  EX_Stall,
     input  M_Stall,
     // Control Signals
+    input  EX_Lwc2,
+    input  EX_Swc2,
+    input  [31:0] EX_CP2Out,
     input  EX_Movn,
     input  EX_Movz,
     input  EX_BZero,
@@ -48,6 +51,9 @@ module EXMEM_Stage(
     input  [31:0] EX_ReadData2,
     input  [4:0]  EX_RtRd,
     // ------------------
+    output reg M_Lwc2,
+    output reg M_Swc2,
+    output reg [31:0] M_CP2Out,
     output reg M_RegWrite,
     output reg M_MemtoReg,
     output reg M_ReverseEndian,
@@ -89,6 +95,9 @@ module EXMEM_Stage(
     wire MovcRegWrite = (EX_Movn & ~EX_BZero) | (EX_Movz & EX_BZero);
     
     always @(posedge clock) begin
+        M_Lwc2          <= (reset) ? 0     : ((M_Stall) ? M_Lwc2          : ((EX_Stall | EX_Flush) ? 0 : EX_Lwc2));
+        M_Swc2          <= (reset) ? 0     : ((M_Stall) ? M_Swc2          : ((EX_Stall | EX_Flush) ? 0 : EX_Swc2));
+        M_CP2Out        <= (reset) ? 0     : ((M_Stall) ? M_CP2Out        : ((EX_Stall | EX_Flush) ? 0 : EX_CP2Out));
         M_RegWrite      <= (reset) ? 0     : ((M_Stall) ? M_RegWrite      : ((EX_Stall | EX_Flush) ? 0 : EX_RegWrite));
         M_RegWrite      <= (reset) ? 0     : ((M_Stall) ? M_RegWrite      : ((EX_Stall | EX_Flush) ? 0 : ((EX_Movn | EX_Movz) ? MovcRegWrite : EX_RegWrite)));
         M_MemtoReg      <= (reset) ? 0     : ((M_Stall) ? M_MemtoReg                                   : EX_MemtoReg);
