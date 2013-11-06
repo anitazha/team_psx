@@ -169,6 +169,7 @@ module Processor(
 
     /*** GTE Signals ***/
     wire [31:0] CP2_RegIn = ((ID_Ctc2 | ID_Mtc2) ? ID_ReadData2_End : ((WB_Gte) ? WB_ReadData : 32'h0));
+    wire        CP2_sf    = Instruction[19];
     wire  [1:0] CP2_mx    = Instruction[18:17];
     wire  [1:0] CP2_vx    = Instruction[16:15];
     wire  [1:0] CP2_tx    = Instruction[14:13];
@@ -388,6 +389,7 @@ module Processor(
         .mtc2           (ID_Mtc2),        
         .lwc2           (ID_Lwc2),        
         .swc2           (ID_Swc2),        
+        .gte_sf         (CP2_sf),
         .gte_mx         (CP2_mx),
         .gte_vx         (CP2_vx),
         .gte_tx         (CP2_tx),

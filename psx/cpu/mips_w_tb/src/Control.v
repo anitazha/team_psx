@@ -504,7 +504,7 @@ module Control(
      * implemented here. "IF_Flush" is defined to allow for the cancelation of a
      * Branch Delay Slot should these be implemented later.
      */
-    assign IF_Flush = 0;
+    assign IF_Flush = 1'b0;
 
     // Indicator that next instruction is a Branch Delay Slot.
     assign NextIsDelay = Datapath[15] | Datapath[14];
@@ -545,7 +545,7 @@ module Control(
     assign Right = Unaligned_Mem &  OpCode[2];
     
     // TODO: Reserved Instruction Exception must still be implemented
-    assign EXC_RI  = 0;
+    assign EXC_RI  = 1'b0;
     
 endmodule
 

@@ -1,32 +1,26 @@
 // instruction codes
-`define INST_RTPS  25'h01
-`define INST_RTPT  25'h30 
-`define INST_MVMVA 25'h12 
-`define INST_DCPL  25'h29 
-`define INST_DPCS  25'h10 
-`define INST_DPCT  25'h2A 
-`define INST_INTPL 25'h11 
-`define INST_SQR   25'h28 
-`define INST_NCS   25'h1E 
-`define INST_NCT   25'h20 
-`define INST_NCDS  25'h13 
-`define INST_NCDT  25'h16 
-`define INST_NCCS  25'h1B 
-`define INST_NCCT  25'h3F 
-`define INST_CDP   25'h14 
-`define INST_CC    25'h1C 
-`define INST_NCLIP 25'h06 
-`define INST_AVSZ3 25'h2D 
-`define INST_AVSZ4 25'h2E 
-`define INST_OP    25'h0C 
-`define INST_GPF   25'h3D 
-`define INST_GPL   25'h3E
-
-// i ghettoishly put these here until i can properly decode things
-`define INST_MFC2  32'h1CCCCCC
-`define INST_MTC2  32'h1DDDDDD
-`define INST_CFC2  32'h1EEEEEE
-`define INST_CTC2  32'h1FFFFFF
+`define INST_RTPS  6'h01
+`define INST_RTPT  6'h30 
+`define INST_MVMVA 6'h12 
+`define INST_DCPL  6'h29 
+`define INST_DPCS  6'h10 
+`define INST_DPCT  6'h2A 
+`define INST_INTPL 6'h11 
+`define INST_SQR   6'h28 
+`define INST_NCS   6'h1E 
+`define INST_NCT   6'h20 
+`define INST_NCDS  6'h13 
+`define INST_NCDT  6'h16 
+`define INST_NCCS  6'h1B 
+`define INST_NCCT  6'h3F 
+`define INST_CDP   6'h14 
+`define INST_CC    6'h1C 
+`define INST_NCLIP 6'h06 
+`define INST_AVSZ3 6'h2D 
+`define INST_AVSZ4 6'h2E 
+`define INST_OP    6'h0C 
+`define INST_GPF   6'h3D 
+`define INST_GPL   6'h3E
 
 // control register indices
 `define IDX_R11R12  0

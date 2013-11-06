@@ -13,7 +13,7 @@ SRC ?= src gte
 VCSLOG = vcs.log
 
 CC = vcs
-CCFLAGS = -sverilog -nc -debug -line +lint=all,noVCDE +warn=all -l $(VCSLOG)
+CCFLAGS = -sverilog -nc -debug -line +lint=all,noVCDE,noFIAAS +warn=all -l $(VCSLOG)
 
 TIMESTAMP := outputs/$(shell date +%m%d-%H%M%S)
 OUTPUT ?= $(TIMESTAMP)

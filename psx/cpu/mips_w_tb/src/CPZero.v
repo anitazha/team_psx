@@ -173,23 +173,23 @@ module CPZero(
     // Status Register (Register 12, Select 0)
     wire [2:0] Status_CU_321 = 3'b000;
     reg  Status_CU_0;       // Access Control to CPs, [2]->Cp3, ... [0]->Cp0
-    wire Status_RP = 0;
-    wire Status_FR = 0;
+    wire Status_RP = 1'd0;
+    wire Status_FR = 1'd0;
     reg  Status_RE;         // Reverse Endian Memory for User Mode
-    wire Status_MX = 0;
-    wire Status_PX = 0;
+    wire Status_MX = 1'd0;
+    wire Status_PX = 1'd0;
     reg  Status_BEV;        // Exception vector locations (0->Norm, 1->Bootstrap)
-    wire Status_TS = 0;
-    wire Status_SR = 0;     // Soft reset not implemented
+    wire Status_TS = 1'd0;
+    wire Status_SR = 1'd0;     // Soft reset not implemented
     reg  Status_NMI;        // Non-Maskable Interrupt
-    wire Status_RES = 0;
+    wire Status_RES = 1'd0;
     wire [1:0] Status_Custom = 2'b00;
     reg [7:0] Status_IM;    // Interrupt mask
-    wire Status_KX = 0;
-    wire Status_SX = 0;
-    wire Status_UX = 0;
+    wire Status_KX = 1'd0;
+    wire Status_SX = 1'd0;
+    wire Status_UX = 1'd0;
     reg  Status_UM;         // Base operating mode (0->Kernel, 1->User)
-    wire Status_R0 = 0;
+    wire Status_R0 = 1'd0;
     reg  Status_ERL;        // Error Level     (0->Normal, 1->Error (reset, NMI))
     reg  Status_EXL;        // Exception level (0->Normal, 1->Exception)
     reg  Status_IE;         // Interrupt Enable
@@ -202,9 +202,9 @@ module CPZero(
     reg  Cause_BD;                  // Exception occured in Branch Delay
     reg  [1:0] Cause_CE;            // CP number for CP Unusable exception
     reg  Cause_IV;                  // Indicator of general IV (0->0x180) or special IV (1->0x200)
-    wire Cause_WP = 0;
+    wire Cause_WP = 1'd0;
     reg  [7:0] Cause_IP;            // Pending HW Interrupt indicator.
-    wire Cause_ExcCode4 = 0;        // Can be made into a register when this bit is needed.
+    wire Cause_ExcCode4 = 1'd0;        // Can be made into a register when this bit is needed.
     reg  [3:0] Cause_ExcCode30;     // Description of Exception (only lower 4 bits currently used; see above)
     wire [31:0] Cause  = {Cause_BD, 1'b0, Cause_CE, 4'b0000, Cause_IV, Cause_WP,
                                  6'b000000, Cause_IP, 1'b0, Cause_ExcCode4, Cause_ExcCode30, 2'b00};
@@ -220,7 +220,7 @@ module CPZero(
     wire [31:0] PRId = {ID_Options, ID_CID, ID_PID, ID_Rev};
 
     // Configuration Register (Register 16, Select 0)
-    wire Config_M = 1;
+    wire Config_M = 1'b1;
     wire [14:0] Config_Impl = 15'b000_0000_0000_0000;
     wire Config_BE = Big_Endian;    // From parameters file
     wire [1:0] Config_AT = 2'b00;
@@ -231,7 +231,7 @@ module CPZero(
                                  4'b0000, Config_K0};
 
     // Configuration Register 1 (Register 16, Select 1)
-    wire Config1_M = 0;
+    wire Config1_M = 1'd0;
     wire [5:0] Config1_MMU = 6'b000000;
     wire [2:0] Config1_IS = 3'b000;
     wire [2:0] Config1_IL = 3'b000;
@@ -239,13 +239,13 @@ module CPZero(
     wire [2:0] Config1_DS = 3'b000;
     wire [2:0] Config1_DL = 3'b000;
     wire [2:0] Config1_DA = 3'b000;
-    wire Config1_C2 = 0;
-    wire Config1_MD = 0;
-    wire Config1_PC = 0;    // XXX Performance Counters
-    wire Config1_WR = 0;    // XXX Watch Registers
-    wire Config1_CA = 0;
-    wire Config1_EP = 0;
-    wire Config1_FP = 0;
+    wire Config1_C2 = 1'd0;
+    wire Config1_MD = 1'd0;
+    wire Config1_PC = 1'd0;    // XXX Performance Counters
+    wire Config1_WR = 1'd0;    // XXX Watch Registers
+    wire Config1_CA = 1'd0;
+    wire Config1_EP = 1'd0;
+    wire Config1_FP = 1'd0;
     wire [31:0] Config1 = {Config1_M, Config1_MMU, Config1_IS, Config1_IL, Config1_IA,
                                   Config1_DS, Config1_DL, Config1_DA, Config1_C2,
                                   Config1_MD, Config1_PC, Config1_WR, Config1_CA,
@@ -365,15 +365,15 @@ module CPZero(
     /*** Cp0 Register Assignments: Non-general exceptions (Reset, Soft Reset, NMI...) ***/
     always @(posedge clock) begin
         if (reset) begin
-            Status_BEV <= 1;
-            Status_NMI <= 0;
-            Status_ERL <= 1;
+            Status_BEV <= 'd1;
+            Status_NMI <= 'd0;
+            Status_ERL <= 'd1;
             ErrorEPC   <= 32'b0;
         end
         else if (ID_Exception_Ready & EXC_NMI) begin
-            Status_BEV <= 1;
-            Status_NMI <= 1;
-            Status_ERL <= 1;
+            Status_BEV <= 'd1;
+            Status_NMI <= 'd1;
+            Status_ERL <= 'd1;
             ErrorEPC   <= ID_RestartPC;
         end
         else begin
@@ -389,12 +389,12 @@ module CPZero(
         if (reset) begin
             Count         <= 32'b0;
             Compare       <= 32'b0;
-            Status_CU_0   <= 0;
-            Status_RE     <= 0;
+            Status_CU_0   <= 'd0;
+            Status_RE     <= 'd0;
             Status_IM     <= 8'b0;
-            Status_UM     <= 0;
-            Status_IE     <= 0;
-            Cause_IV      <= 0;
+            Status_UM     <= 'd0;
+            Status_IE     <= 'd0;
+            Cause_IV      <= 'd0;
             Cause_IP      <= 8'b0;
         end
         else begin
@@ -421,10 +421,10 @@ module CPZero(
     /*** Cp0 Register Assignments: General Exception and Interrupt Processing ***/
     always @(posedge clock) begin
         if (reset) begin
-            Cause_BD <= 0;
+            Cause_BD <= 'd0;
             Cause_CE <= 2'b00;
             Cause_ExcCode30 <= 4'b0000;
-            Status_EXL <= 0;
+            Status_EXL <= 'd0;
             EPC <= 32'h0;
             BadVAddr <= 32'h0;
         end
@@ -434,7 +434,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : M_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 1;
+                Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : M_RestartPC;
                 BadVAddr <= BadAddr_M;
             end
@@ -443,7 +443,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : EX_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 1;
+                Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : EX_RestartPC;
                 BadVAddr <= BadVAddr;
             end
@@ -452,7 +452,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : ID_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 1;
+                Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : ID_RestartPC;
                 BadVAddr <= BadVAddr;
             end
@@ -461,7 +461,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : IF_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 1;
+                Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : BadAddr_IF;
                 BadVAddr <= BadAddr_IF;
             end
@@ -471,7 +471,7 @@ module CPZero(
                 Cause_CE <= Cause_CE;
                 Cause_ExcCode30 <= Cause_ExcCode30;
                 // Without new exceptions, 'Status_EXL' is set by software or cleared by ERET.
-                Status_EXL <= (CP0_WriteCond & (Rd == 5'd12) & (Sel == 3'b000)) ? Reg_In[1] : ((Status_EXL & ERET & ~ID_Stall) ? 0 : Status_EXL);
+                Status_EXL <= (CP0_WriteCond & (Rd == 5'd12) & (Sel == 3'b000)) ? Reg_In[1] : ((Status_EXL & ERET & ~ID_Stall) ? 'd0 : Status_EXL);
                 // The EPC is also writable by software
                 EPC <= (CP0_WriteCond & (Rd == 5'd14) & (Sel == 3'b000)) ? Reg_In : EPC;
                 BadVAddr <= BadVAddr;

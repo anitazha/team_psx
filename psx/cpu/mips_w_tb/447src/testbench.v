@@ -66,8 +66,8 @@ module testbench;
             .Interrupts(5'h0), .NMI(1'b0), .IP(),
             // data access
             .DataMem_Ready(data_ready), .DataMem_Read(data_read),
-            .DataMem_In(mem_data_in), .DataMem_Write(mem_write_en),
-            .DataMem_Address(mem_addr), .DataMem_Out(mem_data_out),
+            .DataMem_In(mem_data_out), .DataMem_Write(mem_write_en),
+            .DataMem_Address(mem_addr), .DataMem_Out(mem_data_in),
             // instruction access
             .InstMem_In(inst), .InstMem_Address(pc),
             .InstMem_Ready(inst_ready), .InstMem_Read(inst_read),

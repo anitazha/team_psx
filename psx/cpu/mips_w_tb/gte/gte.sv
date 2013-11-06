@@ -8,9 +8,10 @@ module gte(
     input         mtc2,       // mov to cop2c
     input         lwc2,       // load from mem to cop2d
     input         swc2,       // load from cop2d to mem
-    input  [2:0]  gte_mx,     // Matrix multiplication vector
-    input  [2:0]  gte_vx,     // Matrix something vector
-    input  [2:0]  gte_tx,     // something matrix
+    input         gte_sf,     // Shift fraction
+    input  [1:0]  gte_mx,     // Matrix multiplication vector
+    input  [1:0]  gte_vx,     // Matrix something vector
+    input  [1:0]  gte_tx,     // something matrix
     input         gte_lm,     // limiter select
     input  [5:0]  gte_cmd,    // GTE command code
     input  [31:0] reg_in,     // data to move to external reg
@@ -26,7 +27,7 @@ module gte(
     logic              ld_inst, clr_inst;
 
     // cycles register/counter signals
-    logic        [5:0] cyc, num_cyc, curr_cyc;
+    logic        [5:0] num_cyc, curr_cyc;
     logic              en_cyc;
 
     // control and data registers and status -- for writeback
@@ -35,10 +36,6 @@ module gte(
     logic              mtc2_en, ctc2_en;
     cop2c_t            c2c; // for calculation & writeback
     cop2d_t            c2d; // for calculation & writeback
-
-    // buffered register data/index values
-    logic        [4:0] curr_rd;
-    logic       [31:0] curr_reg_in;
 
     // matrix mulitplication signals
     logic  [3:1][15:0] mx_vec1, mx_vec2, mx_vec3;
@@ -79,27 +76,43 @@ module gte(
 
     // instruction decode flags
     logic        [1:0] mx, v, cv;
-    logic              sf;
+    logic              sf, lm;
 
     // module instantiations
-    register #(6) inst_reg (.D(gte_cmd), .Q(curr_inst), .en(ld_inst), .clr(clr_inst), .*);
-    register #(6) inst_cyc (.D(cyc), .Q(num_cyc), .en(ld_inst), .clr(clr_inst), .*);
-
     up_counter #(6) cyc_reg (.Q(curr_cyc), .en(en_cyc), .clr(clr_inst), .*);
+    gte_decode   cyc_decode (.inst(gte_cmd), .inst_cnt(num_cyc));
+    gte_fsm      fsm (.*);
 
-    register #(5) rd_reg (.D(rd), .Q(curr_rd), .en(ld_inst), .clr(clr_inst), .*);
-    register #(32) reg_in_reg (.D(reg_in), .Q(curr_reg_in), .en(ld_inst), .clr(clr_inst), .*);
-
-    gte_fsm fsm (.*);
+    // latch instruction specific input
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            mx   <= 'd0;
+            v    <= 'd0;
+            cv   <= 'd0;
+            lm   <= 'd0;
+            sf   <= 'd0;
+            curr_inst <= 'd0;
+        end
+        else if (clr_inst) begin
+            mx   <= 'd0;
+            v    <= 'd0;
+            cv   <= 'd0;
+            lm   <= 'd0;
+            sf   <= 'd0;
+            curr_inst <= 'd0;
+        end
+        else if (ld_inst) begin
+            mx   <= gte_mx;
+            v    <= gte_vx;
+            cv   <= gte_tx;
+            lm   <= gte_lm;
+            sf   <= gte_sf;
+            curr_inst <= gte_cmd;
+        end
+    end
 
     // on the last cycle of the instruction GTE is "available"
     assign avail = ((curr_cyc == (num_cyc-1'd1)) & (lwc2 ? reg_in_rdy : 1'd1));
-
-    // instruction decode flags
-    assign sf = curr_inst[19];
-    assign mx = curr_inst[18:17];
-    assign v  = curr_inst[16:15];
-    assign cv = curr_inst[14:13];
 
     // external register read logic
     assign reg_out = (mfc2 | swc2) ? cop2d[rd] : (cfc2) ? cop2c[rd] : 32'h0;
@@ -110,6 +123,12 @@ module gte(
             cop2d <= 'd0;
             ipl   <= 'd0;
             mt    <= 'd0;
+            opx   <= 'd0;
+            opy   <= 'd0;
+            opz   <= 'd0;
+            ipx   <= 'd0;
+            ipy   <= 'd0;
+            ipz   <= 'd0;
             l1    <= 'd0;
             l2    <= 'd0;
             l3    <= 'd0;
@@ -138,6 +157,12 @@ module gte(
             // intermediates
             ipl   <= (avail) ? 'd0 : nxt_ipl;
             mt    <= (avail) ? 'd0 : nxt_mt;
+            opx   <= (avail) ? 'd0 : nxt_opx;
+            opy   <= (avail) ? 'd0 : nxt_opy;
+            opz   <= (avail) ? 'd0 : nxt_opz;
+            ipx   <= (avail) ? 'd0 : nxt_ipx;
+            ipy   <= (avail) ? 'd0 : nxt_ipy;
+            ipz   <= (avail) ? 'd0 : nxt_ipz;
             l1    <= (avail) ? 'd0 : nxt_l1;
             l2    <= (avail) ? 'd0 : nxt_l2;
             l3    <= (avail) ? 'd0 : nxt_l3;
@@ -402,7 +427,7 @@ module gte(
         c2d.lzcs      = cop2d[`IDX_LZCS];
         c2d.lzcr      = cop2d[`IDX_LZCR];
         
-        // setup for matrix and vector multiply
+        // setup for matrix multiply
         if (mx == 0) begin
             mx_vec1 = c2c.r1;
             mx_vec2 = c2c.r2;
@@ -419,6 +444,7 @@ module gte(
             mx_vec3 = c2c.lb;
         end
 
+        // setup for vector multiply
         if (v == 0) begin
             v_vec[1] = c2d.vx[0];
             v_vec[2] = c2d.vy[0];
@@ -435,6 +461,7 @@ module gte(
             v_vec[3] = c2d.vz[2];
         end
 
+        // setup for some other vector
         if (cv == 0) begin
             cv_vec[1] = c2c.trx;
             cv_vec[2] = c2c.try;
@@ -455,16 +482,16 @@ module gte(
         if (reg_in_rdy) begin
             if (mtc2 | lwc2) begin
                 mtc2_en = 1'h1;
-                nxt_cop2d[curr_rd] = curr_reg_in;
+                nxt_cop2d[rd] = reg_in;
             end
             else if (ctc2) begin
                 ctc2_en = 1'h1;
-                nxt_cop2c[curr_rd] = curr_reg_in;
+                nxt_cop2c[rd] = reg_in;
             end
         end
 
         // General GTE command execution
-        case({{19{1'b0}}, curr_inst[5:0]})
+        case(curr_inst)
             `INST_RTPS: begin
                 case(curr_cyc)
                     6'd0: begin
@@ -1190,9 +1217,9 @@ module gte(
                         c2d.mac[3] = mt[3][43:12];
                     end
                     6'd7: begin
-                        c2d.ir[1] = limA1C(((sf) ? mt[1][43:12] : mt[1][31:0]), sf);
-                        c2d.ir[2] = limA2C(((sf) ? mt[2][43:12] : mt[2][31:0]), sf);
-                        c2d.ir[3] = limA3C(((sf) ? mt[3][43:12] : mt[3][31:0]), sf);
+                        c2d.ir[1] = limA1C(((sf) ? mt[1][43:12] : mt[1][31:0]), lm);
+                        c2d.ir[2] = limA2C(((sf) ? mt[2][43:12] : mt[2][31:0]), lm);
+                        c2d.ir[3] = limA3C(((sf) ? mt[3][43:12] : mt[3][31:0]), lm);
                     end
                 endcase
             end
@@ -1791,9 +1818,8 @@ module gte_fsm(
 endmodule: gte_fsm
 
 module gte_decode(
-    input  logic [24:0] inst);
-
-    logic [5:0] inst_cnt;
+    input  logic [5:0] inst,
+    output logic [5:0] inst_cnt);
 
     always_comb begin
         case (inst)
