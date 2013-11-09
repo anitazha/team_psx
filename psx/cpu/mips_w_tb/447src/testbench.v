@@ -98,6 +98,7 @@ module testbench;
 
     // Fake the handshake needed for OpenCores MIPS
     always @(posedge clk) begin
+        //$display("Current instruction: %x PC: %x", inst, pc);
         if (inst_read)
             inst_ready <= 1'b1;
         else
@@ -105,7 +106,7 @@ module testbench;
     end
 
     always @(posedge clk) begin
-        if (data_read)
+        if (data_read | mem_write_en)
             data_ready <= 1'b1;
         else
             data_ready <= 1'b0;

@@ -12,6 +12,7 @@ zeroloop:
     sb $t1, 0($t2)
     addiu $t3, $t3, 1
     bne $t3, $t0, zeroloop
+    nop
 
     # outer loop: over i = 2..16 (index = $t0, limit = $t1)
     ori $t0, $0, 2
@@ -30,9 +31,11 @@ innerloop:
     # loop if j < 256
     sub $t4, $t3, $t2
     bgtz $t4, innerloop
+    nop
     # i++; outerloop
     addiu $t0, $t0, 1
     bne $t0, $t1, outerloop
+    nop
 
     # find the 50th prime
     addiu $t0, $s0, 1 # ptr into primes array (start at primes[1] -> first probe at 2)
@@ -41,8 +44,10 @@ primeloop:
     addiu $t0, $t0, 1 # next array elem
     lbu $t2, 0($t0)
     beq $t2, $0, primeloop # not prime? continue
+    nop
     addiu $t1, $t1, -1 # prime: decrement counter
     bne $t1, $0, primeloop # keep looking if not at 5000th prime
+    nop
 
     # find index of 50th prime: ptr - array base
     subu $t3, $t0, $s0

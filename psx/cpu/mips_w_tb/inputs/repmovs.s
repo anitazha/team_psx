@@ -9,6 +9,7 @@ sw    $3, 0($2)
 addiu $2, $2, 4
 addiu $4, $4, -1
 bne   $4, $0, loading
+nop
 
 addiu $2, $0, 400
 lui   $3, 0x1000
@@ -21,6 +22,7 @@ addiu $3, $3, 1
 addiu $4, $4, 1
 addiu $2, $2, -1
 bne   $2, $0, CopyLoop
+nop
 
 addiu $2, $0, 100
 lui   $3, 0x5050
@@ -31,10 +33,13 @@ ori   $4, $4, 0x1000
 CheckLoop:
 lw    $5, 0($4)
 bne   $5, $3, Bad
+nop
 addiu $4, $4, 4
 addiu $2, $2, -1
 bne   $2, $0, CheckLoop 
+nop
 j     Finish     
+nop
 
 Bad:
 addiu $10, 0xbaadbaad

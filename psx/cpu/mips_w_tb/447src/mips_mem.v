@@ -129,7 +129,7 @@ module mips_mem(addr1,data_in1,data_out1,we1,excpt1,allow_kernel1,kernel1,
    input [31:0]  data_in1;      // Memory write data
    output [31:0] data_out1;     // Memory read data
    reg [31:0] 	 data_out1;
-   input [0:3] 	 we1;           // Write enable (active high; 1 bit per byte)
+   input [3:0] 	 we1;           // Write enable (active high; 1 bit per byte)
    output 	 excpt1;        // Exception occurred (active high)
    reg 		 excpt1;
    input 	 allow_kernel1; // Is kernel access allowed? (active high)
@@ -141,7 +141,7 @@ module mips_mem(addr1,data_in1,data_out1,we1,excpt1,allow_kernel1,kernel1,
    input [31:0]  data_in2;      // Memory write data
    output [31:0] data_out2;     // Memory read data
    reg [31:0] 	 data_out2;
-   input [0:3]	 we2;           // Write enable (active high; 1 bit per byte)
+   input [3:0]	 we2;           // Write enable (active high; 1 bit per byte)
    output 	 excpt2;        // Exception occurred (active high)
    reg 		 excpt2;
    input 	 allow_kernel2; // Is kernel access allowed? (active high)

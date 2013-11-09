@@ -1,4 +1,6 @@
 .text
+addiu $10, $zero, 0x10000000
+addiu $11, $zero, 0x123456ff
 
         # Store word aligned
         sw $11, 0($10)

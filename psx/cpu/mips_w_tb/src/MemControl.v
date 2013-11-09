@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`define LE
 /*
  * File         : MemControl.v
  * Project      : University of Utah, XUM Project MIPS32 core
@@ -59,7 +60,11 @@ module MemControl(
          Normal memory accesses in the processor are Big Endian. The endianness can be reversed
          to Little Endian in User Mode only.
     */
+`ifdef LE
+    wire BE = 1'b0;
+`elsif
     wire BE = KernelMode | ~ReverseEndian;
+`endif
     
     /*** Indicator that the current memory reference must be word-aligned ***/
     wire Word = ~(Half | Byte | Left | Right);

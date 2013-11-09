@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$m = "\e[1;32m18-477 Makefile: \e[0m";
+$m = "\e[1;32mTeam PSX: \e[0m";
 
 $refFilename = $ARGV[0];
 $refFilename =~ s/\.s/\.reg/;

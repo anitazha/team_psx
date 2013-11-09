@@ -1,4 +1,9 @@
 .text
+addiu $10, $zero, 0x10000000
+addiu $11, $zero, 0x00AA
+addiu $12, $zero, 0x00BB
+addiu $13, $zero, 0x00CC
+addiu $14, $zero, 0x00DD
         # Store byte
         sb $11, 0($10)
 

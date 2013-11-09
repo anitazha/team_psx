@@ -389,12 +389,12 @@ module CPZero(
         if (reset) begin
             Count         <= 32'b0;
             Compare       <= 32'b0;
-            Status_CU_0   <= 'd0;
-            Status_RE     <= 'd0;
+            Status_CU_0   <= 1'd0;
+            Status_RE     <= 1'd0;
             Status_IM     <= 8'b0;
-            Status_UM     <= 'd0;
-            Status_IE     <= 'd0;
-            Cause_IV      <= 'd0;
+            Status_UM     <= 1'd0;
+            Status_IE     <= 1'd0;
+            Cause_IV      <= 1'd0;
             Cause_IP      <= 8'b0;
         end
         else begin

@@ -46,7 +46,7 @@ module Processor(
     wire        saw_syscall;            // used by the 447 testbench
     wire        syscall_halt;           // used by the 447 testbench
     wire        syscall_en;             // used by the 447 testbench
-    reg   [2:0] halt_count;
+    reg   [5:0] halt_count;
 
     /*** MIPS Instruction and Components (ID Stage) ***/
     wire [31:0] Instruction;
@@ -180,7 +180,7 @@ module Processor(
     wire [31:0] CP2_RegOut;
 
     /*** Assignments ***/
-    assign IF_Instruction = (IF_Stall) ? 32'h00000000 : InstMem_In;
+    assign IF_Instruction = (IF_Stall | (saw_syscall | syscall_halt)) ? 32'h00000000 : InstMem_In;
     assign IF_IsBDS = ID_NextIsDelay;
     assign HAZ_DP_Hazards = {ID_DP_Hazards[7:4], EX_WantRsByEX, EX_NeedRsByEX, EX_WantRtByEX, EX_NeedRtByEX};
     assign IF_EXC_AdIF = IF_PCOut[1] | IF_PCOut[0];
@@ -218,11 +218,11 @@ module Processor(
     always @(posedge clock) begin
         if (reset) begin
             halted <= 1'b0;
-            halt_count <= 3'b0;
+            halt_count <= 'b0;
         end
         else if (saw_syscall) begin
             halt_count <= (halt_count + 1'b1);
-            if (halt_count == 3'd7) begin
+            if (halt_count == 6'd33) begin
                 halted <= 1'b1;
             end
         end

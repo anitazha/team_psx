@@ -138,7 +138,7 @@ module ALU(
                 AluOp_Msub  : HILO <= HILO - Mult_Result;
                 AluOp_Msubu : HILO <= HILO - Multu_Result;
                 AluOp_Mthi  : HILO <= {A, LO};
-                AluOp_Mtlo  : HILO <= {HI, B};
+                AluOp_Mtlo  : HILO <= {HI, A};
                 default     : HILO <= HILO;
             endcase
         end
