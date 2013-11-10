@@ -155,133 +155,113 @@ endmodule
 // altera message_level Level1 
 // altera message_off 10034 10035 10036 10037 10230 10240 10030 
 
-module qsys_sdram_a2_sdram_0 (
-                               // inputs:
-                                az_addr,
-                                az_be_n,
-                                az_cs,
-                                az_data,
-                                az_rd_n,
-                                az_wr_n,
-                                clk,
-                                reset_n,
+module qsys_sdram_a2_sdram_0 (// inputs:
+                              input  [24:0] az_addr,
+                              input  [ 3:0] az_be_n,
+                              input         az_cs,
+                              input  [31:0] az_data,
+                              input         az_rd_n,
+                              input         az_wr_n,
+                              input         clk,
+                              input         reset_n,
+			      
+                              // outputs:
+                              output [31:0] za_data,
+                              output        za_valid,
+                              output        za_waitrequest,
+                              output [12:0] zs_addr,
+                              output [ 1:0] zs_ba,
+                              output        zs_cas_n,
+                              output        zs_cke,
+                              output        zs_cs_n,
+			      //zs_dq,
+                              output [ 3:0] zs_dqm,
+                              output        zs_ras_n,
+                              output        zs_we_n,
 
-                               // outputs:
-                                za_data,
-                                za_valid,
-                                za_waitrequest,
-                                zs_addr,
-                                zs_ba,
-                                zs_cas_n,
-                                zs_cke,
-                                zs_cs_n,
-                                zs_dq,
-                                zs_dqm,
-                                zs_ras_n,
-                                zs_we_n
-                             )
-;
+			      input  [31:0] sd_dq_out,
+			      output [31:0] sd_dq_in,
+			      output        sd_oe_out
+                              );
 
-  output  [ 31: 0] za_data;
-  output           za_valid;
-  output           za_waitrequest;
-  output  [ 12: 0] zs_addr;
-  output  [  1: 0] zs_ba;
-  output           zs_cas_n;
-  output           zs_cke;
-  output           zs_cs_n;
-  inout   [ 31: 0] zs_dq;
-  output  [  3: 0] zs_dqm;
-  output           zs_ras_n;
-  output           zs_we_n;
-  input   [ 24: 0] az_addr;
-  input   [  3: 0] az_be_n;
-  input            az_cs;
-  input   [ 31: 0] az_data;
-  input            az_rd_n;
-  input            az_wr_n;
-  input            clk;
-  input            reset_n;
+   wire [ 23: 0]    CODE;
+   reg              ack_refresh_request;
+   reg [ 24: 0]     active_addr;
+   wire [  1: 0]    active_bank;
+   reg              active_cs_n;
+   reg [ 31: 0]     active_data;
+   reg [  3: 0]     active_dqm;
+   reg              active_rnw;
+   wire             almost_empty;
+   wire             almost_full;
+   wire             bank_match;
+   wire [  9: 0]    cas_addr;
+   wire             clk_en;
+   wire [  3: 0]    cmd_all;
+   wire [  2: 0]    cmd_code;
+   wire             cs_n;
+   wire             csn_decode;
+   wire             csn_match;
+   wire [ 24: 0]    f_addr;
+   wire [  1: 0]    f_bank;
+   wire             f_cs_n;
+   wire [ 31: 0]    f_data;
+   wire [  3: 0]    f_dqm;
+   wire             f_empty;
+   reg              f_pop;
+   wire             f_rnw;
+   wire             f_select;
+   wire [ 61: 0]    fifo_read_data;
+   reg [ 12: 0]     i_addr;
+   reg [  3: 0]     i_cmd;
+   reg [  2: 0]     i_count;
+   reg [  2: 0]     i_next;
+   reg [  2: 0]     i_refs;
+   reg [  2: 0]     i_state;
+   reg              init_done;
+   reg [ 12: 0]     m_addr /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
+   reg [  1: 0]     m_bank /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
+   reg [  3: 0]     m_cmd /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
+   reg [  2: 0]     m_count;
+   reg [ 31: 0]     m_data /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON ; FAST_OUTPUT_ENABLE_REGISTER=ON"  */;
+   reg [  3: 0]     m_dqm /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
+   reg [  8: 0]     m_next;
+   reg [  8: 0]     m_state;
+   reg              oe /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_ENABLE_REGISTER=ON"  */;
+   wire             pending;
+   wire             rd_strobe;
+   reg [  1: 0]     rd_valid;
+   reg [ 12: 0]     refresh_counter;
+   reg              refresh_request;
+   wire             rnw_match;
+   wire             row_match;
+   wire [ 23: 0]    txt_code;
+   reg              za_cannotrefresh;
+   
+   reg [ 31: 0]     za_data_out /* synthesis ALTERA_ATTRIBUTE = "FAST_INPUT_REGISTER=ON"  */;
+   reg              za_valid_out;
 
-  wire    [ 23: 0] CODE;
-  reg              ack_refresh_request;
-  reg     [ 24: 0] active_addr;
-  wire    [  1: 0] active_bank;
-  reg              active_cs_n;
-  reg     [ 31: 0] active_data;
-  reg     [  3: 0] active_dqm;
-  reg              active_rnw;
-  wire             almost_empty;
-  wire             almost_full;
-  wire             bank_match;
-  wire    [  9: 0] cas_addr;
-  wire             clk_en;
-  wire    [  3: 0] cmd_all;
-  wire    [  2: 0] cmd_code;
-  wire             cs_n;
-  wire             csn_decode;
-  wire             csn_match;
-  wire    [ 24: 0] f_addr;
-  wire    [  1: 0] f_bank;
-  wire             f_cs_n;
-  wire    [ 31: 0] f_data;
-  wire    [  3: 0] f_dqm;
-  wire             f_empty;
-  reg              f_pop;
-  wire             f_rnw;
-  wire             f_select;
-  wire    [ 61: 0] fifo_read_data;
-  reg     [ 12: 0] i_addr;
-  reg     [  3: 0] i_cmd;
-  reg     [  2: 0] i_count;
-  reg     [  2: 0] i_next;
-  reg     [  2: 0] i_refs;
-  reg     [  2: 0] i_state;
-  reg              init_done;
-  reg     [ 12: 0] m_addr /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
-  reg     [  1: 0] m_bank /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
-  reg     [  3: 0] m_cmd /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
-  reg     [  2: 0] m_count;
-  reg     [ 31: 0] m_data /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON ; FAST_OUTPUT_ENABLE_REGISTER=ON"  */;
-  reg     [  3: 0] m_dqm /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_REGISTER=ON"  */;
-  reg     [  8: 0] m_next;
-  reg     [  8: 0] m_state;
-  reg              oe /* synthesis ALTERA_ATTRIBUTE = "FAST_OUTPUT_ENABLE_REGISTER=ON"  */;
-  wire             pending;
-  wire             rd_strobe;
-  reg     [  1: 0] rd_valid;
-  reg     [ 12: 0] refresh_counter;
-  reg              refresh_request;
-  wire             rnw_match;
-  wire             row_match;
-  wire    [ 23: 0] txt_code;
-  reg              za_cannotrefresh;
-  reg     [ 31: 0] za_data /* synthesis ALTERA_ATTRIBUTE = "FAST_INPUT_REGISTER=ON"  */;
-  reg              za_valid;
-  wire             za_waitrequest;
-  wire    [ 12: 0] zs_addr;
-  wire    [  1: 0] zs_ba;
-  wire             zs_cas_n;
-  wire             zs_cke;
-  wire             zs_cs_n;
-  wire    [ 31: 0] zs_dq;
-  wire    [  3: 0] zs_dqm;
-  wire             zs_ras_n;
-  wire             zs_we_n;
-  assign clk_en = 1;
-  //s1, which is an e_avalon_slave
-  assign {zs_cs_n, zs_ras_n, zs_cas_n, zs_we_n} = m_cmd;
-  assign zs_addr = m_addr;
-  assign zs_cke = clk_en;
-  assign zs_dq = oe?m_data:{32{1'bz}};
-  assign zs_dqm = m_dqm;
-  assign zs_ba = m_bank;
-  assign f_select = f_pop & pending;
-  assign f_cs_n = 1'b0;
-  assign cs_n = f_select ? f_cs_n : active_cs_n;
-  assign csn_decode = cs_n;
-  assign {f_rnw, f_addr, f_dqm, f_data} = fifo_read_data;
-  qsys_sdram_a2_sdram_0_input_efifo_module the_qsys_sdram_a2_sdram_0_input_efifo_module
+   assign za_data = za_data_out;
+   assign za_valid = za_valid_out;
+   
+   assign clk_en = 1;
+   //s1, which is an e_avalon_slave
+   assign {zs_cs_n, zs_ras_n, zs_cas_n, zs_we_n} = m_cmd;
+   assign zs_addr = m_addr;
+   assign zs_cke = clk_en;
+   //assign zs_dq = oe?m_data:{32{1'bz}};
+   assign sd_dq_in = m_data;
+   assign sd_oe_out = oe;
+   assign zs_dqm = m_dqm;
+   assign zs_ba = m_bank;
+   assign f_select = f_pop & pending;
+   assign f_cs_n = 1'b0;
+   assign cs_n = f_select ? f_cs_n : active_cs_n;
+   assign csn_decode = cs_n;
+   assign {f_rnw, f_addr, f_dqm, f_data} = fifo_read_data;
+
+   
+   qsys_sdram_a2_sdram_0_input_efifo_module the_qsys_sdram_a2_sdram_0_input_efifo_module
     (
       .almost_empty (almost_empty),
       .almost_full  (almost_full),
@@ -670,9 +650,9 @@ module qsys_sdram_a2_sdram_0 (
   always @(posedge clk or negedge reset_n)
     begin
       if (reset_n == 0)
-          za_data <= 0;
+          za_data_out <= 0;
       else 
-        za_data <= zs_dq;
+        za_data_out <= sd_dq_out;
     end
 
 
@@ -680,9 +660,9 @@ module qsys_sdram_a2_sdram_0 (
   always @(posedge clk or negedge reset_n)
     begin
       if (reset_n == 0)
-          za_valid <= 0;
+          za_valid_out <= 0;
       else if (1)
-          za_valid <= rd_valid[1];
+          za_valid_out <= rd_valid[1];
     end
 
 

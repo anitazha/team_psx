@@ -1,7 +1,6 @@
 
 
-module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
-		      input  logic 	  dll_locked,
+module mem_controller(input  logic  clk, rst,
 		      output logic [ 6:0] mem_controller_state,
 		      output logic [ 6:0] addr_interpreter_state,
 		      
@@ -13,9 +12,12 @@ module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
 		      output logic 	  dram_clk,
 		      output logic 	  dram_cs_n,
 		      output logic [ 3:0] dram_dqm,
-		      inout  wire  [31:0] dram_dq,
+		      //inout  wire  [31:0] dram_dq,
 		      output logic 	  dram_ras_n,
 		      output logic 	  dram_we_n,
+		      output logic [31:0] dram_dq_in,
+		      input  logic [31:0] dram_dq_out,
+		      output logic        dram_oe_out,
 		      
 		      /* CPU DATA */
 		      input  logic [31:0] data_addr,
@@ -53,7 +55,10 @@ module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
    
    /* INTERNAL LINES */
    // - memory module interconnects 
-   wire        reset_controller_out;
+   wire        rst_controller_out;
+   wire        altpll_0_c0_clk;
+   wire        pll_locked;
+   
    wire [16:0] blk_addr;
    wire [31:0] blk_data;
    
@@ -128,12 +133,16 @@ module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
 			       .zs_cas_n       (dram_cas_n),
 			       .zs_cke         (dram_cke),
 			       .zs_cs_n        (dram_cs_n),
-			       .zs_dq          (dram_dq),
+			       //.zs_dq          (dram_dq),
 			       .zs_dqm         (dram_dqm),
 			       .zs_ras_n       (dram_ras_n),
-			       .zs_we_n        (dram_we_n));
+			       .zs_we_n        (dram_we_n),
+			       /* bidirectional dq lines */
+			       .sd_dq_out      (dram_dq_out),
+			       .sd_dq_in       (dram_dq_in),
+			       .sd_oe_out      (dram_oe_out));
 
-   qsys_sdram_a2_altpll_0 altpll(.clk       (clk_clk),
+   qsys_sdram_a2_altpll_0 altpll(.clk       (clk),
 				 .reset     (rst_controller_out),
 				 .read      (),
 				 .write     (),
@@ -142,7 +151,7 @@ module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
 				 .writedata (),
 				 .c0        (altpll_0_c0_clk),
 				 .areset    (),
-				 .locked    (),
+				 .locked    (pll_locked),
 				 .phasedone ());
    altera_reset_controller
      #(.NUM_RESET_INPUTS        (1),
@@ -184,13 +193,14 @@ module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
 				.blk_addr       (blk_addr),
 				.blk_data       (blk_data),
 				/* SDRAM */
-				.sd_data_o      (sd_data_o),
+				.sd_data_o      (dram_dq_out/*sd_data_o*/),
 				.sd_valid       (sd_valid),
+				.sd_wr_done     (dram_oe_out),
 				.sd_waitrequest (sd_waitrequest),
 				.sd_addr        (sd_addr),
 				.sd_data_i      (sd_data_i),
 				.sd_wen         (sd_wen),
-				.sd_stb         (sd_ren),
+				.sd_ren         (sd_ren),
 				/* scratch pad (BLOCK RAM) */
 				.sc_data_o      (sc_data_o),
 				.sc_addr        (sc_addr),
@@ -251,7 +261,7 @@ module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
 	/* wait for memory request */
 	IDLE: begin
 	   /* memory access from data bus */
-	   if (data_active && dll_locked) begin
+	   if (data_active && pll_locked) begin
 	      if (data_ren) begin
 		 next_state = READ_DATA_INIT;
 		 next_addr = data_addr;
@@ -270,7 +280,7 @@ module mem_controller(input  logic  clk, clk_133_0, clk_133_3, rst,
 	      end
 	   end
 	   /* memory access from instruction bus */
-	   else if (inst_active && dll_locked) begin
+	   else if (inst_active && pll_locked) begin
 	      if (inst_ren) begin
 		 next_state = READ_INST_INIT;
 		 next_addr = inst_addr;

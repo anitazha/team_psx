@@ -1,11 +1,12 @@
 
 
-module memory_test
+module test_mem_top
 	(input  logic        CLOCK_50,
 	 input  logic [3:0]  KEY,
 	 input  logic [17:0] SW,
 	 output logic [17:0] LEDR,
 	 output logic [8:0]  LEDG,
+	 output logic [35:0] GPIO,
 	 
 	 /* SDRAM CHIP INTERFACE */
 	 output logic [12:0] DRAM_ADDR,
@@ -25,7 +26,7 @@ module memory_test
    localparam IR_WAIT = 3'b010;
    localparam IDONE   = 3'b100;
    
-   wire      clk, clk_33, clk_100, clk_133_0, clk_133_3, clk_50, rst;
+   wire      clk, rst;
    wire      dll_locked;
    wire      reset_controller_out;
    
@@ -47,7 +48,10 @@ module memory_test
    wire        dram_cas_n, dram_cke, dram_cs_n; 
    wire	       dram_ras_n, dram_we_n, dram_clk;
    wire [3:0]  dram_dqm;
-   wire [31:0] dram_dq;
+   wire [31:0] dram_dq_out, dram_dq_in;
+   wire        dram_oe_out;
+
+   reg [31:0]  dram_reg_in, dram_reg_out;
    
    wire [6:0]  mem_controller_state;
    wire [6:0]  addr_interpreter_state;
@@ -58,10 +62,10 @@ module memory_test
    
    assign data_addr = {15'd0, SW[16:2], 2'b00};
    assign inst_addr = 32'hBFC0_0000;
-   assign data_data_i = {SW[15:0], SW[15:0]};
+   assign data_data_i = 32'h12345678;
    
    assign clk = CLOCK_50;
-   assign rst = SW[17];
+   assign rst = ~KEY[0];
    
    assign DRAM_CLK   = dram_clk;
    assign DRAM_ADDR  = dram_addr;
@@ -69,11 +73,15 @@ module memory_test
    assign DRAM_CAS_N = dram_cas_n;
    assign DRAM_CKE   = dram_cke;
    assign DRAM_CS_N  = dram_cs_n;
-   assign DRAM_DQ    = dram_dq;
+   assign DRAM_DQ    = dram_oe_out ? dram_dq_in : {32{1'bz}};
    assign DRAM_DQM   = dram_dqm;
    assign DRAM_RAS_N = dram_ras_n;
    assign DRAM_WE_N  = dram_we_n;
-   
+   assign dram_dq_out = DRAM_DQ;
+
+   assign GPIO[31:0] = KEY[1] ? dram_reg_out : dram_reg_in;
+   assign GPIO[32]   = dram_oe_out;
+
    assign LEDG[7:0]  =  ((SW[1:0] == 2'b01) ? {1'b0, mem_controller_state} :
 			((SW[1:0] == 2'b10) ? {curr_statd, curr_stati} :
 			((SW[1:0] == 2'b11) ? {1'b0, addr_interpreter_state} :
@@ -85,43 +93,29 @@ module memory_test
 			  inst_ack, 
 			  2'b00})));
    
-   assign LEDR[15:0] = ((~KEY[3:0] == 4'b0001) ? data_output[15:0]  :
-			((~KEY[3:0] == 4'b0010) ? data_output[31:16] :
-			 ((~KEY[3:0] == 4'b0100) ? inst_output[15:0]  :
-			  ((~KEY[3:0] == 4'b1000) ? inst_output[31:16] : 
-			   ((~KEY[3:0] == 4'b1111) ? DRAM_DQ[31:16]     : 
-			    DRAM_DQ[15:0])))));
+   assign LEDR[15:0] = ((SW[17:16] == 2'b00) ? data_output[15:0]  :
+			((SW[17:16] == 2'b01) ? data_output[31:16] :
+			 ((SW[17:16] == 2'b10) ? inst_output[15:0]  :
+			  ((SW[17:16] == 2'b11) ? inst_output[31:16] : 
+			   SW[15:0]))));
    
    /* memory module */
-   mem_controller mem_c(.clk       (CLOCK_50),
-			.clk_133_0 (clk_133_0),
-			.clk_133_3 (clk_133_3),
-			.rst       (rst),
+   mem_controller mem_c(.clk (clk),
+			.rst (rst),
 			.*);
 
-   /* PLL clock generator */
-   pll_50_100_133 pll(.areset (reset_controller_out),
-		      .inclk0 (CLOCK_50),
-		      .c0     (clk_33),
-		      .c1     (clk_100),
-		      .c2     (clk_133_0),
-		      .c3     (clk_133_3),
-		      .c4     (clk_50),
-		      .locked (dll_locked));
-   
-   /* reset signal synchronizer for sdram controller */
-   altera_reset_controller #(.NUM_RESET_INPUTS        (1),
-			     .OUTPUT_RESET_SYNC_EDGES ("deassert"),
-			     .SYNC_DEPTH              (2))
-   rst_controller(.reset_in0  (rst),
-		  .clk        (clk),
-		  .reset_out  (reset_controller_out),
-		  .reset_in1  (1'b0), // the rest are not used
-		  .reset_in2  (1'b0), .reset_in3  (1'b0), .reset_in4  (1'b0),
-		  .reset_in5  (1'b0), .reset_in6  (1'b0), .reset_in7  (1'b0),
-		  .reset_in8  (1'b0), .reset_in9  (1'b0), .reset_in10 (1'b0),
-		  .reset_in11 (1'b0), .reset_in12 (1'b0), .reset_in13 (1'b0),
-		  .reset_in14 (1'b0), .reset_in15 (1'b0));
+   /* Latch values from DRAM_DQ in/out for SignalTap */
+   always @ (posedge clk, posedge rst) begin
+      if (rst) begin
+	 dram_reg_in <= 32'b0;
+	 dram_reg_out <= 32'b0;
+      end
+      else begin
+	 dram_reg_in <=  dram_dq_in;
+	 dram_reg_out <= DRAM_DQ;
+      end
+   end
+
    
    /* Latch value from reads */
    always @(posedge clk, posedge rst) begin
