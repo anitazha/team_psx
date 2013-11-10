@@ -1,22 +1,31 @@
 
 
 
-module cpu_mem_controller(input logic clk, rst,
-			  input logic [31:0]  ADDR,
-			  input logic [31:0]  DATA_I,
-			  input logic 	      REN, WEN,
-			  output logic 	      ACK,
-			  output logic [31:0] DATA_O,
+module addr_interpreter(input logic clk, rst,
+			input logic [31:0]  addr,
+			input logic [31:0]  data_i,
+			input logic 	    ren, wen,
+			output logic 	    ack,
+			output logic [31:0] data_o,
+		   
+			/* BLOCK RAM INTERFACE */
+			output logic [16:0] blk_addr,
+			output logic [31:0] blk_data,
 
-			  /* BLOCK RAM INTERFACE */
-			  input logic [31:0]  dout_o,
-			  output logic [19:0] addr_o,
-			  output logic 	      wea_o,
-			  output logic [31:0] din_o);
+			/* SDRAM INTERFACE */
+			input logic [31:0]  sd_data_o,
+			input logic 	    sd_valid,
+			input logic 	    sd_waitrequest,
+			output logic [24:0] sd_addr,
+			output logic [31:0] sd_data_i,
+			output logic 	    sd_rd,
+			output logic 	    sd_wr//,
+			
+			/* HW REGISTER INTERFACE */
+			);
 
 
    /* PARAMETERS */
-
    /* state declarations */
    parameter IDLE    = 4'b0001;
    parameter READ_0  = 4'b0010;
@@ -32,8 +41,8 @@ module cpu_mem_controller(input logic clk, rst,
 
    /* constants */
    localparam BIOS_TAG_1 = 32'h1FC00000;
-   localparam BIOS_TAG_2 = 32'h9FC0000;
-   localparam BIOS_TAG_3 = 32'hBFC0000;
+   localparam BIOS_TAG_2 = 32'h9FC00000;
+   localparam BIOS_TAG_3 = 32'hBFC00000;
    
    localparam MAINMEM_TAG_1  = 3'b000;       // KUSEG
    localparam MAINMEM_TAG_2  = 3'b100;       // KSEG0

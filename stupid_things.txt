@@ -1,9 +1,12 @@
 STUPID THINGS
 -------------
-A grand list of errors and issues we ran into that didn't have a clear solution.
+A grand list of errors and issues we ran into that didn't have a 
+clear solution.
 
-- When using debug cores in vivado, make sure the path to the project is not too long. When running 'Implement Design' the process will error at opt_design
+- When using debug cores in vivado, make sure the path to the project is not 
+too long. When running 'Implement Design' the process will error at opt_design
 
 - sudo everything
 
-- 
+- When using quartus, DON'T create bidirectional logic anywhere but the top
+module. DON'T propagate inouts through modules, keep them only in the top.

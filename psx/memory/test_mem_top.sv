@@ -12,8 +12,9 @@ module test_mem_top(input wire RESET, SYSCLK_P, SYSCLK_N,
    localparam R_WAIT = 5'b01000;
    localparam DONE   = 5'b10000;
    
-   wire		clk, rst;
-
+   wire		clk, clk_33, clk_100, clk_133_0, clk_133_3, rst;
+   wire 	locked;
+   
    reg [31:0] 	CPU_ADDR, CPU_ADDR_ROM, CPU_DATA_I, CPU_DATA_O, CPU_DATA_O_R;
    reg [31:0] 	CPU_DATA;
    reg 		CPU_REN, CPU_WEN;
@@ -37,19 +38,34 @@ module test_mem_top(input wire RESET, SYSCLK_P, SYSCLK_N,
    
    /* memory module */
    mem_controller mem_c(.clk(clk),
+			.clk_133_0(clk_133_0),
 			.rst(rst),
-			.DAT_ADDR(CPU_ADDR),
-			.DAT_DATA_I(CPU_DATA_I),
-			.DAT_REN(CPU_REN),
-			.DAT_WEN(CPU_WEN),
-			.DAT_ACK(CPU_ACK),
-			.DAT_DATA_O(CPU_DATA_O),
-			
-			.INS_ADDR(CPU_ADDR_ROM),
-			.INS_REN(CPU_REN),
-			.INS_ACK(CPU_ACK_R),
-			.INS_DATA_O(CPU_DATA_O_R),
-			.*);
+			.zs_addr());
+   
+
+   pll_50_100_133 (.areset (reset_controller_out),
+		   .inclk0 (clk),
+		   .c0     (clk_33),
+		   .c1     (clk_100),
+		   .c2     (clk_133_0),
+		   .c3     (clk_133_3),
+		   .locked (locked));
+
+   /* reset signal synchronizer for sdram controller */
+      altera_reset_controller #(.NUM_RESET_INPUTS        (1),
+				.OUTPUT_RESET_SYNC_EDGES ("deassert"),
+				.SYNC_DEPTH              (2))
+   rst_controller(.reset_in0  (rst),
+		  .clk        (clk),
+		  .reset_out  (reset_controller_out),
+		  .reset_in1  (1'b0), // the rest are not used
+		  .reset_in2  (1'b0), .reset_in3  (1'b0), .reset_in4  (1'b0),
+		  .reset_in5  (1'b0), .reset_in6  (1'b0), .reset_in7  (1'b0),
+		  .reset_in8  (1'b0), .reset_in9  (1'b0), .reset_in10 (1'b0),
+		  .reset_in11 (1'b0), .reset_in12 (1'b0), .reset_in13 (1'b0),
+		  .reset_in14 (1'b0), .reset_in15 (1'b0));
+
+   
    
    assign rst = RESET;
    assign CPU_DATA = BN ? CPU_DATA_O: CPU_DATA_O_R;
