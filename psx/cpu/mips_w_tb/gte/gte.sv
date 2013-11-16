@@ -19,6 +19,7 @@ module gte(
     input  [4:0]  rd,         // destination register
     input         inst_rdy,   // instruction is ready
     input         halted,     // used for printing the registers
+    input         stall,
     output [31:0] reg_out,    // register data out
     output        avail       // indicates instruction in progress
     );
@@ -28,7 +29,7 @@ module gte(
     logic              ld_inst, clr_inst;
 
     // cycles register/counter signals
-    logic        [5:0] num_cyc, curr_cyc;
+    logic        [5:0] num_cyc, curr_cyc, inst_cnt;
     logic              en_cyc;
 
     // control and data registers and status -- for writeback
@@ -81,7 +82,7 @@ module gte(
 
     // module instantiations
     up_counter #(6) cyc_reg (.Q(curr_cyc), .en(en_cyc), .clr(clr_inst), .*);
-    gte_decode   cyc_decode (.inst(gte_cmd), .inst_cnt(num_cyc));
+    gte_decode   cyc_decode (.rdy(ld_inst), .inst(gte_cmd), .inst_cnt(inst_cnt));
     gte_fsm      fsm (.*);
 
     // latch instruction specific input
@@ -93,6 +94,7 @@ module gte(
             lm   <= 'd0;
             sf   <= 'd0;
             curr_inst <= 'd0;
+            num_cyc <= 'd0;
         end
         else if (clr_inst) begin
             mx   <= 'd0;
@@ -101,6 +103,7 @@ module gte(
             lm   <= 'd0;
             sf   <= 'd0;
             curr_inst <= 'd0;
+            num_cyc <= 'd0;
         end
         else if (ld_inst) begin
             mx   <= gte_mx;
@@ -109,11 +112,12 @@ module gte(
             lm   <= gte_lm;
             sf   <= gte_sf;
             curr_inst <= gte_cmd;
+            num_cyc <= inst_cnt;
         end
     end
 
     // on the last cycle of the instruction GTE is "available"
-    assign avail = (((curr_cyc==(num_cyc-1'd1)) | (num_cyc=='b0)) & (lwc2 ? reg_in_rdy : 1'd1));
+    assign avail = (((curr_cyc==num_cyc) | (num_cyc=='b0)) & (lwc2 ? reg_in_rdy : 1'd1));
 
     // external register read logic
     assign reg_out = (mfc2 | swc2) ? cop2d[rd] : ((cfc2) ? cop2c[rd] : 32'h0);
@@ -1824,7 +1828,7 @@ module gte(
 endmodule: gte
 
 module gte_fsm(
-    input  logic inst_rdy, avail, clk, rst,
+    input  logic inst_rdy, avail, stall, clk, rst,
     output logic clr_inst, ld_inst, en_cyc);
 
     enum {WAIT, BUSY} curr_state, next_state;
@@ -1844,7 +1848,7 @@ module gte_fsm(
 
         case (curr_state)
             WAIT: begin
-                if (inst_rdy) begin
+                if (inst_rdy & ~stall) begin
                     ld_inst = 'b1;
                     next_state = BUSY;
                 end
@@ -1865,34 +1869,39 @@ endmodule: gte_fsm
 
 module gte_decode(
     input  logic [5:0] inst,
+    input  logic       rdy,
     output logic [5:0] inst_cnt);
 
     always_comb begin
-        case (inst)
-            `INST_RTPS:  inst_cnt = 'd14;
-            `INST_RTPT:  inst_cnt = 'd22;
-            `INST_MVMVA: inst_cnt = 'd8;
-            `INST_DCPL:  inst_cnt = 'd8;
-            `INST_DPCS:  inst_cnt = 'd8;
-            `INST_DPCT:  inst_cnt = 'd17;
-            `INST_INTPL: inst_cnt = 'd8;
-            `INST_SQR:   inst_cnt = 'd5;
-            `INST_NCS:   inst_cnt = 'd14;
-            `INST_NCT:   inst_cnt = 'd30;
-            `INST_NCDS:  inst_cnt = 'd19;
-            `INST_NCDT:  inst_cnt = 'd44;
-            `INST_NCCS:  inst_cnt = 'd17;
-            `INST_NCCT:  inst_cnt = 'd39;
-            `INST_CDP:   inst_cnt = 'd13;
-            `INST_CC:    inst_cnt = 'd11;
-            `INST_NCLIP: inst_cnt = 'd8;
-            `INST_AVSZ3: inst_cnt = 'd5;
-            `INST_AVSZ4: inst_cnt = 'd6;
-            `INST_OP:    inst_cnt = 'd6;
-            `INST_GPF:   inst_cnt = 'd5;
-            `INST_GPL:   inst_cnt = 'd5;
-            default:     inst_cnt = 'd0;
-        endcase
+        if (~rdy)
+            inst_cnt = 'd0;
+        else begin
+            case (inst)
+                `INST_RTPS:  inst_cnt = 'd14;
+                `INST_RTPT:  inst_cnt = 'd22;
+                `INST_MVMVA: inst_cnt = 'd8;
+                `INST_DCPL:  inst_cnt = 'd8;
+                `INST_DPCS:  inst_cnt = 'd8;
+                `INST_DPCT:  inst_cnt = 'd17;
+                `INST_INTPL: inst_cnt = 'd8;
+                `INST_SQR:   inst_cnt = 'd5;
+                `INST_NCS:   inst_cnt = 'd14;
+                `INST_NCT:   inst_cnt = 'd30;
+                `INST_NCDS:  inst_cnt = 'd19;
+                `INST_NCDT:  inst_cnt = 'd44;
+                `INST_NCCS:  inst_cnt = 'd17;
+                `INST_NCCT:  inst_cnt = 'd39;
+                `INST_CDP:   inst_cnt = 'd13;
+                `INST_CC:    inst_cnt = 'd11;
+                `INST_NCLIP: inst_cnt = 'd8;
+                `INST_AVSZ3: inst_cnt = 'd5;
+                `INST_AVSZ4: inst_cnt = 'd6;
+                `INST_OP:    inst_cnt = 'd6;
+                `INST_GPF:   inst_cnt = 'd5;
+                `INST_GPL:   inst_cnt = 'd5;
+                default:     inst_cnt = 'd0;
+            endcase
+        end
     end
 endmodule: gte_decode
 

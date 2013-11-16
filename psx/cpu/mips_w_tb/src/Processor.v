@@ -400,6 +400,7 @@ module Processor(
         .reg_in_rdy     (CP2_RegIn_Ready),
         .rd             ((CP2_Lwc2 ? WB_RtRd : (ID_Swc2 ? Rt : Rd))),
         .inst_rdy       ((ID_CP2 & ~(ID_Cfc2 | ID_Ctc2 | ID_Mfc2 | ID_Mtc2))),
+        .stall          (ID_Stall),
         .halted         (halted),
         .reg_out        (CP2_RegOut),
         .avail          (CP2_avail)

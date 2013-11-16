@@ -9,7 +9,7 @@
 ### Setup
 ###################################################################
 
-SRC ?= src gte
+SRC ?= src gte dat_files
 VCSLOG = vcs.log
 
 CC = vcs
@@ -148,12 +148,12 @@ sim: compile assemble
 	@echo -e "$mTo view the simulation output, execute the following command: $bcat $(OUTPUT)/sim/vcssim.log$n"
 
 ###################################################################
-### Simulate BIOS
+### Simulate DAT Files
 ###################################################################
 
-bios: compile 
+dat: compile 
 	@mkdir -p $(OUTPUT)/sim
-	@cp `find $(SRC) -iname 'bios.dat'` $(OUTPUT)/sim/mem.text.dat
+	@cp `find $(SRC) -iname $(INPUT)` $(OUTPUT)/sim/mem.text.dat
 	@touch $(OUTPUT)/sim/mem.data.dat; touch $(OUTPUT)/sim/mem.stack.dat
 	@touch $(OUTPUT)/sim/mem.ktext.dat; touch $(OUTPUT)/sim/mem.kdata.dat
 	@echo -e "$mSimulating Verilog in $(OUTPUT)..."
