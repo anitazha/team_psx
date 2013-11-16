@@ -18,6 +18,7 @@ module gte(
     input         reg_in_rdy, // data to move out is ready
     input  [4:0]  rd,         // destination register
     input         inst_rdy,   // instruction is ready
+    input         halted,     // used for printing the registers
     output [31:0] reg_out,    // register data out
     output        avail       // indicates instruction in progress
     );
@@ -112,10 +113,10 @@ module gte(
     end
 
     // on the last cycle of the instruction GTE is "available"
-    assign avail = ((curr_cyc == (num_cyc-1'd1)) & (lwc2 ? reg_in_rdy : 1'd1));
+    assign avail = (((curr_cyc==(num_cyc-1'd1)) | (num_cyc=='b0)) & (lwc2 ? reg_in_rdy : 1'd1));
 
     // external register read logic
-    assign reg_out = (mfc2 | swc2) ? cop2d[rd] : (cfc2) ? cop2c[rd] : 32'h0;
+    assign reg_out = (mfc2 | swc2) ? cop2d[rd] : ((cfc2) ? cop2c[rd] : 32'h0);
 
     always_ff @(posedge clk, posedge rst) begin
         if (rst) begin
@@ -1775,6 +1776,51 @@ module gte(
             {c2c.flag[12], limE} = bound16(val, 32'h0, 32'hFFF);
         end
     endfunction
+
+	// synthesis translate_off
+	integer fd, i;
+	always @(halted) begin
+		if ((~rst) && halted) begin
+            // Output COP2C
+			fd = $fopen("regdumpcop2d.txt");
+
+			$display("\n--- COP2D Register file dump ---");
+			$display("=== Simulation Cycle %d ===", $time);
+			
+			$fdisplay(fd, "--- COP2D Register file dump ---");
+			$fdisplay(fd, "=== Simulation Cycle %d ===", $time);
+
+			for(i = 0; i < 32; i = i+1) begin
+				$display("R%d\t= 0x%8x\t( %0d )", i, cop2d[i], cop2d[i]);
+				$fdisplay(fd, "R%d\t= 0x%8h\t( %0d )", i, cop2d[i], cop2d[i]); 
+			end
+			
+			$display("--- End register file dump ---");
+			$fdisplay(fd, "--- End register file dump ---");
+			
+			$fclose(fd);
+
+            // Output COP2C
+			fd = $fopen("regdumpcop2c.txt");
+
+			$display("\n--- COP2C Register file dump ---");
+			$display("=== Simulation Cycle %d ===", $time);
+			
+			$fdisplay(fd, "--- COP2C Register file dump ---");
+			$fdisplay(fd, "=== Simulation Cycle %d ===", $time);
+
+			for(i = 0; i < 32; i = i+1) begin
+				$display("R%d\t= 0x%8x\t( %0d )", i, cop2c[i], cop2c[i]);
+				$fdisplay(fd, "R%d\t= 0x%8h\t( %0d )", i, cop2c[i], cop2c[i]); 
+			end
+			
+			$display("--- End register file dump ---");
+			$fdisplay(fd, "--- End register file dump ---");
+			
+			$fclose(fd);
+		end
+	end
+	// synthesis translate_on
 endmodule: gte
 
 module gte_fsm(

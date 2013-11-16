@@ -145,7 +145,7 @@ module Hazard_Detection(
     wire ID_Stall_3 = (Rs_IDMEM_Match &  (MEM_MemRead | MEM_MemWrite) & NeedRsByID);
     wire ID_Stall_4 = (Rt_IDMEM_Match &  (MEM_MemRead | MEM_MemWrite) & NeedRtByID);
     // GTE instruction in progress and another is incoming : Stall
-    wire ID_Stall_5 = ((~CP2_free & CP2) | (CP2_Lwc2 & (~CP2_free)));
+    wire ID_Stall_5 = (~CP2_free & CP2 & ~CP2_Lwc2);
     // ID wants data from MEM : Forward if not mem access
     wire ID_Fwd_1   = (Rs_IDMEM_Match & ~(MEM_MemRead | MEM_MemWrite));
     wire ID_Fwd_2   = (Rt_IDMEM_Match & ~(MEM_MemRead | MEM_MemWrite));
@@ -170,7 +170,7 @@ module Hazard_Detection(
     assign EX_Stall = (EX_Stall_1 | EX_Stall_2 | EX_Exception_Stall) | EX_ALU_Stall | M_Stall;
     assign ID_Stall = (ID_Stall_1 | ID_Stall_2 | ID_Stall_3 | ID_Stall_4 | ID_Stall_5 | ID_Exception_Stall) | EX_Stall;
     assign IF_Stall = InstMem_Read | InstMem_Ready | IF_Exception_Stall;
-    
+
     // Forwarding Control Final Assignments
     assign ID_RsFwdSel = (ID_Fwd_1) ? 2'b01 : ((ID_Fwd_3) ? 2'b10 : 2'b00);
     assign ID_RtFwdSel = (Mfc0 | Cfc2 | Mfc2) ? 2'b11 : ((ID_Fwd_2) ? 2'b01 : ((ID_Fwd_4) ? 2'b10 : 2'b00));

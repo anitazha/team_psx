@@ -175,12 +175,13 @@ module Processor(
     wire  [1:0] CP2_tx    = Instruction[14:13];
     wire        CP2_lm    = Instruction[10];
     wire  [5:0] CP2_cmd   = (ID_Cfc2 | ID_Ctc2 | ID_Mfc2 | ID_Mtc2 | ID_Lwc2 | ID_Swc2) ? 6'h0 : Instruction[5:0];
-    wire  CP2_RegIn_Ready = (ID_CP2) ? 1'h1 : (WB_Gte);
+    wire  CP2_RegIn_Ready = (ID_Cfc2 | ID_Ctc2 | ID_Mfc2 | ID_Mtc2) ? 1'h1 : (WB_Gte);
+    wire  CP2_Lwc2        = (ID_Lwc2 | EX_Lwc2 | M_Lwc2 | WB_Gte);
     wire  CP2_avail;
     wire [31:0] CP2_RegOut;
 
     /*** Assignments ***/
-    assign IF_Instruction = (IF_Stall | (saw_syscall | syscall_halt)) ? 32'h00000000 : InstMem_In;
+    assign IF_Instruction = (IF_Stall | (saw_syscall | syscall_halt) | CP2_Lwc2) ? 32'h00000000 : InstMem_In;
     assign IF_IsBDS = ID_NextIsDelay;
     assign HAZ_DP_Hazards = {ID_DP_Hazards[7:4], EX_WantRsByEX, EX_NeedRsByEX, EX_WantRtByEX, EX_NeedRtByEX};
     assign IF_EXC_AdIF = IF_PCOut[1] | IF_PCOut[0];
@@ -305,7 +306,7 @@ module Processor(
         .Cfc2                (ID_Cfc2),
         .Mfc2                (ID_Mfc2),
         .CP2_free            (CP2_avail),
-        .CP2_Lwc2            (ID_Lwc2),
+        .CP2_Lwc2            (CP2_Lwc2),
         .CP2                 (ID_CP2),
         .WB_Gte              (WB_Gte),
         .IF_Exception_Stall  (IF_Exception_Stall),
@@ -387,7 +388,7 @@ module Processor(
         .ctc2           (ID_Ctc2),        
         .mfc2           (ID_Mfc2),        
         .mtc2           (ID_Mtc2),        
-        .lwc2           (ID_Lwc2),        
+        .lwc2           (CP2_Lwc2),        
         .swc2           (ID_Swc2),        
         .gte_sf         (CP2_sf),
         .gte_mx         (CP2_mx),
@@ -397,8 +398,9 @@ module Processor(
         .gte_cmd        (CP2_cmd),
         .reg_in         (CP2_RegIn), // add mem wb data
         .reg_in_rdy     (CP2_RegIn_Ready),
-        .rd             (Rd),
+        .rd             ((CP2_Lwc2 ? WB_RtRd : (ID_Swc2 ? Rt : Rd))),
         .inst_rdy       ((ID_CP2 & ~(ID_Cfc2 | ID_Ctc2 | ID_Mfc2 | ID_Mtc2))),
+        .halted         (halted),
         .reg_out        (CP2_RegOut),
         .avail          (CP2_avail)
     );
@@ -426,7 +428,7 @@ module Processor(
         .clock   (clock),
         .reset   (reset),
         //.enable  (~IF_Stall),   // XXX verify. HERE. Was 1 but on stall latches PC+4, ad nauseum.
-        .enable (~(IF_Stall | ID_Stall)),
+        .enable (~(IF_Stall | ID_Stall | CP2_Lwc2)),
         .D       (IF_PCIn),
         .Q       (IF_PCOut)
     );
@@ -741,9 +743,7 @@ module Processor(
         .Left          (M_Left),
         .Right         (M_Right),
         .M_Exception_Stall (M_Exception_Stall),
-        
-        .IF_Stall (IF_Stall),
-        
+        .IF_Stall      (IF_Stall),
         .DataOut       (M_MemReadData),
         .MWriteData    (DataMem_Out),
         .WriteEnable   (DataMem_Write),

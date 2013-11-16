@@ -18,10 +18,10 @@ CCFLAGS = -sverilog -nc -debug -line +lint=all,noVCDE,noFIAAS +warn=all -l $(VCS
 TIMESTAMP := outputs/$(shell date +%m%d-%H%M%S)
 OUTPUT ?= $(TIMESTAMP)
 
-INPUT ?= inputs/addiu.s
+INPUT ?= 447inputs/addiu.s
 REGDUMP := $(INPUT:.s=.reg)
 
-BATCH ?= inputs/addiu.s
+BATCH ?= 447inputs/addiu.s
 
 SYNTH = lab
 TB = testbench
@@ -92,11 +92,11 @@ default:
 	@echo -e ""
 	@echo -e "\t$bINPUT$n=$uASSEMBLY$n"
 	@echo -e "\t    for $bsim$n and $bverify$n, specifies an input MIPS assemply file;"
-	@echo -e "\t    if unspecified, defaults to $uinputs/addiu.s$n"
+	@echo -e "\t    if unspecified, defaults to $u447inputs/addiu.s$n"
 	@echo -e ""
 	@echo -e "\t$bBATCH$n=$uASSEMBLY FILES$n"
 	@echo -e "\t    for $bbatch-verify$n, specifies one or more input MIPS assemply files;"
-	@echo -e "\t    if unspecified, defaults to $uinputs/addiu.s$n"
+	@echo -e "\t    if unspecified, defaults to $u447inputs/addiu.s$n"
 	@echo -e ""
 	@echo -e "\t$bOUTPUT$n=$uDIR$n"
 	@echo -e "\t    for all targets (except $bupdate$n/$bauto$n), specifies the output directory;"
