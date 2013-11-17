@@ -15,7 +15,7 @@ module addr_interpreter(input  logic clk, rst,
 			/* SDRAM INTERFACE */
 			input  logic [31:0] sd_data_o,
 			input  logic 	    sd_valid,
-			input  logic        sd_wr_done,
+			input  logic 	    sd_wr_done,
 			input  logic 	    sd_waitrequest,
 			output logic [24:0] sd_addr,
 			output logic [31:0] sd_data_i,
@@ -29,6 +29,13 @@ module addr_interpreter(input  logic clk, rst,
 			output logic 	    sc_wen//,
 
 			/* HW REGISTER INTERFACE */
+			input  logic [31:0] hw_data_o,
+			input  logic 	    hw_ack,
+			output logic [31:0] hw_data_i,
+			output logic [31:0] hw_addr,
+			output logic [ 3:0] hw_be,
+			output 		    hw_wen,
+			output logic        hw_ren
 			);
 
    /* PARAMETERS - state declatations */
@@ -75,6 +82,7 @@ module addr_interpreter(input  logic clk, rst,
    reg [7:0]   timeout_counter; 
    
    reg 	       sd_wen_out, sd_ren_out;
+   reg 	       hw_wen_out, hw_ren_out;
    reg 	       sc_wen_out;
    reg [31:0]  data_out;
    
@@ -109,6 +117,8 @@ module addr_interpreter(input  logic clk, rst,
    assign sc_wen = sc_wen_out;
    assign sd_wen = sd_wen_out;
    assign sd_ren = sd_ren_out;
+   assign hw_wen = hw_wen_out;
+   assign hw_ren = hw_ren_out;
    
    assign addr_interpreter_state = curr_state;
 
@@ -142,6 +152,9 @@ module addr_interpreter(input  logic clk, rst,
 	 else if (curr_state == LATCH && in_SCPAD) begin
 	    data_out <= sc_data_o;
 	 end
+	 else if (curr_state == LATCH && in_HWREG) begin
+	    data_out <= hw_data_o;
+	 end
 	 else if (curr_state == LATCH) begin
 	    data_out <= 32'd0;
 	 end
@@ -169,6 +182,8 @@ module addr_interpreter(input  logic clk, rst,
       sd_wen_out = 1'b0;
       sd_ren_out = 1'b0;
       sc_wen_out = 1'b0;
+      hw_wen_out = 1'b0;
+      hw_ren_out = 1'b0;
 
       case (curr_state)
 	/* wait for memory request */
@@ -196,17 +211,36 @@ module addr_interpreter(input  logic clk, rst,
 		 next_state = READ_ACK;
 	      end
 	   end
+	   else if (in_HWREG) begin
+	      hw_ren_out = 1'b1;
+	      next_state = READ_ACK;
+	   end
 	   else begin
 	      next_state = LATCH;
 	   end
 	end
 	READ_ACK: begin
-	   if (sd_valid) begin
-	      next_state = LATCH;
+	   if (in_MAIN) begin
+	      if (sd_valid) begin
+		 next_state = LATCH;
+	      end
+	      else if (timeout_counter == 100) begin
+		 next_state = IDLE;
+	      end
+	      else begin
+		 next_state = READ_ACK;
+	      end
 	   end
-	   else if (timeout_counter == 100) begin
-	      next_state = IDLE;
-	   end
+	   else if (in_HWREG) begin
+	      hw_ren_out = 1'b1
+	      if (hw_ack) begin
+		 hw_ren_out = 1'b0;
+		 next_state = LATCH;
+	      end
+	      else begin
+		 next_state = READ_ACK;
+	      end
+	   end 
 	   else begin
 	      next_state = READ_ACK;
 	   end
@@ -233,22 +267,31 @@ module addr_interpreter(input  logic clk, rst,
 	      next_ack = 1'b1;
 	      sc_wen_out = 1'b1;
 	   end
+	   else if (in_HWREG) begin
+	      next_state = WRITE_ACK;
+	      hw_wen_out = 1'b1;
+	   end
 	   else begin
 	      /* error */
 	      next_state = IDLE;
 	   end
 	end
 	WRITE_ACK: begin
-	   //if (sd_wr_done) begin
+	   if (in_MAIN) begin
 	      next_state = WAIT;
 	      next_ack = 1'b1;
-	   //end
-	   //else if (timeout_counter == 100) begin
-	   //   next_state = IDLE;
-	   //end
-	   //else begin
-	   //   next_state = WRITE_ACK;
-	   //end
+	   end
+	   else if (in_HWREG) begin
+	      hw_wen_out = 1'b1
+	      if (hw_ack) begin
+		 next_state = WAIT;
+		 hw_wen_out = 1'b0;
+		 next_ack = 1'b1;
+	      end
+	      else begin
+		 next_state = WRITE_ACK;
+	      end
+	   end 
 	end
 	
 	/* WAIT for ren-wen to fall */
