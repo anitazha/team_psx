@@ -30,7 +30,10 @@ module io_controller(input  logic clk, rst,
 
                      /* TIMER SIGNALS */
                      input logic         hblank, vblank,
-                     input logic         dotclock
+                     input logic         dotclock,
+
+		     /* Interrupt lines to CPU */
+		     output logic [10:0] interrupts
                      );
 
    /* PARAMETERS */
@@ -149,6 +152,8 @@ module io_controller(input  logic clk, rst,
 
    assign data_o = data_out;
    assign ack_o = ack_out;
+   
+   assign interrupts = I_STAT[10:0];
    
    /* TIMER CONTROLLER */
    psx_timers timers(.sys_clk      (clk),

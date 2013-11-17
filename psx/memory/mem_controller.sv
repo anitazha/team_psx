@@ -42,7 +42,10 @@ module mem_controller(input  logic  clk, rst,
 		       
 		      /* HW REGISTER CONNECTIONS */
 		      input logic         hblank, vblank,
-		      input logic         dotclock
+		      input logic         dotclock,
+
+		      /* INTERRUPTS */
+		      output logic [10:0] interrupts
 		      );
 
    /* PARAMETERS - state declarations */ 
@@ -124,18 +127,19 @@ module mem_controller(input  logic  clk, rst,
 		     .q       (sc_data_o));
    
    /* HW REGISTER CONTROLLER */
-   io_controller io(.clk      (clk),
-		    .rst      (rst),
-		    .addr     (hw_addr),
-		    .data_i   (hw_data_i),
-		    .wen      (hw_wen),
-		    .ren      (hw_ren),
-		    .ben      (data_ben),
-		    .ack      (hw_ack),
-		    .data_o   (hw_data_o),
-		    .hblank   (hblank),
-		    .vblank   (vblankk),
-		    .dotclock (dotclock));
+   io_controller io(.clk        (clk),
+		    .rst        (rst),
+		    .addr       (hw_addr),
+		    .data_i     (hw_data_i),
+		    .wen        (hw_wen),
+		    .ren        (hw_ren),
+		    .ben        (data_ben),
+		    .ack        (hw_ack),
+		    .data_o     (hw_data_o),
+		    .hblank     (hblank),
+		    .vblank     (vblankk),
+		    .dotclock   (dotclock),
+		    .interrupts (interrupts));
    
    /* SDRAM CONTROLLER */
    qsys_sdram_a2_sdram_0 sdram(.clk            (clk),
