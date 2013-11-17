@@ -34,7 +34,7 @@ module addr_interpreter(input  logic clk, rst,
 			output logic [31:0] hw_data_i,
 			output logic [31:0] hw_addr,
 			output logic [ 3:0] hw_be,
-			output 		    hw_wen,
+			output logic	    hw_wen,
 			output logic        hw_ren
 			);
 

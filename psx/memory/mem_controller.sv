@@ -22,8 +22,8 @@ module mem_controller(input  logic  clk, rst,
 		      /* CPU DATA */
 		      input  logic [31:0] data_addr,
 		      input  logic [31:0] data_data_i,
-		      input  logic 	  data_ren, 
-		      input  logic 	  data_wen,
+		      input  logic 	  data_ren,
+		      input  logic [ 3:0] data_wen,
 		      output logic 	  data_ack,
 		      output logic [31:0] data_data_o,
 		      
@@ -31,16 +31,18 @@ module mem_controller(input  logic  clk, rst,
 		      input  logic [31:0] inst_addr,
 		      input  logic 	  inst_ren,
 		      output logic 	  inst_ack,
-		      output logic [31:0] inst_data_o//,
+		      output logic [31:0] inst_data_o,
 		      
-		      /* GPU SIGNALS *
-		       output logic 	  to_gp0, to_gp1,
-		       input logic 	  gpu_rdy,
-		       input logic 	  gpu_fifo_full,
-		       input logic [31:0]  gpu_stat, gpu_read,
-		       output logic [31:0] gp0, gp1, 
+		      /* GPU SIGNALS */
+		      //output logic 	  to_gp0, to_gp1,
+		      //input logic 	  gpu_rdy,
+		      //input logic 	  gpu_fifo_full,
+		      //input logic [31:0]  gpu_stat, gpu_read,
+		      //output logic [31:0] gp0, gp1, 
 		       
-		       * HW REGISTER CONNECTIONS */
+		      /* HW REGISTER CONNECTIONS */
+		      input logic         hblank, vblank,
+		      input logic         dotclock
 		      );
 
    /* PARAMETERS - state declarations */ 
@@ -69,9 +71,16 @@ module mem_controller(input  logic  clk, rst,
    wire [31:0] sc_data_o, sc_data_i;
    wire [7:0]  sc_addr;
    wire        sc_wen;
+
+   wire [31:0] hw_data_o, hw_data_i;
+   wire        hw_ack;
+   wire [31:0] hw_addr;
+   wire        hw_wen, hw_ren;
    
    // - operations flags
    wire        data_active, inst_active;
+   wire        data_ben;
+   wire        data_wen_or;
    
    // - state variables 
    reg [6:0]   curr_state, next_state;
@@ -87,8 +96,10 @@ module mem_controller(input  logic  clk, rst,
    reg [31:0]  data_latch, inst_latch;
    reg 	       ack_o;
    
-   assign data_active = data_ren | data_wen;
+   assign data_active = data_ren | data_wen_or;
    assign inst_active = inst_ren;
+   assign data_ben = data_wen;
+   assign data_wen_or = data_wen[0] | data_wen[1] | data_wen[2] | data_wen[3];
    
    assign data_ack = curr_d_ack;
    assign inst_ack = curr_i_ack;
@@ -109,17 +120,29 @@ module mem_controller(input  logic  clk, rst,
 		     .address (sc_addr),
 		     .data    (sc_data_i),
 		     .wren    (sc_wen),
+		     .byteena (data_ben),
 		     .q       (sc_data_o));
    
    /* HW REGISTER CONTROLLER */
-   
+   io_controller io(.clk      (clk),
+		    .rst      (rst),
+		    .addr     (hw_addr),
+		    .data_i   (hw_data_i),
+		    .wen      (hw_wen),
+		    .ren      (hw_ren),
+		    .ben      (data_ben),
+		    .ack      (hw_ack),
+		    .data_o   (hw_data_o),
+		    .hblank   (hblank),
+		    .vblank   (vblankk),
+		    .dotclock (dotclock));
    
    /* SDRAM CONTROLLER */
    qsys_sdram_a2_sdram_0 sdram(.clk            (clk),
 			       .reset_n        (~rst_controller_out),
 			       /* sdram controller lines */
 			       .az_addr        (sd_addr),
-			       .az_be_n        (4'b0000),
+			       .az_be_n        (~data_ben),
 			       .az_cs          (1'b1),
 			       .az_data        (sd_data_i),
 			       .az_rd_n        (~sd_ren),
@@ -155,7 +178,7 @@ module mem_controller(input  logic  clk, rst,
 				 .phasedone ());
    altera_reset_controller
      #(.NUM_RESET_INPUTS        (1),
-       .OUTPUT_RESET_SYNC_EDGES ("deassert"),
+       .OUTPUT_RESET_SYNC_EDGES ("deassert"),-
        .SYNC_DEPTH              (2)
        )
    rst_controller
@@ -201,11 +224,19 @@ module mem_controller(input  logic  clk, rst,
 				.sd_data_i      (sd_data_i),
 				.sd_wen         (sd_wen),
 				.sd_ren         (sd_ren),
-				/* scratch pad (BLOCK RAM) */
+				/* Scratch Pad (BLOCK RAM) */
 				.sc_data_o      (sc_data_o),
 				.sc_addr        (sc_addr),
 				.sc_data_i      (sc_data_i),
 				.sc_wen         (sc_wen),
+				/* Hardware Registers */
+				.hw_data_o      (),
+				.hw_ack         (),
+				.hw_data_i      (),
+				.hw_addr        (),
+				.hw_be          (),
+				.hw_wen         (),
+				.hw_ren         (),
 				.*);
    
    /* latch the data to the right channel */
@@ -268,11 +299,11 @@ module mem_controller(input  logic  clk, rst,
 		 next_ren = data_ren;
 		 next_wen = 1'b0;
 	      end
-	      else if (data_wen) begin
+	      else if (data_wen_or) begin
 		 next_state = WRITE_INIT;
 		 next_addr = data_addr;
 		 next_data_i = data_data_i;
-		 next_wen = data_wen;
+		 next_wen = data_wen_or;
 		 next_ren = data_ren;
 	      end
 	      else begin
@@ -318,7 +349,7 @@ module mem_controller(input  logic  clk, rst,
 	end 
 	READ_DATA: begin
 	   next_ren = data_ren;
-	   next_wen = data_wen;
+	   next_wen = data_wen_or;
 	   if (~data_active && ~ack_o) begin
 	      next_state = IDLE;
 	      next_d_ack = ack_o;
@@ -350,7 +381,7 @@ module mem_controller(input  logic  clk, rst,
 	   end
 	end
 	WRITE_DATA: begin
-	   next_wen = data_wen;
+	   next_wen = data_wen_or;
 	   next_ren = data_ren;
 	   if (~data_active && ~ack_o) begin
 	      next_state = IDLE;
