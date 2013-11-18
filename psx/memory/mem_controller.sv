@@ -182,7 +182,7 @@ module mem_controller(input  logic  clk, rst,
 				 .phasedone ());
    altera_reset_controller
      #(.NUM_RESET_INPUTS        (1),
-       .OUTPUT_RESET_SYNC_EDGES ("deassert"),-
+       .OUTPUT_RESET_SYNC_EDGES ("deassert"),
        .SYNC_DEPTH              (2)
        )
    rst_controller
@@ -222,7 +222,6 @@ module mem_controller(input  logic  clk, rst,
 				/* SDRAM */
 				.sd_data_o      (dram_dq_out/*sd_data_o*/),
 				.sd_valid       (sd_valid),
-				.sd_wr_done     (dram_oe_out),
 				.sd_waitrequest (sd_waitrequest),
 				.sd_addr        (sd_addr),
 				.sd_data_i      (sd_data_i),
@@ -234,13 +233,12 @@ module mem_controller(input  logic  clk, rst,
 				.sc_data_i      (sc_data_i),
 				.sc_wen         (sc_wen),
 				/* Hardware Registers */
-				.hw_data_o      (),
-				.hw_ack         (),
-				.hw_data_i      (),
-				.hw_addr        (),
-				.hw_be          (),
-				.hw_wen         (),
-				.hw_ren         (),
+				.hw_data_o      (hw_data_o),
+				.hw_ack         (hw_ack),
+				.hw_data_i      (hw_data_i),
+				.hw_addr        (hw_addr),
+				.hw_wen         (hw_wen),
+				.hw_ren         (hw_ren),
 				.*);
    
    /* latch the data to the right channel */

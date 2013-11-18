@@ -33,7 +33,6 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF.write(hex(count)[2:] + ' : ')
-        print 'byte 2' + byte[2]
         MIF.write("{:02x}".format(ord(byte[0])) +
                    "{:02x}".format(ord(byte[1])) +
                    "{:02x}".format(ord(byte[2])) +

@@ -151,7 +151,7 @@ module io_controller(input  logic clk, rst,
    assign shift_addr = {HW_ADDR_HEADER, addr[17:0]};
 
    assign data_o = data_out;
-   assign ack_o = ack_out;
+   assign ack = ack_out;
    
    assign interrupts = I_STAT[10:0];
    

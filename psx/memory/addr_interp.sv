@@ -15,7 +15,6 @@ module addr_interpreter(input  logic clk, rst,
 			/* SDRAM INTERFACE */
 			input  logic [31:0] sd_data_o,
 			input  logic 	    sd_valid,
-			input  logic 	    sd_wr_done,
 			input  logic 	    sd_waitrequest,
 			output logic [24:0] sd_addr,
 			output logic [31:0] sd_data_i,
@@ -147,7 +146,7 @@ module addr_interpreter(input  logic clk, rst,
 	    data_out <= blk_data;
 	 end
 	 else if (curr_state == LATCH && in_MAIN) begin
-	    data_out <= sd_data_o;
+	    data_out <= 32'd0;//sd_data_o;
 	 end
 	 else if (curr_state == LATCH && in_SCPAD) begin
 	    data_out <= sc_data_o;
