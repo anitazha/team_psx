@@ -14,8 +14,6 @@ MIF9 = open("generated_files/bios_16k_9.mif", 'w')
 
 count = 0
 
-byte2bits = [''.join(['01'[i&(1<<b)>0] for b in xrange(7,-1,-1)]) for i in xrange(256)]
-
 
 ##############################################################
 # 256k MIF #                                                 #
@@ -23,7 +21,7 @@ byte2bits = [''.join(['01'[i&(1<<b)>0] for b in xrange(7,-1,-1)]) for i in xrang
 MIF.write('DEPTH = 65536;\n')
 MIF.write('WIDTH = 32;\n')
 MIF.write('ADDRESS_RADIX = HEX;\n')
-MIF.write('DATA_RADIX = BIN;\n')
+MIF.write('DATA_RADIX = HEX;\n')
 MIF.write('CONTENT\n')
 MIF.write('BEGIN\n\n')
 
@@ -32,13 +30,14 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF.write(hex(count)[2:] + ' : ')
-        MIF.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        print 'byte 2' + byte[2]
+        MIF.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF.write(';\n')
         count = count + 1
         if (count == 65536):
@@ -56,7 +55,7 @@ MIF.close()
 MIF0.write('DEPTH = 4096;\n')
 MIF0.write('WIDTH = 32;\n')
 MIF0.write('ADDRESS_RADIX = HEX;\n')
-MIF0.write('DATA_RADIX = BIN;\n')
+MIF0.write('DATA_RADIX = HEX;\n')
 MIF0.write('CONTENT\n')
 MIF0.write('BEGIN\n\n')
 
@@ -65,13 +64,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF0.write(hex(count - 65536)[2:] + ' : ')
-        MIF0.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF0.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF0.write(';\n')
         count = count + 1
         if (count == 69632):
@@ -86,7 +85,7 @@ MIF0.close()
 MIF1.write('DEPTH = 4096;\n')
 MIF1.write('WIDTH = 32;\n')
 MIF1.write('ADDRESS_RADIX = HEX;\n')
-MIF1.write('DATA_RADIX = BIN;\n')
+MIF1.write('DATA_RADIX = HEX;\n')
 MIF1.write('CONTENT\n')
 MIF1.write('BEGIN\n\n')
 
@@ -95,13 +94,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF1.write(hex(count - 69632)[2:] + ' : ')
-        MIF1.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF1.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF1.write(';\n')
         count = count + 1
         if (count == 73728):
@@ -116,7 +115,7 @@ MIF1.close()
 MIF2.write('DEPTH = 4096;\n')
 MIF2.write('WIDTH = 32;\n')
 MIF2.write('ADDRESS_RADIX = HEX;\n')
-MIF2.write('DATA_RADIX = BIN;\n')
+MIF2.write('DATA_RADIX = HEX;\n')
 MIF2.write('CONTENT\n')
 MIF2.write('BEGIN\n\n')
 
@@ -125,13 +124,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF2.write(hex(count - 73728)[2:] + ' : ')
-        MIF2.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF2.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF2.write(';\n')
         count = count + 1
         if (count == 77824):
@@ -156,7 +155,7 @@ while 1:
 MIF3.write('DEPTH = 4096;\n')
 MIF3.write('WIDTH = 32;\n')
 MIF3.write('ADDRESS_RADIX = HEX;\n')
-MIF3.write('DATA_RADIX = BIN;\n')
+MIF3.write('DATA_RADIX = HEX;\n')
 MIF3.write('CONTENT\n')
 MIF3.write('BEGIN\n\n')
 
@@ -165,13 +164,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF3.write(hex(count - 102400)[2:] + ' : ')
-        MIF3.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF3.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF3.write(';\n')
         count = count + 1
         if (count == 106496):
@@ -186,7 +185,7 @@ MIF3.close()
 MIF4.write('DEPTH = 4096;\n')
 MIF4.write('WIDTH = 32;\n')
 MIF4.write('ADDRESS_RADIX = HEX;\n')
-MIF4.write('DATA_RADIX = BIN;\n')
+MIF4.write('DATA_RADIX = HEX;\n')
 MIF4.write('CONTENT\n')
 MIF4.write('BEGIN\n\n')
 
@@ -195,13 +194,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF4.write(hex(count - 106496)[2:] + ' : ')
-        MIF4.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF4.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF4.write(';\n')
         count = count + 1
         if (count == 110592):
@@ -216,7 +215,7 @@ MIF4.close()
 MIF5.write('DEPTH = 4096;\n')
 MIF5.write('WIDTH = 32;\n')
 MIF5.write('ADDRESS_RADIX = HEX;\n')
-MIF5.write('DATA_RADIX = BIN;\n')
+MIF5.write('DATA_RADIX = HEX;\n')
 MIF5.write('CONTENT\n')
 MIF5.write('BEGIN\n\n')
 
@@ -225,13 +224,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF5.write(hex(count - 110592)[2:] + ' : ')
-        MIF5.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF5.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF5.write(';\n')
         count = count + 1
         if (count == 114688):
@@ -246,7 +245,7 @@ MIF5.close()
 MIF6.write('DEPTH = 4096;\n')
 MIF6.write('WIDTH = 32;\n')
 MIF6.write('ADDRESS_RADIX = HEX;\n')
-MIF6.write('DATA_RADIX = BIN;\n')
+MIF6.write('DATA_RADIX = HEX;\n')
 MIF6.write('CONTENT\n')
 MIF6.write('BEGIN\n\n')
 
@@ -255,13 +254,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF6.write(hex(count - 114688)[2:] + ' : ')
-        MIF6.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF6.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF6.write(';\n')
         count = count + 1
         if (count == 118784):
@@ -276,7 +275,7 @@ MIF6.close()
 MIF7.write('DEPTH = 4096;\n')
 MIF7.write('WIDTH = 32;\n')
 MIF7.write('ADDRESS_RADIX = HEX;\n')
-MIF7.write('DATA_RADIX = BIN;\n')
+MIF7.write('DATA_RADIX = HEX;\n')
 MIF7.write('CONTENT\n')
 MIF7.write('BEGIN\n\n')
 
@@ -285,13 +284,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF7.write(hex(count - 118784)[2:] + ' : ')
-        MIF7.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF7.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF7.write(';\n')
         count = count + 1
         if (count == 122880):
@@ -306,7 +305,7 @@ MIF7.close()
 MIF8.write('DEPTH = 4096;\n')
 MIF8.write('WIDTH = 32;\n')
 MIF8.write('ADDRESS_RADIX = HEX;\n')
-MIF8.write('DATA_RADIX = BIN;\n')
+MIF8.write('DATA_RADIX = HEX;\n')
 MIF8.write('CONTENT\n')
 MIF8.write('BEGIN\n\n')
 
@@ -315,13 +314,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF8.write(hex(count - 122880)[2:] + ' : ')
-        MIF8.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF8.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF8.write(';\n')
         count = count + 1
         if (count == 126976):
@@ -336,7 +335,7 @@ MIF8.close()
 MIF9.write('DEPTH = 4096;\n')
 MIF9.write('WIDTH = 32;\n')
 MIF9.write('ADDRESS_RADIX = HEX;\n')
-MIF9.write('DATA_RADIX = BIN;\n')
+MIF9.write('DATA_RADIX = HEX;\n')
 MIF9.write('CONTENT\n')
 MIF9.write('BEGIN\n\n')
 
@@ -345,13 +344,13 @@ while 1:
     if not byte:
         break
     else:
-        #if (ord(byte[0]) + ord(byte[1]) + ord(byte[2]) + ord(byte[3]) == 0):
+        #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF9.write(hex(count - 126976)[2:] + ' : ')
-        MIF9.write(byte2bits[ord(byte[0])] +
-                   byte2bits[ord(byte[1])] +
-                   byte2bits[ord(byte[2])] +
-                   byte2bits[ord(byte[3])])
+        MIF9.write("{:02x}".format(ord(byte[0])) +
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[2])) +
+                   "{:02x}".format(ord(byte[3])))
         MIF9.write(';\n')
         count = count + 1
         #if (count == 106495):
