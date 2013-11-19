@@ -1,4 +1,10 @@
 `timescale 1ns / 1ps
+/* TODO: Little endian is hardcoded into the Processor.v and MemControl.v.
+ *       In MemControl it can be toggled, but under the section of this file
+ *       where we declare PSX Hardware Interrupts, it is hardcoded.
+ */
+`define SIM
+
 /*
  * File         : Processor.v
  * Project      : University of Utah, XUM Project MIPS32 core
@@ -21,6 +27,7 @@
 module Processor(
     input  clock,
     input  reset,
+    input  [10:0] PSX_Interrupts,       // PSX HW Interrupts
     input  [4:0] Interrupts,            // 5 general-purpose hardware interrupts
     input  NMI,                         // Non-maskable interrupt
     // Data Memory Interface
@@ -42,11 +49,13 @@ module Processor(
     `include "MIPS_Parameters.vh"
 
     /*** Syscall signals ***/
+`ifdef SIM
     wire [31:0] r_v0;                   // used by the 447 testbench
     wire        saw_syscall;            // used by the 447 testbench
     wire        syscall_halt;           // used by the 447 testbench
     wire        syscall_en;             // used by the 447 testbench
     reg   [5:0] halt_count;
+`endif
 
     /*** MIPS Instruction and Components (ID Stage) ***/
     wire [31:0] Instruction;
@@ -181,7 +190,7 @@ module Processor(
     wire [31:0] CP2_RegOut;
 
     /*** Assignments ***/
-    assign IF_Instruction = (IF_Stall | (saw_syscall | syscall_halt) | CP2_Lwc2) ? 32'h00000000 : InstMem_In;
+    assign IF_Instruction = (IF_Stall |`ifdef SIM (saw_syscall | syscall_halt) | `endif CP2_Lwc2) ? 32'h00000000 : InstMem_In;
     assign IF_IsBDS = ID_NextIsDelay;
     assign HAZ_DP_Hazards = {ID_DP_Hazards[7:4], EX_WantRsByEX, EX_NeedRsByEX, EX_WantRtByEX, EX_NeedRtByEX};
     assign IF_EXC_AdIF = IF_PCOut[1] | IF_PCOut[0];
@@ -194,12 +203,14 @@ module Processor(
     assign InstMem_Address = IF_PCOut[31:2];
     assign DataMem_Address = M_ALUResult[31:2];
     always @(posedge clock) begin
+        $display("PC: %x Inst: %x InstRead: %b InstReady: %b", {InstMem_Address, 2'b0}, InstMem_In, InstMem_Read, InstMem_Ready);
         IRead <= (reset) ? 1 : ~InstMem_Ready;
         IReadMask <= (reset) ? 0 : ((IRead & InstMem_Ready) ? 1 : ((~IF_Stall) ? 0 : IReadMask));
     end
     assign InstMem_Read = IRead & ~IReadMask;
 
     /*** Syscall unit for halting the 447 testbench ***/
+`ifdef SIM
     assign syscall_en = ID_EXC_Sys ? 1'b1 : 1'b0;
     assign r_v0 = 32'h0a;   // fake $v0 so we can halt
 
@@ -228,6 +239,33 @@ module Processor(
             end
         end
     end
+`endif
+
+    /*** PSX Hardware Interrupts ***/
+    wire [10:0] int_mask_out, int_mask_data;
+    wire [10:0] int_stat_out, int_stat_data;
+    wire int_mask_en = ((PSX_Int_Mask_Addr[31:2] == DataMem_Address) && DataMem_Write);
+    wire int_stat_en = ((PSX_Int_Stat_Addr[31:2] == DataMem_Address) && DataMem_Write);
+    assign int_mask_data[10:8] = ((DataMem_Write[1] & int_mask_en) ? DataMem_Out[10:8] : int_mask_data[10:8]);
+    assign int_mask_data[ 7:0] = ((DataMem_Write[0] & int_mask_en) ? DataMem_Out[ 7:0] : int_mask_data[ 7:0]);
+    assign int_stat_data[10:8] = ((DataMem_Write[1] & int_stat_en) ? DataMem_Out[10:8] : int_stat_data[10:8]);
+    assign int_stat_data[ 7:0] = ((DataMem_Write[0] & int_stat_en) ? DataMem_Out[ 7:0] : int_stat_data[ 7:0]);
+    //wire [31:0] fake_mem_in = ((PSX_Int_Stat_Addr[29:0] == DataMem_Address) ? {int_stat_out, 21'b0} : DataMem_In);
+    wire [31:0] fake_mem_in = ((PSX_Int_Stat_Addr[31:2] == DataMem_Address) ? {21'b0, PSX_Interrupts} : DataMem_In);
+
+    Register #(11,0) PSX_Int_Stat(
+                        .Q      (int_stat_out),
+                        .D      (int_stat_data),
+                        .clock  (clock),
+                        .enable (int_stat_en),
+                        .reset  (reset));
+
+    Register #(11,0) PSX_Int_Mask(
+                        .Q      (int_mask_out),
+                        .D      (int_mask_data),
+                        .clock  (clock),
+                        .enable (int_mask_en),
+                        .reset  (reset));
 
     /*** Datapath Controller ***/
     Control Controller (
@@ -367,6 +405,8 @@ module Processor(
         .ID_CanErr           (ID_CanErr),
         .EX_CanErr           (EX_CanErr),
         .M_CanErr            (M_CanErr),
+        .PSX_Int_Mask        (int_mask_out),
+        .PSX_Int_Stat        (PSX_Interrupts),
         .IF_Exception_Stall  (IF_Exception_Stall),
         .ID_Exception_Stall  (ID_Exception_Stall),
         .EX_Exception_Stall  (EX_Exception_Stall),
@@ -730,7 +770,7 @@ module Processor(
         .CP2Out        (M_CP2Out),
         .DataIn        (M_WriteData_Pre),
         .Address       (M_ALUResult),
-        .MReadData     (DataMem_In),
+        .MReadData     (fake_mem_in),
         .MemRead       (M_MemRead),
         .MemWrite      (M_MemWrite),
         .DataMem_Ready (DataMem_Ready),

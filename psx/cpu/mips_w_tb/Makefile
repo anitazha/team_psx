@@ -9,7 +9,7 @@
 ### Setup
 ###################################################################
 
-SRC ?= src gte dat_files
+SRC ?= src gte mem_sim dat_files
 VCSLOG = vcs.log
 
 CC = vcs
@@ -113,6 +113,7 @@ default:
 compile: 
 	@echo -e "$mCopying Verilog into $(OUTPUT)..."
 	@mkdir -p $(OUTPUT)/sim/src
+	cp -R mem_sim/mif_files $(OUTPUT)/
 	@cp `find $(SRC) 447src -iname '*.v*' -o -iname '*.sv*'` $(OUTPUT)/sim/src
 	@echo -e "$mCompiling and Elaborating Design..."
 	cd $(OUTPUT)/sim; $(CC) $(CCFLAGS) +incdir+src src/*

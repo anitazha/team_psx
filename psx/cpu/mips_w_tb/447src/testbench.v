@@ -47,25 +47,20 @@ module testbench;
     wire [3:0]  mem_write_en;
     reg 	    rst_b;
 
-    wire inst_read, data_read;
-    reg  inst_ready, data_ready;
+    reg [10:0] psx_int;
+    wire inst_read, mem_data_read;
+    reg  inst_ready, mem_data_ready;
 
     // The clock
     clock CLK(clk);
     
     // The MIPS core
-    //mips_core core(.clk(clk), .inst_addr(pc), .inst(inst),
-    // 	  .inst_excpt(inst_excpt), .mem_addr(mem_addr),
-    // 	  .mem_data_in(mem_data_in), .mem_data_out(mem_data_out),
-    // 	  .mem_write_en(mem_write_en), .mem_excpt(mem_excpt),
-    // 	  .halted(halted), .rst_b(rst_b));
-    
-    // The MIPS core
     Processor core (.clock(clk), .reset(~rst_b),
             // interrupts; IP is for diagnostics
             .Interrupts(5'h0), .NMI(1'b0), .IP(),
+            .PSX_Interrupts(psx_int),
             // data access
-            .DataMem_Ready(data_ready), .DataMem_Read(data_read),
+            .DataMem_Ready(mem_data_ready), .DataMem_Read(mem_data_read),
             .DataMem_In(mem_data_out), .DataMem_Write(mem_write_en),
             .DataMem_Address(mem_addr), .DataMem_Out(mem_data_in),
             // instruction access
@@ -73,6 +68,28 @@ module testbench;
             .InstMem_Ready(inst_ready), .InstMem_Read(inst_read),
             .halted(halted));
     
+   // // Memory
+   // mem_controller memory(
+   //         .clk(clk), .rst(~rst_b),
+
+   // 	    /* CPU DATA */
+   // 	    .data_addr      ({mem_addr, 2'b0}),
+   // 	    .data_data_i    (mem_data_in),
+   // 	    .data_ren       (mem_data_read), 
+   // 	    .data_wen       (mem_write_en),
+   // 	    .data_ack       (mem_data_ready),
+   // 	    .data_data_o    (mem_data_out),
+   // 	      
+   // 	    /* CPU INSTRCTION */
+   // 	    .inst_addr      ({pc, 2'b0}),
+   // 	    .inst_ren       (inst_read),
+   // 	    .inst_ack       (inst_ready),
+   // 	    .inst_data_o    (inst),
+
+   // 	    /* INTERRUPTS */
+   // 	    .interrupts     (psx_int)
+   //         );
+
     // Memory
     mips_mem Memory(
             // Port 1 (instructions)
@@ -84,32 +101,32 @@ module testbench;
             .excpt2(mem_excpt), .allow_kernel2(1'b1), .kernel2(),
             .rst_b(rst_b), .clk(clk));
 
+    always_ff@(posedge clk) begin
+        if (inst_read)
+            inst_ready <= 1'b1;
+        else
+            inst_ready <= 1'b0;
+        if (mem_write_en || mem_data_read)
+            mem_data_ready <= 1'b1;
+        else
+            mem_data_ready <= 1'b0;
+    end
+
     initial begin
         rst_b = 0;
+        psx_int <= 11'b00;
         #75;
         rst_b <= 1;
+        #4000;
+        psx_int <= 11'b00000000001;
+        #2000;
+        psx_int[0] <= 1'b0;
     end
 
     always @(halted) begin
         #0;
         if(halted === 1'b1)
             $finish;
-    end
-
-    // Fake the handshake needed for OpenCores MIPS
-    always @(posedge clk) begin
-        //$display("Current instruction: %x PC: %x", inst, pc);
-        if (inst_read)
-            inst_ready <= 1'b1;
-        else
-            inst_ready <= 1'b0;
-    end
-
-    always @(posedge clk) begin
-        if (data_read | mem_write_en)
-            data_ready <= 1'b1;
-        else
-            data_ready <= 1'b0;
     end
 endmodule
 

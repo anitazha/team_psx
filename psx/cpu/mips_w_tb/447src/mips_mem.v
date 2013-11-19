@@ -89,7 +89,7 @@ module mips_mem(addr1,data_in1,data_out1,we1,excpt1,allow_kernel1,kernel1,
     	    data_top_w = data_start_w + data_words,
 
 	    // Text segment
-	    text_start   = 32'h00400000,
+	    text_start   = 32'hBFC00000, // FOR STANDARD MIPS BIOS
 	    text_words   = 'h1000000, /* 256 K */
     	    text_length  = text_words * 4,
 	    text_top = text_start + text_length,

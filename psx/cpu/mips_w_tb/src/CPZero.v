@@ -65,6 +65,8 @@ module CPZero(
     input  ID_CanErr,               // Cumulative signal, i.e. (ID_ID_CanErr | ID_EX_CanErr | ID_M_CanErr)
     input  EX_CanErr,               // Cumulative signal, i.e. (EX_EX_CanErr | EX_M_CanErr)
     input  M_CanErr,                // Memory stage can error (i.e. cause exception)
+    input  [10:0] PSX_Int_Mask,     // PSX Interrupt Mask
+    input  [10:0] PSX_Int_Stat,     // PSX Interrupt State
     //-- Exception Control Flow --/
     output IF_Exception_Stall,
     output ID_Exception_Stall,
@@ -206,6 +208,7 @@ module CPZero(
     reg  [7:0] Cause_IP;            // Pending HW Interrupt indicator.
     wire Cause_ExcCode4 = 1'd0;        // Can be made into a register when this bit is needed.
     reg  [3:0] Cause_ExcCode30;     // Description of Exception (only lower 4 bits currently used; see above)
+    wire Cause_PSX_HW_Int = ((PSX_Int_Mask & PSX_Int_Stat) != 'b0);
     wire [31:0] Cause  = {Cause_BD, 1'b0, Cause_CE, 4'b0000, Cause_IV, Cause_WP,
                                  6'b000000, Cause_IP, 1'b0, Cause_ExcCode4, Cause_ExcCode30, 2'b00};
                         
@@ -413,7 +416,8 @@ module CPZero(
              */
             // If reading -> 0, Otherwise if 0 -> Int5.
             Cause_IP[7]   <= ((Status_CU_0 | KernelMode) & Mfc0 & (Rd == 5'd9) & (Sel == 3'b000)) ? 0 : ((Cause_IP[7] == 0) ? Int5 : Cause_IP[7]);
-            Cause_IP[6:2] <= Int[4:0];
+            Cause_IP[6:3] <= Int[4:1];
+            Cause_IP[2]   <= Cause_PSX_HW_Int; // COP0 R13 Bit10
             Cause_IP[1:0] <= (CP0_WriteCond & (Rd == 5'd13) & (Sel == 3'b000)) ? Reg_In[9:8]  : Cause_IP[1:0];
         end
     end

@@ -33,14 +33,20 @@
      Current Setup:
         General exceptions go to 0x0. Interrupts go to 0x8. Booting starts at 0x10.
 */   
-//parameter [31:0] EXC_Vector_Base_Reset          = 32'h0000_0010;    // MIPS Standard is 0xBFC0_0000
-parameter [31:0] EXC_Vector_Base_Reset          = 32'h0040_0000;    // .text start in 447 testbench
+parameter [31:0] EXC_Vector_Base_Reset          = 32'hBFC0_0000;    // MIPS Standard is 0xBFC0_0000
+//parameter [31:0] EXC_Vector_Base_Reset          = 32'h0040_0000;    // .text start in 447 testbench
 parameter [31:0] EXC_Vector_Base_Other_NoBoot   = 32'h0000_0000;    // MIPS Standard is 0x8000_0000
-parameter [31:0] EXC_Vector_Base_Other_Boot     = 32'h8000_0000;    // MIPS Standard is 0xBFC0_0200
-parameter [31:0] EXC_Vector_Offset_General      = 32'h0000_0000;    // MIPS Standard is 0x0000_0180
-parameter [31:0] EXC_Vector_Offset_Special      = 32'h0000_0008;    // MIPS Standard is 0x0000_0200
+parameter [31:0] EXC_Vector_Base_Other_Boot     = 32'h0000_0000;    // MIPS Standard is 0xBFC0_0200
+parameter [31:0] EXC_Vector_Offset_General      = 32'h8000_0000;    // MIPS Standard is 0x0000_0180
+//parameter [31:0] EXC_Vector_Offset_Special      = 32'h0000_0008;    // MIPS Standard is 0x0000_0200
+parameter [31:0] EXC_Vector_Offset_Special      = 32'h8000_0000;    // MIPS Standard is 0x0000_0200
 
+/*** PSX Hardware Register Locations ***/
 
+//parameter [31:0] PSX_Int_Stat_Addr              = 32'h1F80_1070;
+//parameter [31:0] PSX_Int_Mask_Addr              = 32'h1F80_1074;
+parameter [31:0] PSX_Int_Stat_Addr              = 32'h1000_1070;
+parameter [31:0] PSX_Int_Mask_Addr              = 32'h1000_1074;
 
 /*** Kernel/User Memory Areas ***
 
@@ -55,20 +61,15 @@ parameter [31:0] EXC_Vector_Offset_Special      = 32'h0000_0008;    // MIPS Stan
 */
 parameter [31:0] UMem_Lower = 32'h08000000;
 
-
-
 /*** Processor Endianness ***
 
      The MIPS Configuration Register (CP0 Register 16 Select 0) specifies the processor's
      endianness. A processor in user mode may switch to reverse endianness, which will be
      the opposite of this parameter.
 */
-parameter Big_Endian = 1'b1;
-
-
+parameter Big_Endian = 1'b0;
 
 /*** Encodings for MIPS32 Release 1 Architecture ***/
-
 
 /* Op Code Categories */
 parameter [5:0] Op_Type_R   = 6'b00_0000;  // Standard R-Type instructions
