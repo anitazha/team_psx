@@ -1,5 +1,5 @@
 
-BIOS = open("SCPH7001.BIN", 'rb')
+BIOS = open("lots_of_BIOS/PSX - SCPH7001.BIN", 'rb')
 MIF  = open("generated_files/bios_256k.mif", 'w')
 MIF0 = open("generated_files/bios_16k_0.mif", 'w')
 MIF1 = open("generated_files/bios_16k_1.mif", 'w')
@@ -33,10 +33,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF.write(hex(count)[2:] + ' : ')
-        MIF.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
-                   "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+        MIF.write("{:02x}".format(ord(byte[3])) +
+                  "{:02x}".format(ord(byte[2])) +
+                  "{:02x}".format(ord(byte[1])) +
+                  "{:02x}".format(ord(byte[0])))
         MIF.write(';\n')
         count = count + 1
         if (count == 65536):
@@ -66,10 +66,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF0.write(hex(count - 65536)[2:] + ' : ')
-        MIF0.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF0.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF0.write(';\n')
         count = count + 1
         if (count == 69632):
@@ -96,10 +96,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF1.write(hex(count - 69632)[2:] + ' : ')
-        MIF1.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF1.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF1.write(';\n')
         count = count + 1
         if (count == 73728):
@@ -126,10 +126,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF2.write(hex(count - 73728)[2:] + ' : ')
-        MIF2.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF2.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF2.write(';\n')
         count = count + 1
         if (count == 77824):
@@ -166,10 +166,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF3.write(hex(count - 102400)[2:] + ' : ')
-        MIF3.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF3.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF3.write(';\n')
         count = count + 1
         if (count == 106496):
@@ -196,10 +196,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF4.write(hex(count - 106496)[2:] + ' : ')
-        MIF4.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF4.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF4.write(';\n')
         count = count + 1
         if (count == 110592):
@@ -226,10 +226,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF5.write(hex(count - 110592)[2:] + ' : ')
-        MIF5.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF5.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF5.write(';\n')
         count = count + 1
         if (count == 114688):
@@ -256,10 +256,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF6.write(hex(count - 114688)[2:] + ' : ')
-        MIF6.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF6.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF6.write(';\n')
         count = count + 1
         if (count == 118784):
@@ -286,10 +286,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF7.write(hex(count - 118784)[2:] + ' : ')
-        MIF7.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF7.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF7.write(';\n')
         count = count + 1
         if (count == 122880):
@@ -316,10 +316,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF8.write(hex(count - 122880)[2:] + ' : ')
-        MIF8.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF8.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF8.write(';\n')
         count = count + 1
         if (count == 126976):
@@ -346,10 +346,10 @@ while 1:
         #if (ord(ord(byte[0]) + ord(ord(byte[1]) + ord(ord(byte[2]) + ord(ord(byte[3]) == 0):
             #continue
         MIF9.write(hex(count - 126976)[2:] + ' : ')
-        MIF9.write("{:02x}".format(ord(byte[0])) +
-                   "{:02x}".format(ord(byte[1])) +
+        MIF9.write("{:02x}".format(ord(byte[3])) +
                    "{:02x}".format(ord(byte[2])) +
-                   "{:02x}".format(ord(byte[3])))
+                   "{:02x}".format(ord(byte[1])) +
+                   "{:02x}".format(ord(byte[0])))
         MIF9.write(';\n')
         count = count + 1
         #if (count == 106495):
