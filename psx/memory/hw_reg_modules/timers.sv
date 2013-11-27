@@ -23,6 +23,7 @@ module timer0(input logic         sys_clk, rst,
    reg 	      target_reached;
    reg 	      overflow_reached;
    reg 	      pulsed;
+   reg 	      toggle_wait;
    reg [3:0]  pulse_counter;
    
    reg 	      hblank_flag;
@@ -114,8 +115,11 @@ module timer0(input logic         sys_clk, rst,
       if (rst) begin
          cmode_irq[2:0] <= 3'b001;
          pulsed <= 1'b0;
+	 toggle_wait <= 1'b0;
       end
       else begin
+	 if (value == 16'b0) toggle_wait <= 1'b0;
+	 
          /* BIT 10 */
          /* Set bit10 after writing */
          if (wen[1]) begin
@@ -153,11 +157,14 @@ module timer0(input logic         sys_clk, rst,
                          end
                       end
                     endcase
-                    /* IRQ held for only a few clocks */ 
-                 end
+		 end
+		 /* IRQ held for only a few clocks */
 		 else begin
                     if (pulse_counter == 4'b1111) begin
-                       cmode_irq[0] <= 1'b1;
+		       if (( cmode_reg[3] && value != targt) ||
+			   (~cmode_reg[3] && value != 16'hFFFF)) begin
+			  cmode_irq[0] <= 1'b1;
+		       end
                     end
                  end
 	      end
@@ -185,17 +192,20 @@ module timer0(input logic         sys_clk, rst,
                       // trigger on either
                       2'b11: begin
                          if ((value == 16'hFFFF) | (value == targt)) begin
-                            cmode_irq[0] <= 1'b0;
+			    cmode_irq[0] <= 1'b0;
                             pulsed <= 1'b1;
                          end
                       end
-                    endcase
-                    /* IRQ held for only a few clocks */ 
+                    endcase 
                  end
+		 /* IRQ held for only a few clocks */
 		 else begin
                     if (pulse_counter == 4'b1111) begin
-                       cmode_irq[0] <= 1'b1;
-                       pulsed <= 1'b0;
+		       if (( cmode_reg[3] && value != targt) ||
+			   (~cmode_reg[3] && value != 16'hFFFF)) begin
+			  cmode_irq[0] <= 1'b1;
+			  pulsed <= 1'b0;
+                       end
                     end
                  end
               end
@@ -209,22 +219,31 @@ module timer0(input logic         sys_clk, rst,
                       // trigger on Counter = Target
                       2'b01: begin
 			 if (value == targt) begin
-                            cmode_irq[0] <= 1'b0;
-                            pulsed <= 1'b1;
+                            if (~toggle_wait) begin
+			       toggle_wait <= 1'b1;
+			       cmode_irq[0] <= 1'b0;
+                               pulsed <= 1'b1;
+			    end
 			 end
                       end
                       // trigger on Counter = FFFFh
                       2'b10: begin
 			 if (value == 16'hFFFF) begin
-                            cmode_irq[0] <= 1'b0;
-                            pulsed <= 1'b1;
+                            if (~toggle_wait) begin
+			       toggle_wait <= 1'b1;
+			       cmode_irq[0] <= 1'b0;
+                               pulsed <= 1'b1;
+			    end
 			 end
                       end
                       // trigger on either
                       2'b11: begin
 			 if ((value == 16'hFFFF) | (value == targt)) begin
-                            cmode_irq[0] <= 1'b0;
-                            pulsed <= 1'b1;
+                            if (~toggle_wait) begin
+			       toggle_wait <= 1'b1;
+			       cmode_irq[0] <= 1'b0;
+                               pulsed <= 1'b1;
+			    end
 			 end
                       end
                     endcase
@@ -239,19 +258,28 @@ module timer0(input logic         sys_clk, rst,
 		   // trigger on Counter = Target
 		   2'b01: begin
 		      if (value == targt) begin
-			 cmode_irq[0] <= ~cmode_irq[0];
+			 if (~toggle_wait) begin
+			    toggle_wait <= 1'b1;
+			    cmode_irq[0] <= ~cmode_irq[0];
+			 end
 		      end
 		   end
 		   // trigger on Counter = FFFFh
 		   2'b10: begin
 		      if (value == 16'hFFFF) begin
-			 cmode_irq[0] <= ~cmode_irq[0];
+			 if (~toggle_wait) begin
+			    toggle_wait <= 1'b1;
+			    cmode_irq[0] <= ~cmode_irq[0];
+			 end
 		      end
 		   end
 		   // trigger on either
 		   2'b11: begin
 		      if ((value == 16'hFFFF) | (value == targt)) begin
-			 cmode_irq[0] <= ~cmode_irq[0];
+			 if (~toggle_wait) begin
+			    toggle_wait <= 1'b1;
+			    cmode_irq[0] <= ~cmode_irq[0];
+			 end
 		      end
 		   end
 		 endcase
@@ -353,17 +381,20 @@ module timer0(input logic         sys_clk, rst,
                  end
                  /* Reset to 0000h at Hblank(s) */
                  2'b01: begin
-                    if (hblank & ~hblank_flag) begin
-                       hblank_flag <= 1'b1;
-                       value <= 16'b0;
-                    end
-                    else if (hblank_flag) begin
-                       hblank_flag <= 1'b0;
-                       value <= 16'b1;
-                    end
-                    else begin
-                       value <= value + 16'b1;
-                    end
+                    if (~hblank) begin
+		       hblank_flag <= 1'b0;
+		       value <= value + 16'b1;
+		    end
+		    else if (hblank & ~hblank_flag) begin
+		       hblank_flag <= 1'b1;
+		       value <= 16'b0;
+		    end
+		    else if (hblank & hblank_flag) begin
+		       value <= value + 16'b1;
+		    end
+		    else begin
+		       value <= value + 16'b1;
+		    end
                  end
                  /* Reset to 0000h at Hblank(s) and pause outside Hblank(s) */
                  2'b10: begin
@@ -376,8 +407,7 @@ module timer0(input logic         sys_clk, rst,
                        value <= 16'b0;
                     end
                     else if (hblank && hblank_flag) begin
-                       hblank_flag <= 1'b0;
-                       value <= 16'b1;
+                       value <= value + 16'b1;
                     end
                     else begin
                        value <= value + 16'b1;
@@ -390,6 +420,7 @@ module timer0(input logic         sys_clk, rst,
                     end
                     else if (hblank && ~hblank_flag) begin
                        hblank_flag <= 1'b1;
+		       value <= value + 16'b1;
                     end
                     else if (hblank_flag) begin
                        value <= value + 16'b1;
@@ -433,6 +464,7 @@ module timer2(input logic         sys_clk, rst,
    reg 		      target_reached;
    reg 		      overflow_reached;
    reg 		      pulsed;
+   reg 		      toggle_wait;
    reg [3:0] 	      pulse_counter;
    
    wire 	      sync_en;
@@ -533,8 +565,11 @@ module timer2(input logic         sys_clk, rst,
       if (rst) begin
          cmode_irq[2:0] <= 3'b001;
          pulsed <= 1'b0;
+	 toggle_wait <= 1'b0;
       end
       else begin
+	 if (value == 16'b0) toggle_wait <= 1'b0;
+	 
          /* BIT 10 */
          /* Set bit10 after writing */
          if (wen[1]) begin
@@ -573,10 +608,13 @@ module timer2(input logic         sys_clk, rst,
                       end
                     endcase
 		 end
-                 /* IRQ held for only a few clocks */ 
-                 else begin
+                 /* IRQ held for only a few clocks */
+		 else begin
                     if (pulse_counter == 4'b1111) begin
-                       cmode_irq[0] <= 1'b1;
+		       if (( cmode_reg[3] && value != targt) ||
+			   (~cmode_reg[3] && value != 16'hFFFF)) begin
+			  cmode_irq[0] <= 1'b1;
+		       end
                     end
                  end
               end
@@ -602,7 +640,7 @@ module timer2(input logic         sys_clk, rst,
                          end
                       end
                       // trigger on either
-                      2'b11: begin
+                      2'b11: begin		 
                          if ((value == 16'hFFFF) | (value == targt)) begin
                             cmode_irq[0] <= 1'b0;
                             pulsed <= 1'b1;
@@ -613,8 +651,11 @@ module timer2(input logic         sys_clk, rst,
                  /* IRQ held for only a few clocks */ 
                  else begin
                     if (pulse_counter == 4'b1111) begin
-                       cmode_irq[0] <= 1'b1;
-                       pulsed <= 1'b0;
+		       if (( cmode_reg[3] && value != targt) ||
+			   (~cmode_reg[3] && value != 16'hFFFF)) begin
+			  cmode_irq[0] <= 1'b1;
+			  pulsed <= 1'b0;
+                       end
                     end
                  end
               end
@@ -628,22 +669,31 @@ module timer2(input logic         sys_clk, rst,
                       // trigger on Counter = Target
                       2'b01: begin
 			 if (value == targt) begin
-                            cmode_irq[0] <= 1'b0;
-                            pulsed <= 1'b1;
+                            if (~toggle_wait) begin
+			       toggle_wait <= 1'b1;
+                               cmode_irq[0] <= 1'b0;
+                               pulsed <= 1'b1;
+			    end
 			 end
                       end
                       // trigger on Counter = FFFFh
                       2'b10: begin
 			 if (value == 16'hFFFF) begin
-                            cmode_irq[0] <= 1'b0;
-                            pulsed <= 1'b1;
+                            if (~toggle_wait) begin
+			       toggle_wait <= 1'b1;
+                               cmode_irq[0] <= 1'b0;
+                               pulsed <= 1'b1;
+			    end
 			 end
                       end
                       // trigger on either
                       2'b11: begin
 			 if ((value == 16'hFFFF) | (value == targt)) begin
-                            cmode_irq[0] <= 1'b0;
-                            pulsed <= 1'b1;
+                            if (~toggle_wait) begin
+			       toggle_wait <= 1'b1;
+                               cmode_irq[0] <= 1'b0;
+                               pulsed <= 1'b1;
+			    end
 			 end
                       end
                     endcase
@@ -658,19 +708,28 @@ module timer2(input logic         sys_clk, rst,
 		   // trigger on Counter = Target
 		   2'b01: begin
 		      if (value == targt) begin
-			 cmode_irq[0] <= ~cmode_irq[0];
+                         if (~toggle_wait) begin
+			    toggle_wait <= 1'b1;
+			    cmode_irq[0] <= ~cmode_irq[0];
+			 end
 		      end
 		   end
 		   // trigger on Counter = FFFFh
 		   2'b10: begin
 		      if (value == 16'hFFFF) begin
-			 cmode_irq[0] <= ~cmode_irq[0];
+                         if (~toggle_wait) begin
+			    toggle_wait <= 1'b1;
+			    cmode_irq[0] <= ~cmode_irq[0];
+			 end
 		      end
 		   end
 		   // trigger on either
 		   2'b11: begin
 		      if ((value == 16'hFFFF) | (value == targt)) begin
-			 cmode_irq[0] <= ~cmode_irq[0];
+                         if (~toggle_wait) begin
+			    toggle_wait <= 1'b1;
+			    cmode_irq[0] <= ~cmode_irq[0];
+			 end
 		      end
 		   end
 		 endcase

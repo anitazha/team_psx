@@ -6,7 +6,6 @@ module addr_interpreter(input  logic clk, rst,
 			input  logic 	    ren, wen,
 			output logic 	    ack,
 			output logic [31:0] data_o,
-			output logic [ 6:0] addr_interpreter_state,
 
 			/* BLOCKRAM INTERFACE */
 			input  logic [31:0] blk_data,
@@ -25,14 +24,13 @@ module addr_interpreter(input  logic clk, rst,
 			input  logic [31:0] sc_data_o,
 			output logic [ 7:0] sc_addr,
 			output logic [31:0] sc_data_i,
-			output logic 	    sc_wen//,
+			output logic 	    sc_wen,
 
 			/* HW REGISTER INTERFACE */
 			input  logic [31:0] hw_data_o,
 			input  logic 	    hw_ack,
 			output logic [31:0] hw_data_i,
 			output logic [31:0] hw_addr,
-			output logic [ 3:0] hw_be,
 			output logic	    hw_wen,
 			output logic        hw_ren
 			);
@@ -50,13 +48,13 @@ module addr_interpreter(input  logic clk, rst,
    localparam BIOS_TAG_1 = 32'h1FC0_0000;   // start addresses for BIOS
    localparam BIOS_TAG_2 = 32'h9FC0_0000;
    localparam BIOS_TAG_3 = 32'hBFC0_0000;
-   localparam BIOS_SIZE  = 20'h0008_0000;
+   localparam BIOS_SIZE  = 32'h0008_0000;
 
    localparam MAIN_TAG_1  = 32'h0000_0000;  // KUSEG
    localparam MAIN_TAG_2  = 32'h8000_0000;  // KSEG0
    localparam MAIN_TAG_3  = 32'hA000_0000;  // KSEG1
    localparam MAIN_SIZE   = 32'h0020_0000;  // 2 megabytes
-   localparam MAIN_OFFSET = 24'h000000;
+   localparam MAIN_OFFSET = 32'h0000_0000;
 
    localparam PPORT_TAG_1 = 32'h1F00_0000;  // parallel port start addresses
    localparam PPORT_TAG_2 = 32'h9F00_0000;
@@ -75,7 +73,6 @@ module addr_interpreter(input  logic clk, rst,
    /* INTERNAL LINES */
    reg [6:0]   curr_state,  next_state;
    reg 	       curr_ack,    next_ack;
-   reg [24:0]  curr_addr,   next_addr;
    reg [31:0]  curr_data_i, next_data_i;
 
    reg [7:0]   timeout_counter; 
@@ -94,23 +91,24 @@ module addr_interpreter(input  logic clk, rst,
 		      (addr >= MAIN_TAG_2  & addr <  MAIN_TAG_2+MAIN_SIZE) ||
 		      (addr >= MAIN_TAG_3  & addr <  MAIN_TAG_3+MAIN_SIZE));
    assign in_PPORT = ((addr >= PPORT_TAG_1 & addr < PPORT_TAG_1+PPORT_SIZE) ||
-		      (addr >= PPORT_TAG_2 & addr < PPORT_TAG_1+PPORT_SIZE) ||
-		      (addr >= PPORT_TAG_3 & addr < PPORT_TAG_1+PPORT_SIZE));
+		      (addr >= PPORT_TAG_2 & addr < PPORT_TAG_2+PPORT_SIZE) ||
+		      (addr >= PPORT_TAG_3 & addr < PPORT_TAG_3+PPORT_SIZE));
    assign in_SCPAD = ((addr >= SCPAD_TAG_1 & addr < SCPAD_TAG_1+SCPAD_SIZE) ||
-		      (addr >= SCPAD_TAG_2 & addr < SCPAD_TAG_1+SCPAD_SIZE));
+		      (addr >= SCPAD_TAG_2 & addr < SCPAD_TAG_2+SCPAD_SIZE));
    assign in_HWREG = ((addr >= HWREG_TAG_1 & addr < HWREG_TAG_1+HWREG_SIZE) ||
-		      (addr >= HWREG_TAG_2 & addr < HWREG_TAG_1+HWREG_SIZE) ||
-		      (addr >= HWREG_TAG_3 & addr < HWREG_TAG_1+HWREG_SIZE));
+		      (addr >= HWREG_TAG_2 & addr < HWREG_TAG_2+HWREG_SIZE) ||
+		      (addr >= HWREG_TAG_3 & addr < HWREG_TAG_3+HWREG_SIZE));
 
    assign data_o = data_out;
    assign ack    = curr_ack;
    
    assign sc_data_i = data_i;
    assign sd_data_i = data_i;
+   assign hw_data_i = data_i;
    
-   assign sc_addr = addr[9:2];
-   assign sd_addr = {5'd0, addr[20:2]};
-   
+   assign sc_addr  = addr[9:2];
+   assign sd_addr  = {5'd0, addr[20:2]};
+   assign hw_addr  = addr;   
    assign blk_addr = addr[18:2];
    
    assign sc_wen = sc_wen_out;
@@ -127,7 +125,7 @@ module addr_interpreter(input  logic clk, rst,
 	 timeout_counter <= 6'd0;
       end
       else begin
-	 if (curr_state != READ_ACK || curr_state != WRITE_ACK) begin
+	 if (curr_state != LATCH || curr_state != WRITE_ACK) begin
 	    timeout_counter <= 6'd0;
 	 end
 	 else begin
@@ -145,8 +143,8 @@ module addr_interpreter(input  logic clk, rst,
 	 if (curr_state == LATCH && in_BIOS) begin
 	    data_out <= blk_data;
 	 end
-	 else if (curr_state == LATCH && in_MAIN) begin
-	    data_out <= 32'd0;//sd_data_o;
+	 else if (curr_state == LATCH && in_MAIN && sd_valid) begin
+	    data_out <= sd_data_o;
 	 end
 	 else if (curr_state == LATCH && in_SCPAD) begin
 	    data_out <= sc_data_o;
@@ -207,7 +205,7 @@ module addr_interpreter(input  logic clk, rst,
 		 next_state = READ;
 	      end
 	      else begin     
-		 next_state = READ_ACK;
+		 next_state = LATCH;
 	      end
 	   end
 	   else if (in_HWREG) begin
@@ -219,19 +217,8 @@ module addr_interpreter(input  logic clk, rst,
 	   end
 	end
 	READ_ACK: begin
-	   if (in_MAIN) begin
-	      if (sd_valid) begin
-		 next_state = LATCH;
-	      end
-	      else if (timeout_counter == 100) begin
-		 next_state = IDLE;
-	      end
-	      else begin
-		 next_state = READ_ACK;
-	      end
-	   end
-	   else if (in_HWREG) begin
-	      hw_ren_out = 1'b1
+	   if (in_HWREG) begin
+	      hw_ren_out = 1'b1;
 	      if (hw_ack) begin
 		 hw_ren_out = 1'b0;
 		 next_state = LATCH;
@@ -245,8 +232,22 @@ module addr_interpreter(input  logic clk, rst,
 	   end
 	end
 	LATCH: begin
-	   next_state = WAIT;
-	   next_ack = 1'b1;
+	   if (in_MAIN) begin
+	      if (sd_valid) begin
+		 next_state = WAIT;
+		 next_ack = 1'b1;
+	      end
+	      else if (timeout_counter == 100) begin
+		 next_state = IDLE;
+	      end
+	      else begin
+		 next_state = LATCH;
+	      end
+	   end
+	   else begin
+	      next_state = WAIT;
+	      next_ack = 1'b1;
+	   end
 	end
 	
 	/* WRITE STATE */
@@ -281,7 +282,7 @@ module addr_interpreter(input  logic clk, rst,
 	      next_ack = 1'b1;
 	   end
 	   else if (in_HWREG) begin
-	      hw_wen_out = 1'b1
+	      hw_wen_out = 1'b1;
 	      if (hw_ack) begin
 		 next_state = WAIT;
 		 hw_wen_out = 1'b0;
