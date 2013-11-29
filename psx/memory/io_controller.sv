@@ -162,7 +162,7 @@ module io_controller(input  logic clk, rst,
    assign to_gp0 = to_gp0_o;
    assign to_gp1 = to_gp1_o;
    assign gp0 = gp0_o;
-   assign go1 = gp1_o;
+   assign gp1 = gp1_o;
    assign gpu_ren = gpu_ren_o;
 
    /* DMA outputs */

@@ -266,7 +266,7 @@ module dma_channel(input  logic        sys_clk, rst,
 	     /* MODE 1 - for MDEC, SPU and CDROM */
 	     SYNC_MODE1: begin
 		/* don't do anything if transfer already completed */
-		if (dma_chcr[31:16] == 0) begin
+		if (dma_bcr[31:16] == 16'b0) begin
 		   next_state = IDLE;
 		   dma_done_o = 1'b1;
 		   next_tip = 1'b0;
@@ -435,6 +435,14 @@ module dma_channel(input  logic        sys_clk, rst,
 	   next_wen = 1'b1;
 	   next_ren = 1'b0;
 	   next_state = WRITE_ACK;
+	   if (mem_direction) begin
+	      madr_incr_o = 1'b1;
+	      bcr_decr_o = 1'b1;
+	   end
+	   else begin
+	      madr_incr_o = 1'b1;
+	      bcr_decr_o = 1'b1;
+	   end
 	end
 	WRITE_ACK: begin
 	   if (dma_ack) begin
@@ -1021,6 +1029,13 @@ module dma_interrupts(input  logic sys_clk, rst,
    always @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
 	 DICR[30:0] <= 31'b0;
+	 irq0_reset <= 1'b1;
+	 irq1_reset <= 1'b1;
+	 irq2_reset <= 1'b1;
+	 irq3_reset <= 1'b1;
+	 irq4_reset <= 1'b1;
+	 irq5_reset <= 1'b1;
+	 irq6_reset <= 1'b1;
       end
       else begin
 	 if (wen) begin
@@ -1058,31 +1073,31 @@ module dma_interrupts(input  logic sys_clk, rst,
 	    end
 	 end
 	 else begin
-	    if (irq0_reset & irq_men & irq_en[0]) begin
+	    if (irq0_reset & irq_men & irq_en[0] & irqs[0]) begin
 	       DICR[24] <= irqs[0];
 	       irq0_reset <= 1'b0;
 	    end
-	    if (irq1_reset & irq_men & irq_en[1]) begin
+	    if (irq1_reset & irq_men & irq_en[1] & irqs[1]) begin
 	       DICR[25] <= irqs[1];
 	       irq1_reset <= 1'b0;
 	    end
-	    if (irq2_reset & irq_men & irq_en[2]) begin
+	    if (irq2_reset & irq_men & irq_en[2] & irqs[2]) begin
 	       DICR[26] <= irqs[2];
-	       irq1_reset <= 1'b0;
+	       irq2_reset <= 1'b0;
 	    end
-	    if (irq3_reset & irq_men & irq_en[3]) begin
+	    if (irq3_reset & irq_men & irq_en[3] & irqs[3]) begin
 	       DICR[27] <= irqs[3];
-	       irq1_reset <= 1'b0;
+	       irq3_reset <= 1'b0;
 	    end
-	    if (irq4_reset & irq_men & irq_en[4]) begin
+	    if (irq4_reset & irq_men & irq_en[4] & irqs[4]) begin
 	       DICR[28] <= irqs[4];
 	       irq4_reset <= 1'b0;
 	    end
-	    if (irq5_reset & irq_men & irq_en[5]) begin
+	    if (irq5_reset & irq_men & irq_en[5] & irqs[5]) begin
 	       DICR[29] <= irqs[5];
 	       irq5_reset <= 1'b0;
 	    end
-	    if (irq6_reset & irq_men & irq_en[6]) begin
+	    if (irq6_reset & irq_men & irq_en[6] & irqs[6]) begin
 	       DICR[30] <= irqs[6];
 	       irq6_reset <= 1'b0;
 	    end
