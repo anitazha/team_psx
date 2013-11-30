@@ -188,6 +188,16 @@ module gpu(
    logic 		     clut_vram_re;
    logic 		     clut_ld;
 
+   logic 		     txpg_rdy, txpg_rdy_next;
+   logic [8:0] 		     txpg_count_x, txpg_count_x_next;
+   logic [8:0] 		     txpg_count_y, txpg_count_y_next;
+   logic [3:0] 		     txpg_base_x, txpg_base_x_next;
+   logic 		     txpg_base_y, txpg_base_y_next;
+   logic [18:0] 	     txpg_vram_addr;
+   logic 		     txpg_vram_re;
+   logic 		     txpg_ld;
+   logic [3:0][15:0] 	     txpg_val;
+
    logic 		     fill_rdy, fill_rdy_next;
    logic [11:0] 	     fill_x, fill_y, fill_x_next, fill_y_next;
    logic [15:0] 	     fill_hold, fill_hold_next;
@@ -247,8 +257,8 @@ module gpu(
    logic [63:0] 			 f_u, f_v;
    logic [7:0] 				 m_u, m_v;
 
-   /* Texture unit */
-   logic [255:0][15:0] 			 tx_cache;
+   /* Texture unit lines */
+//   logic [255:0][255:0][15:0] 		 txpg;
    
    genvar 				 text_i;
      
@@ -1177,10 +1187,6 @@ module gpu(
                      decode_state_next = GO_TXPG;
 		     new_cmd.x1 = cmd.x0 + {1'b0, cmd_fifo_cmd[10:0]};
 		     new_cmd.y1 = cmd.y0 + {1'b0, cmd_fifo_cmd[26:16]};
-		     new_cmd.u1 = (cmd.u0 + 
-				   ((cmd_fifo_cmd[10:0] > 11'd255) ? 11'd255 : cmd_fifo_cmd[7:0]));
-		     new_cmd.v1 = (cmd.v0 +
-				   ((cmd_fifo_cmd[26:16] > 11'd255) ? 11'd255 : cmd_fifo_cmd[23:16]));
 		  end
 		GP0_B_FILRECT: begin
 		   /* The seoncd param is a size, not a coord! */
@@ -1283,10 +1289,8 @@ module gpu(
 		  GP0_B_R8_TX_OQ_BL, GP0_B_R8_TX_OQ_RW, GP0_B_R8_TX_ST_BL, GP0_B_R8_TX_ST_RW,
 		  GP0_B_R16_TX_OQ_BL, GP0_B_R16_TX_OQ_RW, GP0_B_R16_TX_ST_BL,
 		  GP0_B_R16_TX_ST_RW: begin
-		     /* These rectangles are ready to draw now */
-		     decode_state_next = DRAWING;
-		     new_cmd.u1 = cmd.u0 + (cmd.x1 - cmd.x0);
-		     new_cmd.v1 = cmd.v0 + (cmd.y1 - cmd.y0);
+		     /* These rectangles need to get textpage now */
+		     decode_state_next = GO_TXPG;
 		  end
 	      endcase // case (cmd_hold)
 	   end // if (~cmd_fifo_cmd)
@@ -1302,6 +1306,17 @@ module gpu(
 	      new_cmd.text_en = cmd_fifo_cmd[25];
 	      decode_fifo_re = 1'b1;
 
+	      /* Now get the textpage */
+	      decode_state_next = GO_TXPG;
+	   end // if (~cmd_fifo_empty)
+	end // case: GET_TX1
+	GO_TXPG: begin
+	   txpg_on = 1'b1;
+	   decode_state_next = GET_TXPG;
+	end
+	GET_TXPG: begin
+	   /* Wait until the textpage is retrieved */
+	   if (txpg_rdy) begin
 	      /* Now on to the command */
 	      case (cmd_hold)
 		GP0_B_P3_TX_OQ_BL, GP0_B_P3_TX_OQ_RW, GP0_B_P3_TX_ST_BL, GP0_B_P3_TX_ST_RW,
@@ -1313,6 +1328,13 @@ module gpu(
 		  GP0_B_P4_TX_ST_BL_SH: begin
 		     /* New get next colors and stuff */
 		     decode_state_next = GET_CL2;
+		  end
+		GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
+		  GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
+		  GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW,
+		  GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW, GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW: begin
+		     /* Start drawing now that the textpage is loaded */
+		     decode_state_next = DRAWING;
 		  end
 	      endcase // case (cmd_hold)
 	   end // if (~cmd_fifo_empty)
@@ -2511,9 +2533,7 @@ module gpu(
       end
    end
 
-   /* WB FSM next state + output logic 
-      Note: this FSM deals with filling the texture register as well in
-      order to keep a single pointof vram access while drawing */
+   /* WB FSM next state + output logic */
    always_comb begin
       /* Defaults */
       wb_state_next = wb_state;
