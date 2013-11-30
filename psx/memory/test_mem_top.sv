@@ -1,133 +1,240 @@
 
 
-module test_mem_top(input wire RESET, SYSCLK_P, SYSCLK_N,
-		    input logic 	BN, BW, BC, BE,
-		    //input logic [7:0] 	GPIO_DIP,
-		    output logic [7:0] 	GPIO_LED_LS);
+module test_mem_top
+	(input  logic        CLOCK_50,
+	 input  logic [3:0]  KEY,
+	 input  logic [17:0] SW,
+	 output logic [17:0] LEDR,
+	 output logic [8:0]  LEDG,
+	 output logic [35:0] GPIO,
+	 
+	 /* SDRAM CHIP INTERFACE */
+	 output logic [12:0] DRAM_ADDR,
+	 output logic [1:0]  DRAM_BA,
+	 output logic        DRAM_CAS_N, DRAM_RAS_N, DRAM_CLK,
+	 output logic        DRAM_CKE, DRAM_CS_N, DRAM_WE_N,
+	 output logic [3:0]  DRAM_DQM,
+	 inout  wire  [31:0] DRAM_DQ);
 
    /* state definitions */
-   localparam W_INIT = 5'b00001;
-   localparam W_WAIT = 5'b00010;
-   localparam R_INIT = 5'b00100;
-   localparam R_WAIT = 5'b01000;
-   localparam DONE   = 5'b10000;
+   localparam DW_INIT = 5'b00001;
+   localparam DW_WAIT = 5'b00010;
+   localparam DR_INIT = 5'b00100;
+   localparam DR_WAIT = 5'b01000;
+   localparam DDONE   = 5'b10000;
+   localparam IR_INIT = 3'b001;
+   localparam IR_WAIT = 3'b010;
+   localparam IDONE   = 3'b100;
    
-   wire		clk, rst;
+   wire      clk, rst;
+   wire      dll_locked;
+   wire      reset_controller_out;
+   
+   reg [4:0] curr_statd, next_statd;
+   reg [2:0] curr_stati, next_stati;
+   reg 	     curr_d_ren, next_d_ren;
+   reg 	     curr_d_wen, next_d_wen;
+   reg 	     curr_i_ren, next_i_ren;
+   
+   reg [31:0] data_addr, data_data_i, data_data_o;
+   reg [31:0] inst_addr, inst_data_o;
+   reg        data_ren, data_wen, data_ack;
+   reg        inst_ren, inst_ack;
+   
+   reg [31:0] data_output, inst_output;
+   
+   wire [12:0] dram_addr;
+   wire [1:0]  dram_bank;
+   wire        dram_cas_n, dram_cke, dram_cs_n; 
+   wire	       dram_ras_n, dram_we_n, dram_clk;
+   wire [3:0]  dram_dqm;
+   wire [31:0] dram_dq_out, dram_dq_in;
+   wire        dram_oe_out;
 
-   reg [31:0] 	CPU_ADDR, CPU_ADDR_ROM, CPU_DATA_I, CPU_DATA_O, CPU_DATA_O_R;
-   reg [31:0] 	CPU_DATA;
-   reg 		CPU_REN, CPU_WEN;
-   reg 		CPU_ACK, CPU_ACK_R;
+   reg [31:0]  dram_reg_in, dram_reg_out;
+   
+   wire [6:0]  mem_controller_state;
+   wire [6:0]  addr_interpreter_state;
+   
+   assign data_ren = curr_d_ren;
+   assign data_wen = curr_d_wen;
+   assign inst_ren = curr_i_ren;
+   
+   assign data_addr = {15'd0, SW[16:2], 2'b00};
+   assign inst_addr = 32'hBFC0_0000;
+   assign data_data_i = 32'h12345678;
+   
+   assign clk = CLOCK_50;
+   assign rst = ~KEY[0];
+   
+   assign DRAM_CLK   = dram_clk;
+   assign DRAM_ADDR  = dram_addr;
+   assign DRAM_BA    = dram_bank;
+   assign DRAM_CAS_N = dram_cas_n;
+   assign DRAM_CKE   = dram_cke;
+   assign DRAM_CS_N  = dram_cs_n;
+   assign DRAM_DQ    = dram_oe_out ? dram_dq_in : {32{1'bz}};
+   assign DRAM_DQM   = dram_dqm;
+   assign DRAM_RAS_N = dram_ras_n;
+   assign DRAM_WE_N  = dram_we_n;
+   assign dram_dq_out = DRAM_DQ;
 
-   reg [4:0] 	curr_state, next_state;
-   reg 		curr_REN, next_REN;
-   reg 		curr_WEN, next_WEN;
-   
-   reg [7:0] 	GPIO_LED_LS_o;
+   assign GPIO[31:0] = KEY[1] ? dram_reg_out : dram_reg_in;
+   assign GPIO[32]   = dram_oe_out;
 
+   assign LEDG[7:0]  =  ((SW[1:0] == 2'b01) ? {1'b0, mem_controller_state} :
+			((SW[1:0] == 2'b10) ? {curr_statd, curr_stati} :
+			((SW[1:0] == 2'b11) ? {1'b0, addr_interpreter_state} :
+			 {data_ren, 
+			  data_wen, 
+			  inst_ren, 
+			  1'b0, 
+			  data_ack, 
+			  inst_ack, 
+			  2'b00})));
    
-   /* Clock Generation */
-   IBUFDS #(.DIFF_TERM("TRUE"),
-	    .IBUF_LOW_PWR("TRUE"),
-	    .IOSTANDARD("DEFAULT"))
-   clk_ibufds (.O(clk),
-	       .I(SYSCLK_P),
-	       .IB(SYSCLK_N));
-   
+   assign LEDR[15:0] = ((SW[17:16] == 2'b00) ? data_output[15:0]  :
+			((SW[17:16] == 2'b01) ? data_output[31:16] :
+			 ((SW[17:16] == 2'b10) ? inst_output[15:0]  :
+			  ((SW[17:16] == 2'b11) ? inst_output[31:16] : 
+			   SW[15:0]))));
    
    /* memory module */
-   mem_controller mem_c(.clk(clk),
-			.rst(rst),
-			.DAT_ADDR(CPU_ADDR),
-			.DAT_DATA_I(CPU_DATA_I),
-			.DAT_REN(CPU_REN),
-			.DAT_WEN(CPU_WEN),
-			.DAT_ACK(CPU_ACK),
-			.DAT_DATA_O(CPU_DATA_O),
-			
-			.INS_ADDR(CPU_ADDR_ROM),
-			.INS_REN(CPU_REN),
-			.INS_ACK(CPU_ACK_R),
-			.INS_DATA_O(CPU_DATA_O_R),
+   mem_controller mem_c(.clk (clk),
+			.rst (rst),
 			.*);
-   
-   assign rst = RESET;
-   assign CPU_DATA = BN ? CPU_DATA_O: CPU_DATA_O_R;
-   
-   assign GPIO_LED_LS =  (BE ? CPU_DATA[15:8] : 
-			  (BC ? CPU_DATA[23:16] :
-			   (BW ? CPU_DATA[31:24] : 
-			    (BN ? CPU_DATA[7:0] : CPU_DATA[7:0] ))));
-			 
-   assign CPU_ADDR     = 32'h00000100;
-   assign CPU_ADDR_ROM = 32'hBFC00000;
-   assign CPU_DATA_I   = 32'h12345678;
-   assign CPU_REN = curr_REN;
-   assign CPU_WEN = curr_WEN;
-   
-   /* FSM next state logic */
-   always @(posedge clk, posedge rst) begin
+
+   /* Latch values from DRAM_DQ in/out for SignalTap */
+   always @ (posedge clk, posedge rst) begin
       if (rst) begin
-	 curr_state <= W_INIT;
-	 curr_REN <= 1'b0;
-	 curr_WEN <= 1'b0;
+	 dram_reg_in <= 32'b0;
+	 dram_reg_out <= 32'b0;
       end
       else begin
-	 curr_state <= next_state;
-	 curr_REN <= next_REN;
-	 curr_WEN <= next_WEN;
+	 dram_reg_in <=  dram_dq_in;
+	 dram_reg_out <= DRAM_DQ;
+      end
+   end
+
+   
+   /* Latch value from reads */
+   always @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 data_output <= 32'd0;
+	 inst_output <= 32'd0;
+      end
+      else begin
+	 if (curr_statd == DDONE) begin
+	    data_output <= data_data_o;
+	 end
+	 if (curr_stati == IDONE) begin
+	    inst_output <= inst_data_o;
+	 end
       end
    end
    
-   /* FSM */
+   /* DATA FSM next state logic */
+   always @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 curr_statd <= DW_INIT;
+	 curr_d_ren <= 1'b0;
+	 curr_d_wen <= 1'b0;
+      end
+      else begin
+	 curr_statd <= next_statd;
+	 curr_d_ren <= next_d_ren;
+	 curr_d_wen <= next_d_wen;
+      end
+   end
+   
+   /* DATA FSM */
    always_comb begin
       /* Defaults */
-      next_state = curr_state;
-      next_REN = curr_REN;
-      next_WEN = curr_WEN;
-
-      case (curr_state)
-	W_INIT: begin
-	   next_WEN = 1'b1;
-	   next_state = W_WAIT;
+      next_statd = curr_statd;
+      next_d_ren = curr_d_ren;
+      next_d_wen = curr_d_wen;
+      
+      case (curr_statd)
+	DW_INIT: begin
+	   next_d_wen = 1'b1;
+	   next_statd = DW_WAIT;
 	end
-
-	W_WAIT: begin
-	   if (CPU_ACK) begin
-	      next_WEN = 1'b0;
-	      next_state = R_INIT;
+	
+	DW_WAIT: begin
+	   if (data_ack) begin
+	      next_d_wen = 1'b0;
+	      next_statd = DR_INIT;
 	   end
 	   else begin
-	      next_state = W_WAIT;
+	      next_statd = DW_WAIT;
 	   end
 	end
-
-	R_INIT: begin
-	   if (~CPU_ACK) begin
-	      next_REN = 1'b1;
-	      next_state = R_WAIT;
+	
+	DR_INIT: begin
+	   if (~data_ack) begin
+	      next_d_ren = 1'b1;
+	      next_statd = DR_WAIT;
 	   end
 	   else begin
-	      next_state = R_INIT;
+	      next_statd = DR_INIT;
 	   end
 	end
-
-	R_WAIT: begin
-	   if (CPU_ACK) begin
-	      next_REN = 1'b0;
-	      next_state = DONE;
+	
+	DR_WAIT: begin
+	   if (data_ack) begin
+	      next_d_ren = 1'b0;
+	      next_statd = DDONE;
 	   end
 	   else begin
-	      next_state = R_WAIT;
+	      next_statd = DR_WAIT;
 	   end
 	end
-
-	DONE: begin
-	   next_state = DONE;
+	
+	DDONE: begin
+	   next_statd = DDONE;
 	end
       endcase // case (curr_state)
    end
-	   
+   
+   /* INSTRUCTION FSM next state logic */
+   always @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 curr_stati <= IR_INIT;
+	 curr_i_ren <= 1'b0;
+      end
+      else begin
+	 curr_stati <= next_stati;
+	 curr_i_ren <= next_i_ren;
+      end
+   end
+   
+   /* INSTRUCTION FSM */
+   always_comb begin
+      /* Defaults */
+      next_stati = curr_stati;
+      next_i_ren = curr_i_ren;
+      
+      case (curr_stati)
+	IR_INIT: begin
+	   next_i_ren = 1'b1;
+	   next_stati = IR_WAIT;
+	end
+	
+	IR_WAIT: begin
+	   if (inst_ack) begin
+	      next_i_ren = 1'b0;
+	      next_stati = IDONE;
+	   end
+	   else begin
+	      next_stati = IR_WAIT;
+	   end
+	end
+	
+	IDONE: begin
+	   next_stati = IDONE;
+	end
+      endcase // case (curr_state)
+   end
    
 endmodule // test_mem_top
 
