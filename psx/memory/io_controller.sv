@@ -103,6 +103,8 @@ module io_controller(input  logic clk, rst,
    localparam GPU_READ_GP0 = 32'h1F80_1810;
    localparam GPU_STAT_GP1 = 32'h1F80_1814;
 
+   localparam CACHECTRL_ADDR = 32'hFFFF_0130;
+
    /* PSX I/O REGISTERS */
    // - Memory Control 1
    reg [31:0] MEM_CTRL_1 [0:8];    // 0x1F801000 - 0x1F801023
@@ -133,6 +135,8 @@ module io_controller(input  logic clk, rst,
    reg [31:0] CLK_1_8_VALUE;       // 0x1F801120
    reg [31:0] CLK_1_8_CMODE;       //  - 1/8 System Clock
    reg [31:0] CLK_1_8_TARGT;
+
+   reg [31:0] CACHE_CTRL;
    
    /* Internal Lines */
    reg 	      timer_wen, timer_ren;
@@ -260,6 +264,8 @@ module io_controller(input  logic clk, rst,
 	 DMA5[0] <= 32'd0; DMA5[1] <= 32'd0; DMA5[2] <= 32'd0;
 	 DMA6[0] <= 32'd0; DMA6[1] <= 32'd0; DMA6[2] <= 32'd0;
 	 DMA_DPCR <= 32'h07654321;
+	 /* Memory Control 3 - Cache Control */
+	 CACHE_CTRL <= 32'd0;
       end 
       else begin
 	 if (curr_state == WRITE) begin
@@ -519,7 +525,14 @@ module io_controller(input  logic clk, rst,
 		 if (ben[0]) DMA_DPCR[ 7: 0] <= data_i[ 7: 0];
 	      end
 		 
-
+	      /* Memory Control 3 */
+	      CACHE_CTRL_ADDR: begin
+		 if (ben[3]) CACHE_CTRL[31:24] <= data_i[31:24];
+		 if (ben[2]) CACHE_CTRL[23:16] <= data_i[23:16];
+		 if (ben[1]) CACHE_CTRL[15: 8] <= data_i[15: 8];
+		 if (ben[0]) CACHE_CTRL[ 7: 0] <= data_i[ 7: 0];
+	      end
+	      
 	      default: begin
 		 // don't care about unused addresses
 	      end
@@ -658,7 +671,10 @@ module io_controller(input  logic clk, rst,
 		data_out <= gpu_read;
 	      GPU_STAT_GP1:
 		data_out <= gpu_stat;
-	      
+
+	      /* Memory Control 3 */
+	      CACHE_CTRL_ADDR:
+		data_out <= CACHE_CTRL;
 
 	      default:
 		data_out <= 32'b0;
