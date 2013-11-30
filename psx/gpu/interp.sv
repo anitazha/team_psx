@@ -13,7 +13,14 @@ module interp(
    
    logic [31:0] 		  det;
    logic [31:0] 		  ndiv_cx, ndiv_cy;
-   logic [31:0] 		  part1, part2, part3;
+   logic [31:0] 		  cx_part1, cx_part2, cx_part3;
+   logic [31:0] 		  cx_part1_next, cx_part2_next, cx_part3_next;
+   logic [31:0] 		  cy_part1, cy_part2, cy_part3;
+   logic [31:0] 		  cy_part1_next, cy_part2_next, cy_part3_next;
+   logic [31:0] 		  cs_part1, cs_part2, cs_part3;
+   logic [31:0] 		  cs_part1_next, cs_part2_next, cs_part3_next;
+   logic [31:0] 		  det_part1, det_part2, det_part3;
+   logic [31:0] 		  det_part1_next, det_part2_next, det_part3_next;
    logic [31:0] 		  ndiv_cs;
    logic [31:0] 		  ndiv_cx_next, ndiv_cy_next, ndiv_cs_next, det_next;
    
@@ -22,14 +29,14 @@ module interp(
    logic [31:0] 		  abs_ndiv_cx_next, abs_ndiv_cy_next, abs_ndiv_cs_next;
    logic [31:0] 		  abs_det_next;
 
-   logic [63:0] 		  q_cx, q_cy, q_cs, q_cx_next, q_cy_next, q_cs_next;
-   logic [64:0][31:0] 		  remain_cx, remain_cy, remain_cs;
-   logic [63:0][31:0] 		  remain_cx_next, remain_cy_next, remain_cs_next;
-   logic [63:0][32:0] 		  rem_cx, rem_cy, rem_cs;
-   logic [63:0] 		  div_cx, div_cy, div_cs;
+   logic [39:8] 		  q_cx, q_cy, q_cs, q_cx_next, q_cy_next, q_cs_next;
+   logic [40:8][31:0] 		  remain_cx, remain_cy, remain_cs;
+   logic [39:8][31:0] 		  remain_cx_next, remain_cy_next, remain_cs_next;
+   logic [39:8][32:0] 		  rem_cx, rem_cy, rem_cs;
+   logic [39:0] 		  div_cx, div_cy, div_cs;
    
-   logic [63:0] 		  r_cx, r_cy, r_cs;
-   logic [63:0] 		  r_cx_next, r_cy_next, r_cs_next;
+   logic [39:8] 		  r_cx, r_cy, r_cs;
+   logic [39:8] 		  r_cx_next, r_cy_next, r_cs_next;
    logic [31:0] 		  abs_cx, abs_cy, abs_cs;
    
    logic [31:0] 		  cx_next, cy_next, cs_next;
@@ -47,20 +54,62 @@ module interp(
    assign s1_32 = {20'b0, s1};
    assign s2_32 = {20'b0, s2};
    
-   /* Determinant */
-   assign det_next = x0_32 * (y1_32 - y2_32) + x1_32 * (y2_32 - y0_32) + x2_32 * (y0_32 - y1_32);
-
+   /* Split calculations (part) hold */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 det_part1 <= 32'd0;
+	 det_part2 <= 32'd0;
+	 det_part3 <= 32'd0;
+	 cx_part1 <= 32'd0;
+	 cx_part2 <= 32'd0;
+	 cx_part3 <= 32'd0;
+	 cy_part1 <= 32'd0;
+	 cy_part2 <= 32'd0;
+	 cy_part3 <= 32'd0;
+	 cs_part1 <= 32'd0;
+	 cs_part2 <= 32'd0;
+	 cs_part3 <= 32'd0;
+      end // if (rst)
+      else begin
+	 det_part1 <= det_part1_next;
+	 det_part2 <= det_part2_next;
+	 det_part3 <= det_part3_next;
+	 cx_part1 <= cx_part1_next;
+	 cx_part2 <= cx_part2_next;
+	 cx_part3 <= cx_part3_next;
+	 cy_part1 <= cy_part1_next;
+	 cy_part2 <= cy_part2_next;
+	 cy_part3 <= cy_part3_next;
+	 cs_part1 <= cs_part1_next;
+	 cs_part2 <= cs_part2_next;
+	 cs_part3 <= cs_part3_next;
+      end // else: !if(rst)
+   end // always_ff @
+   
    /* Non-div c's */
    always_comb begin
       /* Defaults */
-      ndiv_cx_next = s0_32 * (y1_32 - y2_32) + s1_32 * (y2_32 - y0_32) + s2_32 * (y0_32 - y1_32);
-      ndiv_cy_next = s0_32 * (x2_32 - x1_32) + s1_32 * (x0_32 - x2_32) + s2_32 * (x1_32 - x0_32);
+      det_part1_next = x0_32 * (y1_32 - y2_32);
+      det_part2_next = x1_32 * (y2_32 - y0_32);
+      det_part3_next = x2_32 * (y0_32 - y1_32);
       
-      part1 = x1_32 * y2_32 - x2_32 * y1_32;
-      part2 = x2_32 * y0_32 - x0_32 * y2_32;
-      part3 = x0_32 * y1_32 - x1_32 * y0_32;
+      cx_part1_next = s0_32 * (y1_32 - y2_32);
+      cx_part2_next = s1_32 * (y2_32 - y0_32);
+      cx_part3_next = s2_32 * (y0_32 - y1_32);
 
-      ndiv_cs_next = s0_32 * part1 + s1_32 * part2 + s2_32 * part3;
+      cy_part1_next = s0_32 * (x2_32 - x1_32);
+      cy_part2_next = s1_32 * (x0_32 - x2_32);
+      cy_part3_next = s2_32 * (x1_32 - x0_32);
+      
+      cs_part1_next = x1_32 * y2_32 - x2_32 * y1_32;
+      cs_part2_next = x2_32 * y0_32 - x0_32 * y2_32;
+      cs_part3_next = x0_32 * y1_32 - x1_32 * y0_32;
+      
+      ndiv_cx_next = cx_part1 + cx_part2 + cx_part3;
+      ndiv_cy_next = cy_part1 + cy_part2 + cy_part3;
+      ndiv_cs_next = s0_32 * cs_part1 + s1_32 * cs_part2 + s2_32 * cs_part3;
+
+      det_next = det_part1 + det_part2 + det_part3;
    end // always_comb
 
    /* Intermediate value hold */
@@ -101,17 +150,17 @@ module interp(
       end // else: !if(rst)
    end // always_ff @
 
-   assign remain_cx[64] = 32'd0;
-   assign remain_cy[64] = 32'd0;
-   assign remain_cs[64] = 32'd0;
+   assign remain_cx[40] = 32'd0;
+   assign remain_cy[40] = 32'd0;
+   assign remain_cs[40] = 32'd0;
 
-   assign div_cx = {16'b0, abs_ndiv_cx, 16'b0};
-   assign div_cy = {16'b0, abs_ndiv_cy, 16'b0};
-   assign div_cs = {16'b0, abs_ndiv_cs, 16'b0};
+   assign div_cx = {abs_ndiv_cx, 16'b0};
+   assign div_cy = {abs_ndiv_cy, 16'b0};
+   assign div_cs = {abs_ndiv_cs, 16'b0};
    
    /* Do the divsion (pipelined!)... */
    generate
-      for (i = 0; i < 64; i = i + 1) begin: int_div
+      for (i = 8; i < 40; i = i + 1) begin: int_div
 	 always_comb begin
 	    /* Defaults */
 	    rem_cx[i] = {remain_cx[i+1], div_cx[i]} - {1'b0, abs_det};
@@ -158,9 +207,9 @@ module interp(
    /* Abs final value hold */
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
-	 r_cx <= 64'd0;
-	 r_cy <= 64'd0;
-	 r_cs <= 64'd0;
+	 r_cx <= 32'd0;
+	 r_cy <= 32'd0;
+	 r_cs <= 32'd0;
       end
       else begin
 	 r_cx <= r_cx_next;
@@ -192,7 +241,19 @@ module interp(
    end // always_ff
 
    /* If nothing is changing, we are done! */
-   assign done = ((ndiv_cx == ndiv_cx_next) &
+   assign done = ((cx_part1 == cx_part1_next) &
+		  (cx_part2 == cx_part2_next) &
+		  (cx_part3 == cx_part3_next) &
+		  (cy_part1 == cy_part1_next) &
+		  (cy_part2 == cy_part2_next) &
+		  (cy_part3 == cy_part3_next) &
+		  (cs_part1 == cs_part1_next) &
+		  (cs_part2 == cs_part2_next) &
+		  (cs_part3 == cs_part3_next) &
+		  (det_part1 == det_part1_next) &
+		  (det_part2 == det_part2_next) &
+		  (det_part3 == det_part3_next) &
+		  (ndiv_cx == ndiv_cx_next) &
 		  (ndiv_cy == ndiv_cy_next) &
 		  (ndiv_cs == ndiv_cs_next) &
 		  (det == det_next) &

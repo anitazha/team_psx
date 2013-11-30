@@ -107,6 +107,15 @@ typedef struct packed {
    logic [`GPU_PIPELINE_WIDTH-1:0] 	   in_shape;
 } color_stage_t;
 
+/* Color Stage barrier regs */
+typedef struct packed {
+   logic       valid;
+   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] x;
+   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] y;
+   logic [`GPU_PIPELINE_WIDTH-1:0] 	 in_shape;
+   logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  m_u, m_v;
+} color_sub_stage_t;
+
 /* Shade Stage barrier regs */
 typedef struct packed {
    logic                                   valid;
@@ -115,6 +124,16 @@ typedef struct packed {
    logic [`GPU_PIPELINE_WIDTH-1:0] 	   in_shape;
    logic [`GPU_PIPELINE_WIDTH-1:0][7:0]    r, g, b;
 } shader_stage_t;
+
+/* Shade Sub Stage barrier regs */
+typedef struct packed {
+   logic                                 valid;
+   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] x;
+   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] y;
+   logic [`GPU_PIPELINE_WIDTH-1:0] 	 in_shape;
+   logic [`GPU_PIPELINE_WIDTH-1:0][31:0] int_r, int_g, int_b;
+   logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  r, g, b;
+} shader_sub_stage_t;
 
 /* Writeback Stage barrier regs */
 typedef struct packed {

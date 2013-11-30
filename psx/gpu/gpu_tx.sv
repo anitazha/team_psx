@@ -247,13 +247,14 @@ module gpu(
    
    /* COLOR STAGE */
    color_stage_t color_stage, next_color_stage;
+   color_sub_stage_t color_sub_stage, next_color_sub_stage;
    
    logic [`GPU_PIPELINE_WIDTH-1:0][31:0] f_u, f_v;
    logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  s_u, s_v;
-   logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  m_u, m_v;
 
    /* Texture unit */
    logic [`GPU_PIPELINE_WIDTH-1:0][15:0] tx_cache;
+   logic [`GPU_PIPELINE_WIDTH-1:0][15:0] tx_color;
    logic [15:0] 			 tx_val;
    logic 				 tx_ld;
    logic 				 tx_stall, color_stall;
@@ -263,8 +264,8 @@ module gpu(
 
    /* SHADER STAGE */
    shader_stage_t shader_stage, next_shader_stage;
+   shader_sub_stage_t shader_sub_stage, next_shader_sub_stage;
 
-   logic [`GPU_PIPELINE_WIDTH-1:0][31:0] int_r, int_g, int_b;
    logic [`GPU_PIPELINE_WIDTH-1:0][31:0] f_r, f_g, f_b;
 
    logic 				 shade_stall;
@@ -2250,10 +2251,12 @@ module gpu(
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 color_stage <= 'd0;
+	 color_sub_stage <= 'd0;
       end
       else begin
 	 if (~pipeline_stall) begin
 	    color_stage <= next_color_stage;
+	    color_sub_stage <= next_color_sub_stage;
 	 end
       end
    end
@@ -2276,9 +2279,13 @@ module gpu(
       ##################################################### */
 
    /* Pass Values */
-   assign next_shader_stage.valid = color_stage.valid;
-   assign next_shader_stage.x = color_stage.x;
-   assign next_shader_stage.y = color_stage.y;
+   assign next_color_sub_stage.valid = color_stage.valid;
+   assign next_color_sub_stage.x = color_stage.x;
+   assign next_color_sub_stage.y = color_stage.y;
+
+   assign next_shader_stage.valid = color_sub_stage.valid;
+   assign next_shader_stage.x = color_sub_stage.x;
+   assign next_shader_stage.y = color_sub_stage.y;
 
    /* Texture Page cache */
    always_ff @(posedge clk, posedge rst) begin
@@ -2304,7 +2311,8 @@ module gpu(
 	    next_shader_stage.g[text_i] = 8'd128;
 	    next_shader_stage.b[text_i] = 8'd128;
 
-	    next_shader_stage.in_shape[text_i] = color_stage.in_shape[text_i];
+	    next_color_sub_stage.in_shape[text_i] = color_stage.in_shape[text_i];
+	    next_shader_stage.in_shape[text_i] = color_sub_stage.in_shape[text_i];
 
 	    f_u[text_i] = 32'd0;
 	    f_v[text_i] = 32'd0;
@@ -2312,8 +2320,10 @@ module gpu(
 	    s_u[text_i] = 8'd0;
 	    s_v[text_i] = 8'd0;
 
-	    m_u[text_i] = 8'd0;
-	    m_v[text_i] = 8'd0;
+	    next_color_sub_stage.m_u[text_i] = 8'd0;
+	    next_color_sub_stage.m_v[text_i] = 8'd0;
+
+	    tx_color[text_i] = 16'd0;
 	    
 	    /* If its textured, use results from texture unit */
 	    if (cmd.texture == TEXT) begin
@@ -2338,19 +2348,55 @@ module gpu(
 			       (f_v[text_i][15:8] + f_v[text_i][7])));
 	       
 	       /* Window the result */
-	       m_u[text_i] = ((s_u[text_i] & 
-			       (~(text_mask_x << 'd3))) | ((text_off_x & text_mask_x) << 'd3));
-	       m_v[text_i] = ((s_v[text_i] & 
-			       (~(text_mask_y << 'd3))) | ((text_off_y & text_mask_y) << 'd3));
+	       next_color_sub_stage.m_u[text_i] = ((s_u[text_i] & 
+						    (~(text_mask_x << 'd3))) | 
+						   ((text_off_x & text_mask_x) << 'd3));
+	       next_color_sub_stage.m_v[text_i] = ((s_v[text_i] & 
+						    (~(text_mask_y << 'd3))) | 
+						   ((text_off_y & text_mask_y) << 'd3));
 
+	       /* Apply the CLUT */
+	       case (cmd.text_mode)
+		 2'd0: begin
+		    /* 4-bit */
+		    case (color_sub_stage.m_u[text_i][1:0])
+		      2'd0: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][3:0]];
+		      end
+		      2'd1: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][7:4]];
+		      end
+		      2'd2: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][11:8]];
+		      end
+		      2'd3: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][15:12]];
+		      end
+		    endcase // case (m_u[text_i][1:0])
+		 end // case: 2'd0
+		 2'd1: begin
+		    /* 8-bit */
+		    if (color_sub_stage.m_u[text_i][0]) begin
+		       tx_color[text_i] = clut[tx_cache[text_i][7:0]];
+		    end
+		    else begin
+		       tx_color[text_i] = clut[tx_cache[text_i][15:8]];
+		    end
+		 end
+		 2'd2: begin
+		    /* 16-bit mode */
+		    tx_color[text_i] = tx_cache[text_i];
+		 end
+	       endcase // case (cmd.text_mode)
+	       
 	       /* Handle transparent colors */
-	       if (tx_cache[text_i] == 16'd0) begin
+	       if (tx_color[text_i] == 16'd0) begin
 		  next_shader_stage.in_shape[text_i] = 1'b0;
 	       end
-	       
-	       next_shader_stage.r[text_i] = {tx_cache[text_i][4:0], 3'b0};
-	       next_shader_stage.g[text_i] = {tx_cache[text_i][9:5], 3'b0};
-	       next_shader_stage.b[text_i] = {tx_cache[text_i][14:10], 3'b0};
+
+	       next_shader_stage.r[text_i] = {tx_color[text_i][4:0], 3'b0};
+	       next_shader_stage.g[text_i] = {tx_color[text_i][9:5], 3'b0};
+	       next_shader_stage.b[text_i] = {tx_color[text_i][14:10], 3'b0};
 	    end // if (cmd.texture == TEXT)
 	 end // always_comb
       end // block: color_stage_gen
@@ -2360,10 +2406,12 @@ module gpu(
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 shader_stage <= 'd0;
+	 shader_sub_stage <= 'd0;
       end
       else begin
 	 if (~pipeline_stall) begin
 	    shader_stage <= next_shader_stage;
+	    shader_sub_stage <= next_shader_sub_stage;
 	 end
       end
    end
@@ -2387,11 +2435,16 @@ module gpu(
       ##################################################### */
 
    /* Pass Values */
-   assign next_wb_stage.valid = shader_stage.valid;
-   assign next_wb_stage.x = shader_stage.x;
-   assign next_wb_stage.y = shader_stage.y;
-   assign next_wb_stage.in_shape = shader_stage.in_shape;
+   assign next_shader_sub_stage.valid = shader_stage.valid;
+   assign next_shader_sub_stage.x = shader_stage.x;
+   assign next_shader_sub_stage.y = shader_stage.y;
+   assign next_shader_sub_stage.in_shape = shader_stage.in_shape;
 
+   assign next_wb_stage.valid = shader_sub_stage.valid;
+   assign next_wb_stage.x = shader_sub_stage.x;
+   assign next_wb_stage.y = shader_sub_stage.y;
+   assign next_wb_stage.in_shape = shader_sub_stage.in_shape;
+   
    /* Determie whether or not to stall this stage */
    assign shade_stall = ((cmd.shade == SHADE) & 
 			 ((cmd.texture == MONO) | 
@@ -2403,13 +2456,17 @@ module gpu(
       for (color_i = 0; color_i < `GPU_PIPELINE_WIDTH; color_i = color_i + 1) begin: shader_stage_gen
 	 always_comb begin
 	    /* Defaults */
-	    next_wb_stage.r[color_i] = shader_stage.r[color_i];
-	    next_wb_stage.g[color_i] = shader_stage.g[color_i];
-	    next_wb_stage.b[color_i] = shader_stage.b[color_i];
+	    next_shader_sub_stage.r[color_i] = shader_stage.r[color_i];
+	    next_shader_sub_stage.g[color_i] = shader_stage.g[color_i];
+	    next_shader_sub_stage.b[color_i] = shader_stage.b[color_i];
 	    
-	    int_r[color_i] = 32'd0;
-	    int_g[color_i] = 32'd0;
-	    int_b[color_i] = 32'd0;
+	    next_wb_stage.r[color_i] = shader_sub_stage.r[color_i];
+	    next_wb_stage.g[color_i] = shader_sub_stage.g[color_i];
+	    next_wb_stage.b[color_i] = shader_sub_stage.b[color_i];
+	    
+	    next_shader_sub_stage.int_r[color_i] = 32'd0;
+	    next_shader_sub_stage.int_g[color_i] = 32'd0;
+	    next_shader_sub_stage.int_b[color_i] = 32'd0;
 
 	    f_r[color_i] = 32'd0;
 	    f_g[color_i] = 32'd0;
@@ -2421,16 +2478,19 @@ module gpu(
 		 ((cmd.texture == TEXT) & (cmd.texture_mode == BLEND)))) begin
 	       /* Gouraud */
 	       /* First get the color: int_* = [24 | 8]  */
-	       int_r[color_i] = (r_trans_x * shader_stage.x[color_i] + 
-				 r_trans_y * shader_stage.y[color_i] + r_trans_c);
-	       int_g[color_i] = (g_trans_x * shader_stage.x[color_i] +
-				 g_trans_y * shader_stage.y[color_i] + g_trans_c);
-	       int_b[color_i] = (b_trans_x * shader_stage.x[color_i] +
-				 b_trans_y * shader_stage.y[color_i] + b_trans_c);
+	       next_shader_sub_stage.int_r[color_i] = (r_trans_x * shader_stage.x[color_i] + 
+						       r_trans_y * shader_stage.y[color_i] + 
+						       r_trans_c);
+	       next_shader_sub_stage.int_g[color_i] = (g_trans_x * shader_stage.x[color_i] +
+						       g_trans_y * shader_stage.y[color_i] + 
+						       g_trans_c);
+	       next_shader_sub_stage.int_b[color_i] = (b_trans_x * shader_stage.x[color_i] +
+						       b_trans_y * shader_stage.y[color_i] + 
+						       b_trans_c);
 	       
-	       f_r[color_i] = (int_r[color_i] * shader_stage.r[color_i]) >> 'd7;
-	       f_g[color_i] = (int_g[color_i] * shader_stage.g[color_i]) >> 'd7;
-	       f_b[color_i] = (int_b[color_i] * shader_stage.b[color_i]) >> 'd7;
+	       f_r[color_i] = (shader_sub_stage.int_r[color_i] * shader_sub_stage.r[color_i]) >> 'd7;
+	       f_g[color_i] = (shader_sub_stage.int_g[color_i] * shader_sub_stage.g[color_i]) >> 'd7;
+	       f_b[color_i] = (shader_sub_stage.int_b[color_i] * shader_sub_stage.b[color_i]) >> 'd7;
 
 	       /* Saturate and round color (note that due to shift, 56 is the new sign bit) */
 	       next_wb_stage.r[color_i] = ((f_r[color_i][24]) ? 8'b0 : 
@@ -2448,9 +2508,9 @@ module gpu(
 	    end
 	    else if (~((cmd.texture == TEXT) & (cmd.texture_mode == RAW))) begin
 	       /* Flat */
-	       f_r[color_i] = (cmd.r0 * shader_stage.r[color_i]) >> 'd7;
-	       f_g[color_i] = (cmd.g0 * shader_stage.g[color_i]) >> 'd7;
-	       f_b[color_i] = (cmd.b0 * shader_stage.b[color_i]) >> 'd7;
+	       f_r[color_i] = (cmd.r0 * shader_sub_stage.r[color_i]) >> 'd7;
+	       f_g[color_i] = (cmd.g0 * shader_sub_stage.g[color_i]) >> 'd7;
+	       f_b[color_i] = (cmd.b0 * shader_sub_stage.b[color_i]) >> 'd7;
 	       
 	       next_wb_stage.r[color_i] = (f_r[color_i] > 24'd255) ? 8'd255 : f_r[color_i][7:0];
 	       next_wb_stage.g[color_i] = (f_g[color_i] > 24'd255) ? 8'd255 : f_g[color_i][7:0];
@@ -2536,7 +2596,7 @@ module gpu(
 	      wb_count_next = 8'd0;
 	      wb_state_next = GETMEM_WB;
 	   end
-	   else if (color_stage.valid & ~cmd.text_en & (cmd.texture == TEXT)) begin
+	   else if (color_sub_stage.valid & ~cmd.text_en & (cmd.texture == TEXT)) begin
 	      tx_stall = 1'b1;
 	      wb_count_next = 8'd0;
 	      wb_state_next = GETTX_WB;
@@ -2643,20 +2703,23 @@ module gpu(
 		 case (cmd.text_mode)
 		   2'd0: begin
 		      /* 4-bit mode */
-		      wb_vram_addr = {cmd.text_y, m_v[wb_count], cmd.text_x[3:2], 
-				      ({cmd.text_x[1:0], 6'b0} + {2'b0, m_u[wb_count][7:2]})};
-		      tx_val = clut[(vram_bus_in >> {m_u[wb_count][1:0], 2'b0}) & 16'hF];
+		      wb_vram_addr = {cmd.text_y, color_sub_stage.m_v[wb_count], cmd.text_x[3:2], 
+				      ({cmd.text_x[1:0], 6'b0} + 
+				       {2'b0, color_sub_stage.m_u[wb_count][7:2]})};
+		      tx_val = vram_bus_in;
 		   end
 		   2'd1: begin
 		      /* 8-bit mode */
-		      wb_vram_addr = {cmd.text_y, m_v[wb_count], cmd.text_x[3:2],
-				      ({cmd.text_x[1:0], 6'b0} + {1'b0, m_u[wb_count][7:1]})};
-                      tx_val = clut[(vram_bus_in >> {m_u[wb_count][0], 3'b0}) & 16'hFF];
+		      wb_vram_addr = {cmd.text_y, color_sub_stage.m_v[wb_count], cmd.text_x[3:2],
+				      ({cmd.text_x[1:0], 6'b0} + 
+				       {1'b0, color_sub_stage.m_u[wb_count][7:1]})};
+		      tx_val = vram_bus_in;
 		   end
 		   2'd2: begin
 		      /* 16-bit mode */
-		      wb_vram_addr = {cmd.text_y, m_v[wb_count], cmd.text_x[3:2],
-				      ({cmd.text_x[1:0], 6'b0} + m_u[wb_count])};
+		      wb_vram_addr = {cmd.text_y, color_sub_stage.m_v[wb_count], cmd.text_x[3:2],
+				      ({cmd.text_x[1:0], 6'b0} + 
+				       color_sub_stage.m_u[wb_count])};
                       tx_val = vram_bus_in;
 		   end
 		 endcase // case (cmd.text_mode)
