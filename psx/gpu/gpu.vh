@@ -1,6 +1,6 @@
 
 /* Defines the number of pixels a single pipeline stage processes at once */
-`define GPU_PIPELINE_WIDTH 2
+`define GPU_PIPELINE_WIDTH 1
 
 /* Typedefs for internal CMD register things */
 typedef enum logic [1:0] {TRI, RECT, LINE} shape_t;
