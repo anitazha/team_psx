@@ -97,7 +97,8 @@ module addr_interpreter(input  logic clk, rst,
 		      (addr >= SCPAD_TAG_2 & addr < SCPAD_TAG_2+SCPAD_SIZE));
    assign in_HWREG = ((addr >= HWREG_TAG_1 & addr < HWREG_TAG_1+HWREG_SIZE) ||
 		      (addr >= HWREG_TAG_2 & addr < HWREG_TAG_2+HWREG_SIZE) ||
-		      (addr >= HWREG_TAG_3 & addr < HWREG_TAG_3+HWREG_SIZE));
+		      (addr >= HWREG_TAG_3 & addr < HWREG_TAG_3+HWREG_SIZE) ||
+		      (addr == 32'hFFFF0130));
 
    assign data_o = data_out;
    assign ack    = curr_ack;
