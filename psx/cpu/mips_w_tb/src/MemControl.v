@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`define BE
 /*
  * File         : MemControl.v
  * Project      : University of Utah, XUM Project MIPS32 core

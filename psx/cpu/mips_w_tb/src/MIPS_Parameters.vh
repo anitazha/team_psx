@@ -35,18 +35,15 @@
 */   
 parameter [31:0] EXC_Vector_Base_Reset          = 32'hBFC0_0000;    // MIPS Standard is 0xBFC0_0000
 //parameter [31:0] EXC_Vector_Base_Reset          = 32'h0040_0000;    // .text start in 447 testbench
-parameter [31:0] EXC_Vector_Base_Other_NoBoot   = 32'h0000_0000;    // MIPS Standard is 0x8000_0000
-parameter [31:0] EXC_Vector_Base_Other_Boot     = 32'h0000_0000;    // MIPS Standard is 0xBFC0_0200
-parameter [31:0] EXC_Vector_Offset_General      = 32'h8000_0000;    // MIPS Standard is 0x0000_0180
-//parameter [31:0] EXC_Vector_Offset_Special      = 32'h0000_0008;    // MIPS Standard is 0x0000_0200
-parameter [31:0] EXC_Vector_Offset_Special      = 32'h8000_0000;    // MIPS Standard is 0x0000_0200
+parameter [31:0] EXC_Vector_Base_Other_NoBoot   = 32'h8000_0000;    // MIPS Standard is 0x8000_0000
+parameter [31:0] EXC_Vector_Base_Other_Boot     = 32'hBFC0_0200;    // MIPS Standard is 0xBFC0_0200
+parameter [31:0] EXC_Vector_Offset_General      = 32'h0000_0180;    // MIPS Standard is 0x0000_0180
+parameter [31:0] EXC_Vector_Offset_Special      = 32'h0000_0200;    // MIPS Standard is 0x0000_0200
 
 /*** PSX Hardware Register Locations ***/
 
-//parameter [31:0] PSX_Int_Stat_Addr              = 32'h1F80_1070;
-//parameter [31:0] PSX_Int_Mask_Addr              = 32'h1F80_1074;
-parameter [31:0] PSX_Int_Stat_Addr              = 32'h1000_1070;
-parameter [31:0] PSX_Int_Mask_Addr              = 32'h1000_1074;
+parameter [31:0] PSX_Int_Stat_Addr              = 32'h1F80_1070;
+parameter [31:0] PSX_Int_Mask_Addr              = 32'h1F80_1074;
 
 /*** Kernel/User Memory Areas ***
 
