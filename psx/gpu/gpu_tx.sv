@@ -1611,8 +1611,7 @@ module gpu(
 	      xy_gen_y_new = 'd0;
 	      xy_gen_state_next = COMPLETE;
 	   end
-	   else if ((xy_gen_y == xy_gen_max_y) &
-		    ((xy_gen_x + `GPU_PIPELINE_WIDTH) >= xy_gen_max_x)) begin
+	   else if ((xy_gen_x + `GPU_PIPELINE_WIDTH) > (xy_gen_max_x + 12'd1)) begin
 	      /* Generated all x, y */
 	      next_draw_stage.valid = 1'b1;
 	      xy_gen_x_new = 'd0;
