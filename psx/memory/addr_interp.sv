@@ -69,7 +69,7 @@ module addr_interpreter(input  logic clk, rst,
    localparam HWREG_TAG_2 = 32'h9F80_1000;
    localparam HWREG_TAG_3 = 32'hBF80_1000;
    localparam HWREG_SIZE  = 32'h0000_2000;
-   localparam MEM_CTRL_3  = 32'hFFFF_0130;
+   localparam MEM_CTRL_3  = 32'hFFFE_0130;
 
    /* INTERNAL LINES */
    reg [6:0]   curr_state,  next_state;

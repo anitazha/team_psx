@@ -148,8 +148,6 @@ module mem_controller(input  logic  clk, rst,
 
    assign dram_clk = altpll_0_c0_clk;
    
-   assign mem_controller_state = curr_state;
-   
    /* BLOCKRAM CONTROLLER */
    blockram BIOS
      (.clk     (clk),
@@ -522,7 +520,7 @@ module mem_controller(input  logic  clk, rst,
               next_state = IDLE;
            end
            else begin
-              next_state = WRITE_DATA;
+              next_state = INIT_SDRAM_WAIT;
            end
         end
 	

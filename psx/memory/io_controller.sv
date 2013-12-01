@@ -103,7 +103,7 @@ module io_controller(input  logic clk, rst,
    localparam GPU_READ_GP0 = 32'h1F80_1810;
    localparam GPU_STAT_GP1 = 32'h1F80_1814;
 
-   localparam CACHECTRL_ADDR = 32'hFFFF_0130;
+   localparam CACHE_CTRL_ADDR = 32'hFFFE_0130;
 
    /* PSX I/O REGISTERS */
    // - Memory Control 1

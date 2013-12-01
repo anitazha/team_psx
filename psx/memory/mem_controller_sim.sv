@@ -71,43 +71,43 @@ module mem_controller(input  logic  clk, rst,
                       /* SDRAM CHIP INTERFACE */
                       output logic [12:0] dram_addr,
                       output logic [ 1:0] dram_bank,
-                      output logic 	  dram_cas_n,
-                      output logic 	  dram_cke,
-                      output logic 	  dram_clk,
-                      output logic 	  dram_cs_n,
+                      output logic        dram_cas_n,
+                      output logic        dram_cke,
+                      output logic        dram_clk,
+                      output logic        dram_cs_n,
                       output logic [ 3:0] dram_dqm,
                       //inout  wire  [31:0] dram_dq,
-                      output logic 	  dram_ras_n,
-                      output logic 	  dram_we_n,
+                      output logic        dram_ras_n,
+                      output logic        dram_we_n,
                       output logic [31:0] dram_dq_in,
                       input  logic [31:0] dram_dq_out,
-                      output logic 	  dram_oe_out,
+                      output logic        dram_oe_out,
                       
                       /* CPU DATA */
                       input  logic [31:0] data_addr,
                       input  logic [31:0] data_data_i,
-                      input  logic 	  data_ren,
+                      input  logic        data_ren,
                       input  logic [ 3:0] data_wen,
-                      output logic 	  data_ack,
+                      output logic        data_ack,
                       output logic [31:0] data_data_o,
                       
                       /* CPU INSTRCTION */
                       input  logic [31:0] inst_addr,
-                      input  logic 	  inst_ren,
-                      output logic 	  inst_ack,
+                      input  logic        inst_ren,
+                      output logic        inst_ack,
                       output logic [31:0] inst_data_o,
                       
                       /* GPU SIGNALS */
-                      output logic 	  to_gp0, to_gp1,
-		      output logic 	  gpu_ren,
-                      input  logic 	  gpu_rdy,
-                      input  logic 	  gpu_fifo_full,
+                      output logic        to_gp0, to_gp1,
+                      output logic        gpu_ren,
+                      input  logic        gpu_rdy,
+                      input  logic        gpu_fifo_full,
                       input  logic [31:0] gpu_stat, gpu_read,
                       output logic [31:0] gp0, gp1, 
                        
                       /* HW REGISTER CONNECTIONS */
-                      input  logic 	  hblank, vblank,
-                      input  logic 	  dotclock,
+                      input  logic        hblank, vblank,
+                      input  logic        dotclock,
 
                       /* INTERRUPTS */
                       output logic [10:0] interrupts
@@ -157,7 +157,7 @@ module mem_controller(input  logic  clk, rst,
    wire [ 6:0] DMA_MADR_incr, DMA_MADR_decr, DMA_MADR_new, DMA_BCR_decr;
    wire [31:0] DMA_DPCR;
    wire [31:0] DMA0_MADR, DMA1_MADR, DMA2_MADR, DMA3_MADR,
-	       DMA4_MADR, DMA5_MADR, DMA6_MADR;
+               DMA4_MADR, DMA5_MADR, DMA6_MADR;
    wire [ 6:0] DMA_IRQ;
    
    wire [31:0] dma_addr, interp_addr;
@@ -172,20 +172,20 @@ module mem_controller(input  logic  clk, rst,
    wire [ 3:0] data_ben;
    wire        data_wen_or;
    
-   reg 	       sdram_initialized, next_sdram_initialized;
+   reg         sdram_initialized, next_sdram_initialized;
    reg [31:0]  curr_init_addr, next_init_addr;
    
-   reg 	       service_DMA;
+   reg         service_DMA;
    
    // - state variables 
-   reg [7:0]   curr_state, next_state;
+   reg [3:0]   curr_state, next_state;
    reg [31:0]  curr_addr, next_addr;
    reg [31:0]  curr_data_i, next_data_i;
    reg         curr_ren, next_ren;
    reg         curr_wen, next_wen;
    reg         curr_d_ack, next_d_ack;
    reg         curr_i_ack, next_i_ack;
-   reg 	       curr_dma_skip, next_dma_skip;
+   reg         curr_dma_skip, next_dma_skip;
    
    // - output registers 
    reg [31:0]  data_o;
@@ -213,9 +213,7 @@ module mem_controller(input  logic  clk, rst,
    assign inst_data_o = inst_latch;
 
    assign dram_clk = altpll_0_c0_clk;
-   
-   assign mem_controller_state = curr_state;
-   
+
    /* BLOCKRAM CONTROLLER */
    blockram BIOS
      (.clk     (clk),
@@ -314,26 +312,26 @@ module mem_controller(input  logic  clk, rst,
       .dma_done      (dma_done),
       .dma_req       (dma_req),
       /* MDECin */
-      .dma0_i        (34'b0),
-      .dma0_o        (34'b0),
+      .dma0_i        (),
+      .dma0_o        (),
       /* MDECout */
-      .dma1_i        (34'b0),
-      .dma1_o        (34'b0),
+      .dma1_i        (),
+      .dma1_o        (),
       /* GPU */
       .dma2_i        ({gpu_rdy, gpu_fifo_full, gpu_read}),
       .dma2_o        ({dma_to_gp0, dma_gpu_ren, dma_gp0}),
       /* CDROM */
-      .dma3_i        (34'b0),
-      .dma3_o        (34'b0),
+      .dma3_i        (),
+      .dma3_o        (),
       /* SPU */
-      .dma4_i        (34'b0),
-      .dma4_o        (34'b0),
+      .dma4_i        (),
+      .dma4_o        (),
       /* PIO */
-      .dma5_i        (34'b0),
-      .dma5_o        (34'b0),
+      .dma5_i        (),
+      .dma5_o        (),
       /* OTC */
-      .dma6_i        (34'b0),
-      .dma6_o        (34'b0));
+      .dma6_i        (),
+      .dma6_o        ());
    
      
    /* SDRAM CONTROLLER */
@@ -466,10 +464,10 @@ module mem_controller(input  logic  clk, rst,
          curr_ren      = 1'b0;
          curr_d_ack    = 1'b0;
          curr_i_ack    = 1'b0;
-	 curr_dma_skip = 1'b0;
+         curr_dma_skip = 1'b0;
 
-	 sdram_initialized = 1'b0;
-	 curr_init_addr = 32'b0;
+         sdram_initialized = 1'b0;
+         curr_init_addr = 32'b0;
       end
       else begin
          curr_state    = next_state;
@@ -479,10 +477,10 @@ module mem_controller(input  logic  clk, rst,
          curr_ren      = next_ren;
          curr_d_ack    = next_d_ack;
          curr_i_ack    = next_i_ack;
-	 curr_dma_skip = next_dma_skip;
+         curr_dma_skip = next_dma_skip;
 
-	 sdram_initialized = next_sdram_initialized;
-	 curr_init_addr = next_init_addr;
+         sdram_initialized = next_sdram_initialized;
+         curr_init_addr = next_init_addr;
       end
    end
    
@@ -505,75 +503,75 @@ module mem_controller(input  logic  clk, rst,
       case (curr_state)
         /* wait for memory request */
         IDLE: begin
-	   /* initialized memory to zeros */
-	   if (~sdram_initialized) begin
-	      next_state = INIT_SDRAM;
-	   end
+           /* initialized memory to zeros */
+           if (~sdram_initialized) begin
+              next_state = INIT_SDRAM;
+           end
            /* memory access from data bus */
-	   else if (pll_locked) begin
-	      if (dma_req && ~curr_dma_skip) begin
-		 next_dma_skip = 1'b1;
-		 service_DMA = 1'b1;
-		 next_state = DMA;
-	      end	      
-	      else if (data_active) begin
-		 if (data_ren) begin
+           else if (pll_locked) begin
+              if (dma_req && ~curr_dma_skip) begin
+                 next_dma_skip = 1'b1;
+                 service_DMA = 1'b1;
+                 next_state = DMA;
+              end             
+              else if (data_active) begin
+                 if (data_ren) begin
                     next_state = READ_DATA_INIT;
                     next_addr = data_addr;
                     next_ren = data_ren;
                     next_wen = 1'b0;
-		 end
-		 else if (data_wen_or) begin
+                 end
+                 else if (data_wen_or) begin
                     next_state = WRITE_INIT;
                     next_addr = data_addr;
                     next_data_i = data_data_i;
                     next_wen = data_wen_or;
                     next_ren = data_ren;
-		 end
-		 else begin
+                 end
+                 else begin
                     next_state = IDLE;
-		 end
+                 end
               end
               /* memory access from instruction bus */
               else if (inst_active) begin
-		 if (inst_ren) begin
+                 if (inst_ren) begin
                     next_state = READ_INST_INIT;
                     next_addr = inst_addr;
                     next_ren = inst_ren;
                     next_wen = 1'b0;
-		 end
-		 else begin
+                 end
+                 else begin
                     next_state = IDLE;
-		 end
+                 end
               end
-	      else if (dma_req && curr_dma_skip) begin
-		 next_dma_skip = 1'b0;
-		 next_state = IDLE;
-	      end
-	   end
+              else if (dma_req && curr_dma_skip) begin
+                 next_dma_skip = 1'b0;
+                 next_state = IDLE;
+              end
+           end
            /* --- */
            else begin
               next_state = IDLE;
            end
         end
 
-	/* initialized all of SDRAM to zeros */
-	INIT_SDRAM: begin
-	   if (curr_init_addr != 22'h200000) begin
-	      next_addr = curr_init_addr;
-	      next_wen = 1'b1;
-	      next_ren = 1'b0;
-	      next_data_i = 32'b0;
-	      next_state = INIT_SDRAM_WRITE;
+        /* initialized all of SDRAM to zeros */
+        INIT_SDRAM: begin
+           if (curr_init_addr != 22'h200000) begin
+              next_addr = curr_init_addr;
+              next_wen = 1'b1;
+              next_ren = 1'b0;
+              next_data_i = 32'b0;
+              next_state = INIT_SDRAM_WRITE;
 
-	      next_init_addr = curr_init_addr + 32'h4;
-	   end
-	   else begin
-	      next_sdram_initialized = 1'b1;
-	      next_state = IDLE;
-	   end
-	end
-	/* write states */
+              next_init_addr = curr_init_addr + 32'h4;
+           end
+           else begin
+              next_sdram_initialized = 1'b1;
+              next_state = IDLE;
+           end
+        end
+        /* write states */
         INIT_SDRAM_WRITE: begin
            if (ack_o) begin
               next_state = INIT_SDRAM_WAIT;
@@ -584,25 +582,25 @@ module mem_controller(input  logic  clk, rst,
         end
         INIT_SDRAM_WAIT: begin
            next_wen = 1'b0;
-	   next_ren = 1'b0;
+           next_ren = 1'b0;
            if (~ack_o) begin
               next_state = IDLE;
            end
            else begin
-              next_state = WRITE_DATA;
+              next_state = INIT_SDRAM_WAIT;
            end
         end
-	
-	/* transfer control to DMA */
-	DMA: begin
-	   service_DMA = 1'b1;
-	   if (dma_done) begin
-	      next_state = IDLE;
-	   end
-	   else begin
-	      next_state = DMA;
-	   end
-	end
+        
+        /* transfer control to DMA */
+        DMA: begin
+           service_DMA = 1'b1;
+           if (dma_done) begin
+              next_state = IDLE;
+           end
+           else begin
+              next_state = DMA;
+           end
+        end
         
         /* read states */
         READ_DATA_INIT: begin
@@ -626,12 +624,12 @@ module mem_controller(input  logic  clk, rst,
         READ_DATA: begin
            next_ren = data_ren;
            next_wen = data_wen_or;
-	   next_d_ack = ack_o;
+           next_d_ack = ack_o;
            if (~data_active && ~ack_o) begin
               next_state = IDLE;
-	      if (curr_dma_skip) begin
-		 next_dma_skip = 1'b0;
-	      end
+              if (curr_dma_skip) begin
+                 next_dma_skip = 1'b0;
+              end
            end
            else begin
               next_state = READ_DATA;
@@ -643,9 +641,9 @@ module mem_controller(input  logic  clk, rst,
            next_i_ack = ack_o;
            if (~inst_active && ~ack_o) begin
               next_state = IDLE;
-	      if (curr_dma_skip) begin
-		 next_dma_skip = 1'b0;
-	      end
+              if (curr_dma_skip) begin
+                 next_dma_skip = 1'b0;
+              end
            end
            else begin
               next_state = READ_INST;
@@ -668,9 +666,9 @@ module mem_controller(input  logic  clk, rst,
            if (~data_active && ~ack_o) begin
               next_state = IDLE;
               next_d_ack = ack_o;
-	      if (curr_dma_skip) begin
-		 next_dma_skip = 1'b0;
-	      end
+              if (curr_dma_skip) begin
+                 next_dma_skip = 1'b0;
+              end
            end
            else begin
               next_state = WRITE_DATA;
