@@ -499,7 +499,7 @@ module mem_controller(input  logic  clk, rst,
 	      next_data_i = 32'b0;
 	      next_state = INIT_SDRAM_WRITE;
 
-	      next_init_addr = curr_init_addr + 32'b4;
+	      next_init_addr = curr_init_addr + 32'h4;
 	   end
 	   else begin
 	      next_sdram_initialized = 1'b1;
