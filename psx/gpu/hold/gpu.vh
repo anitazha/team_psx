@@ -1,6 +1,6 @@
 
 /* Defines the number of pixels a single pipeline stage processes at once */
-`define GPU_PIPELINE_WIDTH 1
+`define GPU_PIPELINE_WIDTH 32
 
 /* Typedefs for internal CMD register things */
 typedef enum logic [1:0] {TRI, RECT, LINE} shape_t;
@@ -39,14 +39,17 @@ typedef struct packed {
 /* Decode stage FSM states */
 typedef enum logic [5:0] {WAIT, GET_XY0, GET_XY1, GET_XY2, 
                           GET_TX0, GET_TX1, GET_TX2, GET_CL1,
-                          GET_CL2, GET_CLUT, WAIT_MEM, 
-			  DRAWING, GO_MEM, GO_CLUT} DECODE_t;
+                          GET_CL2, GET_CLUT, GET_TXPG, WAIT_MEM, 
+			  DRAWING, GO_MEM, GO_CLUT, GO_TXPG} DECODE_t;
 
 /* XY generator FSM states */
 typedef enum logic [1:0] {SIT_AROUND, CHURN_BUTTER, COMPLETE} XYGEN_t;
 
 /* CLUT getting FSM states */
 typedef enum logic [1:0] {WAIT_CLUT, GETMEM_CLUT} CLUT_t;
+
+/* Textpage getting FSM states */
+typedef enum logic [1:0] {WAIT_TXPG, GETMEM_TXPG} TXPG_t;
 
 /* Fill FSM states */
 typedef enum logic [1:0] {WAIT_FILL, TOMEM_FILL} FILL_t;
@@ -61,7 +64,7 @@ typedef enum logic [1:0] {WAIT_V2C, GETMEM1_V2C, GETMEM2_V2C} V2C_t;
 typedef enum logic [1:0] {WAIT_C2V, GETMEM_C2V, TOMEM_C2V} C2V_t;
 
 /* WB FSM states */
-typedef enum logic [2:0] {WAIT_WB, GETMEM_WB, GETTX_WB, HOLDTX_WB, TOMEM_WB} WB_t;
+typedef enum logic [1:0] {WAIT_WB, GETMEM_WB, TOMEM_WB} WB_t;
 
 /* GPU Status register struct */
 typedef struct packed {
@@ -107,15 +110,6 @@ typedef struct packed {
    logic [`GPU_PIPELINE_WIDTH-1:0] 	   in_shape;
 } color_stage_t;
 
-/* Color Stage barrier regs */
-typedef struct packed {
-   logic       valid;
-   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] x;
-   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] y;
-   logic [`GPU_PIPELINE_WIDTH-1:0] 	 in_shape;
-   logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  m_u, m_v;
-} color_sub_stage_t;
-
 /* Shade Stage barrier regs */
 typedef struct packed {
    logic                                   valid;
@@ -124,16 +118,6 @@ typedef struct packed {
    logic [`GPU_PIPELINE_WIDTH-1:0] 	   in_shape;
    logic [`GPU_PIPELINE_WIDTH-1:0][7:0]    r, g, b;
 } shader_stage_t;
-
-/* Shade Sub Stage barrier regs */
-typedef struct packed {
-   logic                                 valid;
-   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] x;
-   logic [`GPU_PIPELINE_WIDTH-1:0][11:0] y;
-   logic [`GPU_PIPELINE_WIDTH-1:0] 	 in_shape;
-   logic [`GPU_PIPELINE_WIDTH-1:0][31:0] int_r, int_g, int_b;
-   logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  r, g, b;
-} shader_sub_stage_t;
 
 /* Writeback Stage barrier regs */
 typedef struct packed {

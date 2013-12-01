@@ -9,11 +9,12 @@
 ### Setup
 ###################################################################
 
-SRC ?= src gte mem_sim dat_files
+SRC ?= src gte memory dat_files
 VCSLOG = vcs.log
 
 CC = vcs
-CCFLAGS = -sverilog -nc -debug -line +lint=all,noVCDE,noFIAAS +warn=all -l $(VCSLOG)
+#CCFLAGS = -sverilog -nc -debug -line +lint=all,noVCDE,noFIAAS +warn=all -l $(VCSLOG)
+CCFLAGS = -sverilog -nc -debug -line +warn=all -timescale=1ns/1ps -l $(VCSLOG)
 
 TIMESTAMP := outputs/$(shell date +%m%d-%H%M%S)
 OUTPUT ?= $(TIMESTAMP)
@@ -113,7 +114,7 @@ default:
 compile: 
 	@echo -e "$mCopying Verilog into $(OUTPUT)..."
 	@mkdir -p $(OUTPUT)/sim/src
-	cp -R mem_sim/mif_files $(OUTPUT)/
+	cp -R memory/mif_files $(OUTPUT)/
 	@cp `find $(SRC) 447src -iname '*.v*' -o -iname '*.sv*'` $(OUTPUT)/sim/src
 	@echo -e "$mCompiling and Elaborating Design..."
 	cd $(OUTPUT)/sim; $(CC) $(CCFLAGS) +incdir+src src/*
@@ -139,14 +140,9 @@ assemble:
 ### Simulate Verilog
 ###################################################################
 
-sim: compile assemble
+sim: compile
 	@echo -e "$mSimulating Verilog in $(OUTPUT)..."
-	cd $(OUTPUT)/sim; ./simv -l vcssim.log
-	@if grep 'Warning*' $(OUTPUT)/sim/vcssim.log > /dev/null; \
-		then echo -e '$m$rSimulator log has warnings!$n'; fi
-	@echo -e "$mSimulation of $(INPUT) has completed in $(OUTPUT)."
 	@echo -e "$mTo run with the VCS GUI, navigate to $b$(OUTPUT)/sim $nand execute $b./simv -gui$n"
-	@echo -e "$mTo view the simulation output, execute the following command: $bcat $(OUTPUT)/sim/vcssim.log$n"
 
 ###################################################################
 ### Simulate DAT Files

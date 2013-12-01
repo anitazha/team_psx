@@ -153,8 +153,6 @@ module gpu(
 
    CLUT_t clut_state, clut_state_next;
 
-   TXPG_t txpg_state, txpg_state_next;
-
    FILL_t fill_state, fill_state_next;
    V2V_t v2v_state, v2v_state_next;
    V2C_t v2c_state, v2c_state_next;
@@ -165,13 +163,13 @@ module gpu(
    logic 		     decode_fifo_re;
    logic 		     xy_gen_on;
    logic 		     clut_on;
-   logic 		     txpg_on;
    logic 		     fill_on;
    logic 		     v2v_on;
    logic 		     v2c_on;
    logic 		     c2v_on;   
    
    logic [1:0] 		     side0, side1, side2;
+   logic [1:0] 		     side0_new, side1_new, side2_new;
 
    logic [11:0] 	     min_x01, min_y01, min_x02, min_y02;
    logic [11:0] 	     max_x01, max_y01, max_x02, max_y02;
@@ -185,6 +183,7 @@ module gpu(
    logic 		     clut_rdy, clut_rdy_next;
    logic [8:0] 		     clut_count, clut_count_next;
    logic [18:0] 	     clut_vram_addr;
+   logic [9:0] 		     clut_max;
    logic 		     clut_vram_re;
    logic 		     clut_ld;
 
@@ -219,11 +218,16 @@ module gpu(
    logic                     v2c_vram_re;
    logic 		     main_bus_re_hold, main_bus_re_hold_new;
    
-   logic [63:0] 	     u_trans_x, u_trans_y, u_trans_c;
-   logic [63:0] 	     v_trans_x, v_trans_y, v_trans_c;
-   logic [63:0] 	     r_trans_x, r_trans_y, r_trans_c;
-   logic [63:0] 	     g_trans_x, g_trans_y, g_trans_c;
-   logic [63:0] 	     b_trans_x, b_trans_y, b_trans_c;
+   logic [31:0] 	     u_trans_x, u_trans_y, u_trans_c;
+   logic 		     u_trans_done;
+   logic [31:0] 	     v_trans_x, v_trans_y, v_trans_c;
+   logic 		     v_trans_done;
+   logic [31:0] 	     r_trans_x, r_trans_y, r_trans_c;
+   logic 		     r_trans_done;
+   logic [31:0] 	     g_trans_x, g_trans_y, g_trans_c;
+   logic 		     g_trans_done;
+   logic [31:0] 	     b_trans_x, b_trans_y, b_trans_c;
+   logic 		     b_trans_done;
    
 
    /* Stall */
@@ -243,21 +247,28 @@ module gpu(
    
    /* COLOR STAGE */
    color_stage_t color_stage, next_color_stage;
+   color_sub_stage_t color_sub_stage, next_color_sub_stage;
    
-   logic [63:0] 			 f_u, f_v;
-   logic [7:0] 				 m_u, m_v;
+   logic [`GPU_PIPELINE_WIDTH-1:0][31:0] f_u, f_v;
+   logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  s_u, s_v;
 
    /* Texture unit */
-   logic [255:0][15:0] 			 tx_cache;
-   
+   logic [`GPU_PIPELINE_WIDTH-1:0][15:0] tx_cache;
+   logic [`GPU_PIPELINE_WIDTH-1:0][15:0] tx_color;
+   logic [15:0] 			 tx_val;
+   logic 				 tx_ld;
+   logic 				 tx_stall, color_stall;
+ 
    genvar 				 text_i;
      
 
    /* SHADER STAGE */
    shader_stage_t shader_stage, next_shader_stage;
+   shader_sub_stage_t shader_sub_stage, next_shader_sub_stage;
 
-   logic [`GPU_PIPELINE_WIDTH-1:0][63:0] int_r, int_g, int_b;
-   logic [`GPU_PIPELINE_WIDTH-1:0][63:0] f_r, f_g, f_b;
+   logic [`GPU_PIPELINE_WIDTH-1:0][31:0] f_r, f_g, f_b;
+
+   logic 				 shade_stall;
 
    genvar 				 color_i;
    
@@ -427,14 +438,13 @@ module gpu(
       ##################################################### */
 
    /* VRAM/Main memory access signal logic */
-   assign vram_addr = (clut_vram_addr | txpg_vram_addr | wb_vram_addr |
-		       fill_vram_addr | v2v_vram_addr | v2c_vram_addr |
-		       c2v_vram_addr);
+   assign vram_addr = (clut_vram_addr |  wb_vram_addr | fill_vram_addr | 
+		       v2v_vram_addr | v2c_vram_addr | c2v_vram_addr);
    assign vram_bus_out = (wb_vram_data | v2v_vram_data | 
 			  c2v_vram_data | fill_vram_data);
    assign vram_we = (wb_vram_we | v2v_vram_we | c2v_vram_we | fill_vram_we);
    assign vram_re = (wb_vram_re | v2v_vram_re | c2v_vram_re | v2c_vram_re | 
-		     clut_vram_re | txpg_vram_re);
+		     clut_vram_re);
    
    /* Command FIFO */
    fifo_16x32 cmd_fifo(.data_in(main_bus),
@@ -579,7 +589,7 @@ module gpu(
       ##################################################### */
 
    /* Pipeline stall logic */
-   assign pipeline_stall = wb_stall;
+   assign pipeline_stall = wb_stall | tx_stall | shade_stall | color_stall;
 
    /* New CMD module, an FSM for filling the cmd register and starting drawing,
       mem transfers, and doing other GP0 cmds */
@@ -655,7 +665,6 @@ module gpu(
       xy_gen_on = 1'b0;
 
       clut_on = 1'b0;
-      txpg_on = 1'b0;
 
       fill_on = 1'b0;
       v2v_on = 1'b0;
@@ -704,6 +713,7 @@ module gpu(
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
 		   new_cmd.texture = MONO;
+		   new_cmd.semi_trans_mode = GPU_status.semi_trans_mode;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -786,6 +796,7 @@ module gpu(
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = SHADE;
 		   new_cmd.texture = MONO;
+		   new_cmd.semi_trans_mode = GPU_status.semi_trans_mode;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -840,6 +851,7 @@ module gpu(
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
 		   new_cmd.texture = MONO;
+		   new_cmd.semi_trans_mode = GPU_status.semi_trans_mode;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -866,6 +878,7 @@ module gpu(
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = SHADE;
 		   new_cmd.texture = MONO;
+		   new_cmd.semi_trans_mode = GPU_status.semi_trans_mode;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -892,6 +905,7 @@ module gpu(
 		   new_cmd.transparency = SEMI;
 		   new_cmd.shade = NONE;
 		   new_cmd.texture = MONO;
+		   new_cmd.semi_trans_mode = GPU_status.semi_trans_mode;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -906,6 +920,10 @@ module gpu(
 		   new_cmd.shade = NONE;
 		   new_cmd.texture = TEXT;
 		   new_cmd.texture_mode = BLEND;
+		   new_cmd.text_x = GPU_status.text_x;
+		   new_cmd.text_y = GPU_status.text_y;
+		   new_cmd.text_mode = GPU_status.text_mode;
+		   new_cmd.text_en = GPU_status.text_en;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -920,6 +938,11 @@ module gpu(
 		   new_cmd.shade = NONE;
 		   new_cmd.texture = TEXT;
 		   new_cmd.texture_mode = BLEND;
+		   new_cmd.text_x = GPU_status.text_x;
+		   new_cmd.text_y = GPU_status.text_y;
+		   new_cmd.semi_trans_mode = GPU_status.semi_trans_mode;
+		   new_cmd.text_mode = GPU_status.text_mode;
+		   new_cmd.text_en = GPU_status.text_en;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -934,6 +957,10 @@ module gpu(
 		   new_cmd.shade = NONE;
 		   new_cmd.texture = TEXT;
 		   new_cmd.texture_mode = RAW;
+		   new_cmd.text_x = GPU_status.text_x;
+		   new_cmd.text_y = GPU_status.text_y;
+		   new_cmd.text_mode = GPU_status.text_mode;
+		   new_cmd.text_en = GPU_status.text_en;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -948,6 +975,11 @@ module gpu(
 		   new_cmd.shade = NONE;
 		   new_cmd.texture = TEXT;
 		   new_cmd.texture_mode = RAW;
+		   new_cmd.text_x = GPU_status.text_x;
+		   new_cmd.text_y = GPU_status.text_y;
+		   new_cmd.semi_trans_mode = GPU_status.semi_trans_mode;
+		   new_cmd.text_mode = GPU_status.text_mode;
+		   new_cmd.text_en = GPU_status.text_en;
 		   new_cmd.b0 = cmd_fifo_cmd[23:16];
 		   new_cmd.g0 = cmd_fifo_cmd[15:8];
 		   new_cmd.r0 = cmd_fifo_cmd[7:0];
@@ -1173,14 +1205,10 @@ module gpu(
 		end
 		GP0_B_RV_TX_OQ_BL, GP0_B_RV_TX_OQ_RW,
 		  GP0_B_RV_TX_ST_BL, GP0_B_RV_TX_ST_RW: begin
-                     /* These rectangles need size; use XY1 for size and get texture */
-                     decode_state_next = GO_TXPG;
+                     /* These rectangles need size; use XY1 for size and start drawing */
+                     decode_state_next = DRAWING;
 		     new_cmd.x1 = cmd.x0 + {1'b0, cmd_fifo_cmd[10:0]};
 		     new_cmd.y1 = cmd.y0 + {1'b0, cmd_fifo_cmd[26:16]};
-		     new_cmd.u1 = (cmd.u0 + 
-				   ((cmd_fifo_cmd[10:0] > 11'd255) ? 11'd255 : cmd_fifo_cmd[7:0]));
-		     new_cmd.v1 = (cmd.v0 +
-				   ((cmd_fifo_cmd[26:16] > 11'd255) ? 11'd255 : cmd_fifo_cmd[23:16]));
 		  end
 		GP0_B_FILRECT: begin
 		   /* The seoncd param is a size, not a coord! */
@@ -1279,15 +1307,27 @@ module gpu(
 		   /* Variable size needs to get height width */
 		   decode_state_next = GET_XY1;
 		end
-		GP0_B_R1_TX_OQ_BL, GP0_B_R1_TX_OQ_RW, GP0_B_R1_TX_ST_BL, GP0_B_R1_TX_ST_RW,
-		  GP0_B_R8_TX_OQ_BL, GP0_B_R8_TX_OQ_RW, GP0_B_R8_TX_ST_BL, GP0_B_R8_TX_ST_RW,
-		  GP0_B_R16_TX_OQ_BL, GP0_B_R16_TX_OQ_RW, GP0_B_R16_TX_ST_BL,
-		  GP0_B_R16_TX_ST_RW: begin
-		     /* These rectangles are ready to draw now */
-		     decode_state_next = DRAWING;
-		     new_cmd.u1 = cmd.u0 + (cmd.x1 - cmd.x0);
-		     new_cmd.v1 = cmd.v0 + (cmd.y1 - cmd.y0);
-		  end
+		GP0_B_R1_TX_OQ_BL, GP0_B_R1_TX_OQ_RW, GP0_B_R1_TX_ST_BL, GP0_B_R1_TX_ST_RW: begin
+		   /* These rectangles are ready to draw now */
+		   decode_state_next = DRAWING;
+
+		   new_cmd.x1 = cmd.x0 + 12'd1;
+		   new_cmd.y1 = cmd.y0 + 12'd1;
+		end
+		GP0_B_R8_TX_OQ_BL, GP0_B_R8_TX_OQ_RW, GP0_B_R8_TX_ST_BL, GP0_B_R8_TX_ST_RW: begin
+		   /* These rectangles are ready to draw now */
+		   decode_state_next = DRAWING;
+
+		   new_cmd.x1 = cmd.x0 + 12'd8;
+		   new_cmd.y1 = cmd.y0 + 12'd8;
+		end
+		GP0_B_R16_TX_OQ_BL, GP0_B_R16_TX_OQ_RW, GP0_B_R16_TX_ST_BL, GP0_B_R16_TX_ST_RW: begin
+		   /* These rectangles are ready to draw now */
+		   decode_state_next = DRAWING;
+
+		   new_cmd.x1 = cmd.x0 + 12'd16;
+		   new_cmd.y1 = cmd.y0 + 12'd16;
+		end
 	      endcase // case (cmd_hold)
 	   end // if (~cmd_fifo_cmd)
 	end // case: GET_TX0
@@ -1501,7 +1541,8 @@ module gpu(
 	 xy_gen_y <= 12'd0;
       end
       else begin
-	 if (~pipeline_stall) begin
+	 /* If the state is complete, it doesnt matter if we reload it */
+	 if (~pipeline_stall | (xy_gen_state == COMPLETE)) begin
 	    xy_gen_state <= xy_gen_state_next;
 	    xy_gen_x <= xy_gen_x_new;
 	    xy_gen_y <= xy_gen_y_new;
@@ -1570,8 +1611,7 @@ module gpu(
 	      xy_gen_y_new = 'd0;
 	      xy_gen_state_next = COMPLETE;
 	   end
-	   else if ((xy_gen_y == xy_gen_max_y) &
-		    ((xy_gen_x + `GPU_PIPELINE_WIDTH) >= xy_gen_max_x)) begin
+	   else if ((xy_gen_x + `GPU_PIPELINE_WIDTH) > (xy_gen_max_x + 12'd1)) begin
 	      /* Generated all x, y */
 	      next_draw_stage.valid = 1'b1;
 	      xy_gen_x_new = 'd0;
@@ -1633,6 +1673,23 @@ module gpu(
       clut_vram_addr = 'd0;
       clut_vram_re = 1'b0;
       clut_ld = 1'b0;
+      clut_max = 9'd0;
+
+      /* Set the max size of the CLUT */
+      case (cmd.text_mode)
+	2'd0: begin
+	   /* 4-bit mode */
+	   clut_max = 9'd15;
+	end
+	2'd1: begin
+	   /* 8-bit mode */
+	   clut_max = 9'd255;
+	end
+	2'd2: begin
+	   /* 16-bit mode; no clut needed */
+	   clut_max = 9'd0;
+	end
+      endcase // case (cmd.text_mode)
       
       case (clut_state)
 	WAIT_CLUT: begin
@@ -1643,7 +1700,7 @@ module gpu(
 	   end
 	end
 	GETMEM_CLUT: begin
-	   if (clut_count > 9'd255) begin
+	   if (clut_count > clut_max) begin
 	      clut_rdy_next = 1'b1;
 	      clut_state_next = WAIT_CLUT;
 	   end
@@ -1669,104 +1726,7 @@ module gpu(
       end
    end
 
-   /* Textpage getting FSM */
-   always_ff @(posedge clk, posedge rst) begin
-      if (rst) begin
-	 txpg_state <= WAIT_TXPG;
-	 txpg_count_x <= 9'd0;
-	 txpg_count_y <= 9'd0;
-	 txpg_base_x <= 4'b0;
-	 txpg_base_y <= 1'b0;
-	 txpg_rdy <= 1'b1;
-      end
-      else begin
-	 txpg_state <= txpg_state_next;
-	 txpg_count_x <= txpg_count_x_next;
-	 txpg_count_y <= txpg_count_y_next;
-	 txpg_base_x <= txpg_base_x_next;
-	 txpg_base_y <= txpg_base_y_next;
-	 txpg_rdy <= txpg_rdy_next;
-      end // else: !if(rst)
-   end // always_ff @
-
-   /* Textpage getting next state + output logic */
-   always_comb begin
-      /* Defaults */
-      txpg_state_next = txpg_state;
-      txpg_count_x_next = txpg_count_x;
-      txpg_count_y_next = txpg_count_y;
-      txpg_base_x_next = txpg_base_x;
-      txpg_base_y_next = txpg_base_y;
-      txpg_rdy_next = txpg_rdy;
-      
-      txpg_ld = 1'b0;
-      txpg_val = 'd0;
-      
-      txpg_vram_addr = 'd0;
-      txpg_vram_re = 1'b0;
-      
-      case (txpg_state)
-	WAIT_TXPG: begin
-	   if (txpg_on) begin
-	      txpg_rdy_next = 1'b0;
-	      txpg_count_x_next = 9'd0;
-	      txpg_count_y_next = 9'd0;
-	      txpg_state_next = GETMEM_TXPG;
-
-	      /* Get Textpage bases from cmd or status depending on command */
-	      if (cmd.shape == RECT) begin
-		 txpg_base_x_next = GPU_status.text_x;
-		 txpg_base_y_next = GPU_status.text_y;
-	      end
-	      else begin
-		 txpg_base_x_next = cmd.text_x;
-		 txpg_base_y_next = cmd.text_y;
-	      end
-	   end
-	end
-	GETMEM_TXPG: begin
-	   if (txpg_count_y > 9'd255) begin
-	      txpg_rdy_next = 1'b1;
-	      txpg_state_next = WAIT_TXPG;
-	   end
-	   else if (gpu_en) begin
-	      txpg_vram_addr = {((cmd.text_y << 8) + txpg_count_y), 
-				((cmd.text_x << 6) + txpg_count_x)};
-	      txpg_vram_re = 1'b1;
-
-	      /* Set counters to next values */
-	      if (txpg_count_x == 9'd255) begin
-		 txpg_count_x_next = 9'd0;
-		 txpg_count_y_next = txpg_count_y + 9'd1;
-	      end
-	      else begin
-		 txpg_count_x_next = txpg_count_x + 9'd1;
-	      end
-	      
-	      txpg_ld = 1'b1;
-
-	      /* Check color mode and generate the values accordingly */
-	      case (GPU_status.text_mode)
-		2'd0: begin
-		   txpg_val[0] = clut[vram_bus_in[3:0]];
-		   txpg_val[1] = clut[vram_bus_in[7:4]];
-		   txpg_val[2] = clut[vram_bus_in[11:8]];
-		   txpg_val[3] = clut[vram_bus_in[15:12]];
-		end
-		2'd1: begin
-		   txpg_val[0] = clut[vram_bus_in[7:0]];
-		   txpg_val[1] = clut[vram_bus_in[15:8]];
-		end
-		default: begin
-		   txpg_val[0] = vram_bus_in;
-		end
-	      endcase 
-	   end // if (vram_rdy)
-	end // case: READINGMEM_TXPG
-      endcase // case (txpg_state)
-   end // always_comb
-      
-   
+         
 
    /* ######################################################## */
 	 
@@ -1901,7 +1861,7 @@ module gpu(
 	      v2v_vram_re = 1'b1;
 	      
 	      /* If masked, use this as the new writeback value */
-	      if (vram_bus_in[15]) begin
+	      if (vram_bus_in[15] & GPU_status.mask_en) begin
 		 v2v_hold_next = vram_bus_in;
 	      end
 	      v2v_state_next = TOMEM_V2V;
@@ -2008,7 +1968,8 @@ module gpu(
 		    c2v_fifo_re = 1'b1;
 		    c2v_low_read_next = 1'b1;
 		 end
-		 c2v_vram_data[15] |= GPU_status.mask_en;
+		 
+		 c2v_vram_data[15] |= GPU_status.set_mask;
 	      end
 	      
 	      if (c2v_x == cmd.x1) begin
@@ -2155,40 +2116,56 @@ module gpu(
    line_finder lf_s0(.x0({4'b0, cmd.x1}), .y0({4'b0, cmd.y1}),
 		     .x1({4'b0, cmd.x2}), .y1({4'b0, cmd.y2}),
 		     .x({4'b0, cmd.x0}), .y({4'b0, cmd.y0}),
-		     .result(side0)),
+		     .result(side0_new)),
      lf_s1(.x0({4'b0, cmd.x0}), .y0({4'b0, cmd.y0}),
 	   .x1({4'b0, cmd.x2}), .y1({4'b0, cmd.y2}),
 	   .x({4'b0, cmd.x1}), .y({4'b0, cmd.y1}),
-	   .result(side1)),
+	   .result(side1_new)),
      lf_s2(.x0({4'b0, cmd.x0}), .y0({4'b0, cmd.y0}),
 	   .x1({4'b0, cmd.x1}), .y1({4'b0, cmd.y1}),
 	   .x({4'b0, cmd.x2}), .y({4'b0, cmd.y2}),
-	   .result(side2));
+	   .result(side2_new));
 
-   /* Interpolators for texture; note that *_trans_* is a fixed point number 64-bits wide:
-      [ 48 bits of integer | 16 bits fraction ] */
+   /* Side hold registers */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 side0 <= 2'd0;
+	 side1 <= 2'd0;
+	 side2 <= 2'd0;
+      end
+      else begin
+	 side0 <= side0_new;
+	 side1 <= side1_new;
+	 side2 <= side2_new;
+      end
+   end // always_ff @
+
+   /* Interpolators for texture; note that *_trans_* is a fixed point number 32-bits wide:
+      [ 24 bits of integer | 8 bits fraction ] */
    interp in_u(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
 	       .s0({4'b0, cmd.u0}), .s1({4'b0, cmd.u1}), .s2({4'b0, cmd.u2}),
-	       .cx(u_trans_x), .cy(u_trans_y), .cs(u_trans_c)),
+	       .cx(u_trans_x), .cy(u_trans_y), .cs(u_trans_c),
+	       .clk(clk), .rst(rst), .done(u_trans_done)),
      in_v(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
 	  .s0({4'b0, cmd.v0}), .s1({4'b0, cmd.v1}), .s2({4'b0, cmd.v2}),
-	  .cx(v_trans_x), .cy(v_trans_y), .cs(v_trans_c));
+	  .cx(v_trans_x), .cy(v_trans_y), .cs(v_trans_c),
+	  .clk(clk), .rst(rst), .done(v_trans_done));
 
    /* Interpolators for shading */
    interp in_r(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
 	       .s0({4'b0, cmd.r0}), .s1({4'b0, cmd.r1}), .s2({4'b0, cmd.r2}),
-	       .cx(r_trans_x), .cy(r_trans_y), .cs(r_trans_c)),
+	       .cx(r_trans_x), .cy(r_trans_y), .cs(r_trans_c),
+	       .clk(clk), .rst(rst), .done(r_trans_done)),
      in_g(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
 	  .s0({4'b0, cmd.g0}), .s1({4'b0, cmd.g1}), .s2({4'b0, cmd.g2}),
-	  .cx(g_trans_x), .cy(g_trans_y), .cs(g_trans_c)),
+	  .cx(g_trans_x), .cy(g_trans_y), .cs(g_trans_c),
+	  .clk(clk), .rst(rst), .done(g_trans_done)),
      in_b(.x0(cmd.x0), .y0(cmd.y0), .x1(cmd.x1), .y1(cmd.y1), .x2(cmd.x2), .y2(cmd.y2),
 	  .s0({4'b0, cmd.b0}), .s1({4'b0, cmd.b1}), .s2({4'b0, cmd.b2}),
-	  .cx(b_trans_x), .cy(b_trans_y), .cs(b_trans_c));
+	  .cx(b_trans_x), .cy(b_trans_y), .cs(b_trans_c),
+	  .clk(clk), .rst(rst), .done(b_trans_done));
+
    
-
-
-
-
 
 
 
@@ -2273,10 +2250,12 @@ module gpu(
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 color_stage <= 'd0;
+	 color_sub_stage <= 'd0;
       end
       else begin
 	 if (~pipeline_stall) begin
 	    color_stage <= next_color_stage;
+	    color_sub_stage <= next_color_sub_stage;
 	 end
       end
    end
@@ -2299,38 +2278,28 @@ module gpu(
       ##################################################### */
 
    /* Pass Values */
-   assign next_shader_stage.valid = color_stage.valid;
-   assign next_shader_stage.x = color_stage.x;
-   assign next_shader_stage.y = color_stage.y;
-   assign next_shader_stage.in_shape = color_stage.in_shape;
+   assign next_color_sub_stage.valid = color_stage.valid;
+   assign next_color_sub_stage.x = color_stage.x;
+   assign next_color_sub_stage.y = color_stage.y;
+
+   assign next_shader_stage.valid = color_sub_stage.valid;
+   assign next_shader_stage.x = color_sub_stage.x;
+   assign next_shader_stage.y = color_sub_stage.y;
 
    /* Texture Page cache */
-   // always_ff @(posedge clk, posedge rst) begin
-   //    if (rst) begin
-   // 	 txpg = 'd0;
-   //    end
-   //    else begin
-   // 	 if (txpg_ld) begin
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+    	 tx_cache <= 'd0;
+      end
+      else begin
+    	 if (tx_ld) begin
+	    tx_cache[wb_count] <= tx_val;
+    	 end
+       end
+   end
 
-   // 	    /* Select based on color mode */
-   // 	    case (GPU_status.text_mode)
-   // 	      2'd0: begin
-   // 		 txpg[(txpg_count_x << 'd2) | 9'h0][txpg_count_y] <= txpg_val[0];
-   // 		 txpg[(txpg_count_x << 'd2) | 9'h1][txpg_count_y] <= txpg_val[1];
-   // 		 txpg[(txpg_count_x << 'd2) | 9'h2][txpg_count_y] <= txpg_val[2];
-   // 		 txpg[(txpg_count_x << 'd2) | 9'h3][txpg_count_y] <= txpg_val[3];
-   // 	      end
-   // 	      2'd1: begin
-   // 		 txpg[(txpg_count_x << 'd1) | 9'h0][txpg_count_y] <= txpg_val[0];
-   // 		 txpg[(txpg_count_x << 'd1) | 9'h1][txpg_count_y] <= txpg_val[1];
-   // 	      end
-   // 	      default: begin
-   // 		 txpg[txpg_count_x][txpg_count_y] <= txpg_val[0];
-   // 	      end
-   // 	    endcase // case (GPU_status.text_mode)
-   // 	 end
-   //    end
-   // end
+   /* Determie whether or not to stall this stage */
+   assign color_stall = (cmd.texture == TEXT) & (~u_trans_done | ~v_trans_done);
    
    /* Fill color logic */
    generate
@@ -2341,29 +2310,93 @@ module gpu(
 	    next_shader_stage.g[text_i] = 8'd128;
 	    next_shader_stage.b[text_i] = 8'd128;
 
-      /* If its textured, use results from texture unit */
-//      if (cmd.texture == TEXT) begin
-//	 for (text_i = 0; text_i < `GPU_PIPELINE_WIDTH; text_i = text_i + 1) begin
-//	    if (cmd.shape == TRI) begin
-//	       /* f_* are in the for [18  | 6] */
-//	       f_u = (u_trans_x * color_stage.x[text_i] + 
-//		      u_trans_y * color_stage.y[text_i] + u_trans_c);
-//	       f_v = (v_trans_x * color_stage.x[text_i] + 
-//		      v_trans_y * color_stage.y[text_i] + v_trans_c);
-//	    end
-//	    else begin
-//	       f_u = color_stage.x[text_i] - cmd.x0;
-//	       f_v = color_stage.y[text_i] - cmd.y0;
-//	    end // else: !if(cmd.shape == POLY)
-//
-//	    m_u = ((f_u[13:6] & (~(text_mask_x << 'd3))) | ((text_off_x & text_mask_x) << 'd3));
-//	    m_v = ((f_u[13:6] & (~(text_mask_y << 'd3))) | ((text_off_y & text_mask_y) << 'd3));
-//	    
-//	    next_shader_stage.r[text_i] = txpg[m_u][m_v];
-//	    next_shader_stage.g[text_i] = txpg[m_u][m_v];
-//	    next_shader_stage.b[text_i] = txpg[m_u][m_v];
-//	 end
-//     end
+	    next_color_sub_stage.in_shape[text_i] = color_stage.in_shape[text_i];
+	    next_shader_stage.in_shape[text_i] = color_sub_stage.in_shape[text_i];
+
+	    f_u[text_i] = 32'd0;
+	    f_v[text_i] = 32'd0;
+	    
+	    s_u[text_i] = 8'd0;
+	    s_v[text_i] = 8'd0;
+
+	    next_color_sub_stage.m_u[text_i] = 8'd0;
+	    next_color_sub_stage.m_v[text_i] = 8'd0;
+
+	    tx_color[text_i] = 16'd0;
+	    
+	    /* If its textured, use results from texture unit */
+	    if (cmd.texture == TEXT) begin
+	       if (cmd.shape == TRI) begin
+		  /* f_* are in the for [24  | 8] */
+		  f_u[text_i] = (u_trans_x * color_stage.x[text_i] + 
+				 u_trans_y * color_stage.y[text_i] + u_trans_c);
+		  f_v[text_i] = (v_trans_x * color_stage.x[text_i] + 
+				 v_trans_y * color_stage.y[text_i] + v_trans_c);
+	       end
+	       else begin
+		  f_u[text_i] = {(cmd.u0 + color_stage.x[text_i] - cmd.x0), 8'b0};
+		  f_v[text_i] = {(cmd.v0 + color_stage.y[text_i] - cmd.y0), 8'b0};
+	       end // else: !if(cmd.shape == POLY)
+	       
+	       /* Saturate the result (if its out of bounds) */
+	       s_u[text_i] = ((f_u[text_i][31]) ? 8'd0 : 
+			      (((f_u[text_i][31:8] + f_u[text_i][7]) > 24'd255) ? 8'd255 :
+			       (f_u[text_i][15:8] + f_u[text_i][7])));
+	       s_v[text_i] = ((f_v[text_i][31]) ? 8'd0 :
+			      (((f_v[text_i][31:8] + f_v[text_i][7]) > 24'd255) ? 8'd255 :
+			       (f_v[text_i][15:8] + f_v[text_i][7])));
+	       
+	       /* Window the result */
+	       next_color_sub_stage.m_u[text_i] = ((s_u[text_i] & 
+						    (~(text_mask_x << 'd3))) | 
+						   ((text_off_x & text_mask_x) << 'd3));
+	       next_color_sub_stage.m_v[text_i] = ((s_v[text_i] & 
+						    (~(text_mask_y << 'd3))) | 
+						   ((text_off_y & text_mask_y) << 'd3));
+
+	       /* Apply the CLUT */
+	       case (cmd.text_mode)
+		 2'd0: begin
+		    /* 4-bit */
+		    case (color_sub_stage.m_u[text_i][1:0])
+		      2'd0: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][3:0]];
+		      end
+		      2'd1: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][7:4]];
+		      end
+		      2'd2: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][11:8]];
+		      end
+		      2'd3: begin
+			 tx_color[text_i] = clut[tx_cache[text_i][15:12]];
+		      end
+		    endcase // case (m_u[text_i][1:0])
+		 end // case: 2'd0
+		 2'd1: begin
+		    /* 8-bit */
+		    if (color_sub_stage.m_u[text_i][0]) begin
+		       tx_color[text_i] = clut[tx_cache[text_i][7:0]];
+		    end
+		    else begin
+		       tx_color[text_i] = clut[tx_cache[text_i][15:8]];
+		    end
+		 end
+		 2'd2: begin
+		    /* 16-bit mode */
+		    tx_color[text_i] = tx_cache[text_i];
+		 end
+	       endcase // case (cmd.text_mode)
+	       
+	       /* Handle transparent colors */
+	       if (tx_color[text_i] == 16'd0) begin
+		  next_shader_stage.in_shape[text_i] = 1'b0;
+	       end
+
+	       next_shader_stage.r[text_i] = {tx_color[text_i][4:0], 3'b0};
+	       next_shader_stage.g[text_i] = {tx_color[text_i][9:5], 3'b0};
+	       next_shader_stage.b[text_i] = {tx_color[text_i][14:10], 3'b0};
+	    end // if (cmd.texture == TEXT)
 	 end // always_comb
       end // block: color_stage_gen
    endgenerate
@@ -2372,10 +2405,12 @@ module gpu(
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
 	 shader_stage <= 'd0;
+	 shader_sub_stage <= 'd0;
       end
       else begin
 	 if (~pipeline_stall) begin
 	    shader_stage <= next_shader_stage;
+	    shader_sub_stage <= next_shader_sub_stage;
 	 end
       end
    end
@@ -2399,64 +2434,82 @@ module gpu(
       ##################################################### */
 
    /* Pass Values */
-   assign next_wb_stage.valid = shader_stage.valid;
-   assign next_wb_stage.x = shader_stage.x;
-   assign next_wb_stage.y = shader_stage.y;
-   assign next_wb_stage.in_shape = shader_stage.in_shape;
+   assign next_shader_sub_stage.valid = shader_stage.valid;
+   assign next_shader_sub_stage.x = shader_stage.x;
+   assign next_shader_sub_stage.y = shader_stage.y;
+   assign next_shader_sub_stage.in_shape = shader_stage.in_shape;
 
-
+   assign next_wb_stage.valid = shader_sub_stage.valid;
+   assign next_wb_stage.x = shader_sub_stage.x;
+   assign next_wb_stage.y = shader_sub_stage.y;
+   assign next_wb_stage.in_shape = shader_sub_stage.in_shape;
+   
+   /* Determie whether or not to stall this stage */
+   assign shade_stall = ((cmd.shade == SHADE) & 
+			 ((cmd.texture == MONO) | 
+			  ((cmd.texture == TEXT) & (cmd.texture_mode == BLEND))) &
+			 (~r_trans_done | ~g_trans_done | ~b_trans_done));
+   
    /* Preform shading if requests by the cmd */
    generate
       for (color_i = 0; color_i < `GPU_PIPELINE_WIDTH; color_i = color_i + 1) begin: shader_stage_gen
 	 always_comb begin
 	    /* Defaults */
-	    next_wb_stage.r[color_i] = shader_stage.r[color_i];
-	    next_wb_stage.g[color_i] = shader_stage.g[color_i];
-	    next_wb_stage.b[color_i] = shader_stage.b[color_i];
+	    next_shader_sub_stage.r[color_i] = shader_stage.r[color_i];
+	    next_shader_sub_stage.g[color_i] = shader_stage.g[color_i];
+	    next_shader_sub_stage.b[color_i] = shader_stage.b[color_i];
 	    
-	    int_r[color_i] = 64'd0;
-	    int_g[color_i] = 64'd0;
-	    int_b[color_i] = 64'd0;
+	    next_wb_stage.r[color_i] = shader_sub_stage.r[color_i];
+	    next_wb_stage.g[color_i] = shader_sub_stage.g[color_i];
+	    next_wb_stage.b[color_i] = shader_sub_stage.b[color_i];
+	    
+	    next_shader_sub_stage.int_r[color_i] = 32'd0;
+	    next_shader_sub_stage.int_g[color_i] = 32'd0;
+	    next_shader_sub_stage.int_b[color_i] = 32'd0;
 
-	    f_r[color_i] = 64'd0;
-	    f_g[color_i] = 64'd0;
-	    f_b[color_i] = 64'd0;
+	    f_r[color_i] = 32'd0;
+	    f_g[color_i] = 32'd0;
+	    f_b[color_i] = 32'd0;
 
 	    /* Determine is we need to shader */
-	    if (cmd.shade == SHADE) begin
+	    if ((cmd.shade == SHADE) & 
+		((cmd.texture == MONO) | 
+		 ((cmd.texture == TEXT) & (cmd.texture_mode == BLEND)))) begin
 	       /* Gouraud */
-	       /* First get the color: int_* = [48 | 16]  */
-	       int_r[color_i] = (r_trans_x * shader_stage.x[color_i] + 
-				 r_trans_y * shader_stage.y[color_i] + r_trans_c);
-	       int_g[color_i] = (g_trans_x * shader_stage.x[color_i] +
-				 g_trans_y * shader_stage.y[color_i] + g_trans_c);
-	       int_b[color_i] = (b_trans_x * shader_stage.x[color_i] +
-				 b_trans_y * shader_stage.y[color_i] + b_trans_c);
+	       /* First get the color: int_* = [24 | 8]  */
+	       next_shader_sub_stage.int_r[color_i] = (r_trans_x * shader_stage.x[color_i] + 
+						       r_trans_y * shader_stage.y[color_i] + 
+						       r_trans_c);
+	       next_shader_sub_stage.int_g[color_i] = (g_trans_x * shader_stage.x[color_i] +
+						       g_trans_y * shader_stage.y[color_i] + 
+						       g_trans_c);
+	       next_shader_sub_stage.int_b[color_i] = (b_trans_x * shader_stage.x[color_i] +
+						       b_trans_y * shader_stage.y[color_i] + 
+						       b_trans_c);
 	       
-	       f_r[color_i] = (int_r[color_i] * shader_stage.r[color_i]) >> 'd7;
-	       f_g[color_i] = (int_g[color_i] * shader_stage.g[color_i]) >> 'd7;
-	       f_b[color_i] = (int_b[color_i] * shader_stage.b[color_i]) >> 'd7;
+	       f_r[color_i] = (shader_sub_stage.int_r[color_i] * shader_sub_stage.r[color_i]) >> 'd7;
+	       f_g[color_i] = (shader_sub_stage.int_g[color_i] * shader_sub_stage.g[color_i]) >> 'd7;
+	       f_b[color_i] = (shader_sub_stage.int_b[color_i] * shader_sub_stage.b[color_i]) >> 'd7;
 
 	       /* Saturate and round color (note that due to shift, 56 is the new sign bit) */
-	       next_wb_stage.r[color_i] = ((f_r[color_i][56]) ? 8'b0 : 
-					   (((f_r[color_i][63:16] + 
-					      f_r[color_i][15]) > 48'd255) ? 8'd255 : 
-					    (f_r[color_i][23:16] + f_r[color_i][15])));
-	       next_wb_stage.g[color_i] = ((f_g[color_i][56]) ? 8'b0 :
-					   (((f_g[color_i][63:16] + 
-					      f_g[color_i][15]) > 48'd255) ? 8'd255 : 
-					    (f_g[color_i][23:16] + f_g[color_i][15])));
-	       next_wb_stage.b[color_i] = ((f_b[color_i][56]) ? 8'b0 :
-					   (((f_b[color_i][63:16] + 
-					      f_b[color_i][15]) > 48'd255) ? 8'd255 : 
-					    (f_b[color_i][23:16] + f_b[color_i][15])));
-	       
+	       next_wb_stage.r[color_i] = ((f_r[color_i][24]) ? 8'b0 : 
+					   (((f_r[color_i][31:8] + 
+					      f_r[color_i][7]) > 24'd255) ? 8'd255 : 
+					    (f_r[color_i][15:8] + f_r[color_i][7])));
+	       next_wb_stage.g[color_i] = ((f_g[color_i][24]) ? 8'b0 :
+					   (((f_g[color_i][31:8] + 
+					      f_g[color_i][7]) > 24'd255) ? 8'd255 : 
+					    (f_g[color_i][15:8] + f_g[color_i][7])));
+	       next_wb_stage.b[color_i] = ((f_b[color_i][24]) ? 8'b0 :
+					   (((f_b[color_i][31:8] + 
+					      f_b[color_i][7]) > 24'd255) ? 8'd255 : 
+					    (f_b[color_i][15:8] + f_b[color_i][7])));
 	    end
-	    else begin
+	    else if (~((cmd.texture == TEXT) & (cmd.texture_mode == RAW))) begin
 	       /* Flat */
-	       f_r[color_i] = (cmd.r0 * shader_stage.r[color_i]) >> 'd7;
-	       f_g[color_i] = (cmd.g0 * shader_stage.g[color_i]) >> 'd7;
-	       f_b[color_i] = (cmd.b0 * shader_stage.b[color_i]) >> 'd7;
+	       f_r[color_i] = (cmd.r0 * shader_sub_stage.r[color_i]) >> 'd7;
+	       f_g[color_i] = (cmd.g0 * shader_sub_stage.g[color_i]) >> 'd7;
+	       f_b[color_i] = (cmd.b0 * shader_sub_stage.b[color_i]) >> 'd7;
 	       
 	       next_wb_stage.r[color_i] = (f_r[color_i] > 24'd255) ? 8'd255 : f_r[color_i][7:0];
 	       next_wb_stage.g[color_i] = (f_g[color_i] > 24'd255) ? 8'd255 : f_g[color_i][7:0];
@@ -2530,6 +2583,10 @@ module gpu(
       wb_r = 8'd0;
       wb_g = 8'd0;
       wb_b = 8'd0;
+
+      tx_val = 16'd0;
+      tx_ld = 1'b0;
+      tx_stall = 1'b0;
       
       case (wb_state)
 	WAIT_WB: begin
@@ -2537,6 +2594,11 @@ module gpu(
 	      wb_stall = 1'b1;
 	      wb_count_next = 8'd0;
 	      wb_state_next = GETMEM_WB;
+	   end
+	   else if (color_sub_stage.valid & ~cmd.text_en & (cmd.texture == TEXT)) begin
+	      tx_stall = 1'b1;
+	      wb_count_next = 8'd0;
+	      wb_state_next = GETTX_WB;
 	   end
 	end
 	GETMEM_WB: begin
@@ -2548,7 +2610,12 @@ module gpu(
 	      
 	      if (~wb_stage.in_shape[wb_count]) begin
 		 /* This pixel isnt in the shape, just move on to the next one */
-		 wb_count_next = wb_count_next + 8'd1;
+		 if (color_stage.valid & ~cmd.text_en & (cmd.texture == TEXT)) begin
+		    wb_state_next = GETTX_WB;
+		 end
+		 else begin
+		    wb_count_next = wb_count + 8'd1;
+		 end
 	      end
 	      else if (gpu_en) begin
 		 wb_vram_addr = {wb_stage.y[wb_count][8:0], wb_stage.x[wb_count][9:0]};
@@ -2559,92 +2626,47 @@ module gpu(
 		       wb_hold_next[15] = 1'b1;
 		    end
 		    
-		    if (cmd.shade == TRI) begin
-		       if (cmd.transparency == SEMI) begin
-			  case (cmd.semi_trans_mode)
-			    2'd0: begin
-			       wb_r = ((vram_bus_in[4:0] >> 'd1) + 
-				       (wb_stage.r[wb_count][7:3] >> 'd1));
-			       wb_g = ((vram_bus_in[9:5] >> 'd1) + 
-				       (wb_stage.g[wb_count][7:3] >> 'd1));
-			       wb_b = ((vram_bus_in[14:10] >> 'd1) + 
-				       (wb_stage.b[wb_count][7:3] >> 'd1));
-			    end
-			    2'd1: begin
-			       wb_r = ((vram_bus_in[4:0]) +
-				       (wb_stage.r[wb_count][7:3]));
-			       wb_b = ((vram_bus_in[9:5]) +
-				       (wb_stage.g[wb_count][7:3]));
-			       wb_g = ((vram_bus_in[14:10]) +
-				       (wb_stage.b[wb_count][7:3]));
-			    end
-			    2'd2: begin
-			       wb_r = ((vram_bus_in[4:0]) -
-				       (wb_stage.r[wb_count][7:3]));
-			       wb_b = ((vram_bus_in[9:5]) -
-				       (wb_stage.g[wb_count][7:3]));
-			       wb_g = ((vram_bus_in[14:10]) -
-				       (wb_stage.b[wb_count][7:3]));
-			    end
-			    2'd3: begin
-			       wb_r = ((vram_bus_in[4:0]) +
-				       (wb_stage.r[wb_count][7:3] >> 'd2));
-			       wb_g = ((vram_bus_in[9:5]) +
-				       (wb_stage.g[wb_count][7:3] >> 'd2));
-			       wb_b = ((vram_bus_in[14:10]) +
-				       (wb_stage.b[wb_count][7:3] >> 'd2));
-			    end
-			  endcase // case (cmd.semi_trans_mode)
-		       end // if (cmd.transparency == SEMI)
-		       else begin
-			  wb_r = wb_stage.r[wb_count][7:3];
-			  wb_g = wb_stage.g[wb_count][7:3];
-			  wb_b = wb_stage.b[wb_count][7:3];
-		       end
-		    end // if (cmd.shade == POLY)
+		    if (cmd.transparency == SEMI) begin
+		       case (cmd.semi_trans_mode)
+			 2'd0: begin
+			    wb_r = ((vram_bus_in[4:0] >> 'd1) + 
+				    (wb_stage.r[wb_count][7:3] >> 'd1));
+			    wb_g = ((vram_bus_in[9:5] >> 'd1) + 
+				    (wb_stage.g[wb_count][7:3] >> 'd1));
+			    wb_b = ((vram_bus_in[14:10] >> 'd1) + 
+				    (wb_stage.b[wb_count][7:3] >> 'd1));
+			 end
+			 2'd1: begin
+			    wb_r = ((vram_bus_in[4:0]) +
+				    (wb_stage.r[wb_count][7:3]));
+			    wb_b = ((vram_bus_in[9:5]) +
+				    (wb_stage.g[wb_count][7:3]));
+			    wb_g = ((vram_bus_in[14:10]) +
+				    (wb_stage.b[wb_count][7:3]));
+			 end
+			 2'd2: begin
+			    wb_r = ((vram_bus_in[4:0]) -
+				    (wb_stage.r[wb_count][7:3]));
+			    wb_b = ((vram_bus_in[9:5]) -
+				    (wb_stage.g[wb_count][7:3]));
+			    wb_g = ((vram_bus_in[14:10]) -
+				    (wb_stage.b[wb_count][7:3]));
+			 end
+			 2'd3: begin
+			    wb_r = ((vram_bus_in[4:0]) +
+				    (wb_stage.r[wb_count][7:3] >> 'd2));
+			    wb_g = ((vram_bus_in[9:5]) +
+				    (wb_stage.g[wb_count][7:3] >> 'd2));
+			    wb_b = ((vram_bus_in[14:10]) +
+				    (wb_stage.b[wb_count][7:3] >> 'd2));
+			 end
+		       endcase // case (cmd.semi_trans_mode)
+		    end // if (cmd.transparency == SEMI)
 		    else begin
-		       if (cmd.transparency == SEMI) begin
-			  case (GPU_status.semi_trans_mode)
-			    2'd0: begin
-			       wb_r = ((vram_bus_in[4:0] >> 'd1) +
-				       (wb_stage.r[wb_count][7:3] >> 'd1));
-			       wb_g = ((vram_bus_in[9:5] >> 'd1) +
-				       (wb_stage.g[wb_count][7:3] >> 'd1));
-			       wb_b = ((vram_bus_in[14:10] >> 'd1) +
-				       (wb_stage.b[wb_count][7:3] >> 'd1));
-			    end // case: 2'b0
-			    2'd1: begin
-			       wb_r = ((vram_bus_in[4:0]) +
-				       (wb_stage.r[wb_count][7:3]));
-			       wb_g = ((vram_bus_in[9:5]) +
-				       (wb_stage.g[wb_count][7:3]));
-			       wb_b = ((vram_bus_in[14:10]) +
-				       (wb_stage.b[wb_count][7:3]));
-			    end // case: 2'b1
-			    2'd2: begin
-			       wb_r = ((vram_bus_in[4:0]) -
-				       (wb_stage.r[wb_count][7:3]));
-			       wb_g = ((vram_bus_in[9:5]) -
-				       (wb_stage.g[wb_count][7:3]));
-			       wb_b = ((vram_bus_in[14:10]) -
-				       (wb_stage.b[wb_count][7:3]));
-			    end // case: 2'd2
-			    2'd3: begin
-			       wb_r = ((vram_bus_in[4:0]) +
-				       (wb_stage.r[wb_count][7:3] >> 'd2));
-			       wb_g = ((vram_bus_in[9:5]) +
-				       (wb_stage.g[wb_count][7:3] >> 'd2));
-			       wb_b = ((vram_bus_in[14:10]) +
-				       (wb_stage.b[wb_count][7:3] >> 'd2));
-			    end // case: 2'b0
-			  endcase
-		       end // if (cmd.transparency == SEMI)
-		       else begin
-			  wb_r = wb_stage.r[wb_count][7:3];
-			  wb_g = wb_stage.g[wb_count][7:3];
-			  wb_b = wb_stage.b[wb_count][7:3];
-		       end // else: !if(cmd.transparency == SEMI)
-		    end // else: !if(cmd.shade == POLY)
+		       wb_r = wb_stage.r[wb_count][7:3];
+		       wb_g = wb_stage.g[wb_count][7:3];
+		       wb_b = wb_stage.b[wb_count][7:3];
+		    end
 		    
 		    /* Now set the hold register (saturating if needed) */
 		    wb_hold_next[4:0] = (wb_r[7]) ? 5'd0 : ((wb_r > 8'd31) ? 5'd31 : wb_r[4:0]);
@@ -2654,11 +2676,69 @@ module gpu(
 		 else begin
 		    wb_hold_next = vram_bus_in;
 		 end // else: !if(~vram_bus[15])
+
+		 if (color_stage.valid & ~cmd.text_en & (cmd.texture == TEXT)) begin
+		    wb_state_next = GETTX_WB;
+		 end
+		 else begin
+		    wb_state_next = TOMEM_WB;
+		 end
+	      end // if (gpu_en)
+	   end // else: !if(wb_count >= `GPU_PIPELINE_WIDTH)
+	end // case: GETMEM_WB
+	GETTX_WB: begin
+	   if (wb_count >= `GPU_PIPELINE_WIDTH) begin
+	      /* Hold the stall for another cycle to let the tx_cache load with the final value */
+	      wb_state_next = HOLDTX_WB;
+	      tx_stall = 1'b1;
+	   end
+	   else begin
+	      tx_stall = 1'b1;
+
+	      if (gpu_en) begin
+		 wb_vram_re = 1'b1;
+		 tx_ld = 1'b1;
 		 
-		 wb_state_next = TOMEM_WB;
-	      end
-	   end // if (vram_rdy)
-	end // case: READINGMEM_WB
+		 case (cmd.text_mode)
+		   2'd0: begin
+		      /* 4-bit mode */
+		      wb_vram_addr = {cmd.text_y, color_sub_stage.m_v[wb_count], cmd.text_x[3:2], 
+				      ({cmd.text_x[1:0], 6'b0} + 
+				       {2'b0, color_sub_stage.m_u[wb_count][7:2]})};
+		      tx_val = vram_bus_in;
+		   end
+		   2'd1: begin
+		      /* 8-bit mode */
+		      wb_vram_addr = {cmd.text_y, color_sub_stage.m_v[wb_count], cmd.text_x[3:2],
+				      ({cmd.text_x[1:0], 6'b0} + 
+				       {1'b0, color_sub_stage.m_u[wb_count][7:1]})};
+		      tx_val = vram_bus_in;
+		   end
+		   2'd2: begin
+		      /* 16-bit mode */
+		      wb_vram_addr = {cmd.text_y, color_sub_stage.m_v[wb_count], cmd.text_x[3:2],
+				      ({cmd.text_x[1:0], 6'b0} + 
+				       color_sub_stage.m_u[wb_count])};
+                      tx_val = vram_bus_in;
+		   end
+		 endcase // case (cmd.text_mode)
+		 
+		 if (wb_stage.valid & wb_stage.in_shape[wb_count]) begin
+		    wb_state_next = TOMEM_WB;
+		 end
+		 else begin
+		    wb_count_next = wb_count + 8'd1;
+
+		    if (wb_stage.valid) begin
+		       wb_state_next = GETMEM_WB;
+		    end
+		 end
+	      end // if (gpu_en)
+	   end
+	end // case: GETTX_WB
+	HOLDTX_WB: begin
+	   wb_state_next = WAIT_WB;
+	end
 	TOMEM_WB: begin
 	   wb_stall = 1'b1;
 
