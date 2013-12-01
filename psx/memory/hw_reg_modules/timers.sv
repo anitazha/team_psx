@@ -51,7 +51,6 @@ module timer0(input logic         sys_clk, rst,
    /* handle write requests */
    always @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
-         value <= 16'b0;
          cmode_reg <= 10'b0;
          targt <= 16'b0;
 	 
@@ -323,7 +322,7 @@ module timer0(input logic         sys_clk, rst,
    /* increment counter
     * reset value at overflow or target value depending on mode register 
     */
-   always @ (posedge src_clk, posedge counter_rst, posedge rst) begin
+   always @ (posedge src_clk, posedge rst) begin
       if (rst) begin
          value <= 16'b0;
          hblank_flag <= 1'b0;
@@ -773,7 +772,7 @@ module timer2(input logic         sys_clk, rst,
    /* increment counter
     * reset value at overflow or target value depending on mode register 
     */
-   always @ (posedge src_clk, posedge counter_rst, posedge rst) begin
+   always @ (posedge src_clk, posedge rst) begin
       if (rst) begin
          value <= 16'b0;
          target_reached <= 1'b0;

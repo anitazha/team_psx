@@ -47,15 +47,18 @@ module mem_controller(input  logic  clk, rst,
                       output logic [10:0] interrupts
                       );
 
-   /* PARAMETERS - state declarations */ 
-   localparam IDLE           = 8'b00000001;
-   localparam READ_DATA_INIT = 8'b00000010;
-   localparam READ_INST_INIT = 8'b00000100;
-   localparam READ_DATA      = 8'b00001000;
-   localparam READ_INST      = 8'b00010000;
-   localparam WRITE_INIT     = 8'b00100000;
-   localparam WRITE_DATA     = 8'b01000000;
-   localparam DMA            = 8'b10000000;   
+   /* PARAMETERS - state declarations */
+   localparam INIT_SDRAM       = 4'b0000;
+   localparam INIT_SDRAM_WRITE = 4'b0001;
+   localparam INIT_SDRAM_WAIT  = 4'b0010;
+   localparam IDLE             = 4'b0011;
+   localparam READ_DATA_INIT   = 4'b0100;
+   localparam READ_INST_INIT   = 4'b0101;
+   localparam READ_DATA        = 4'b0110;
+   localparam READ_INST        = 4'b0111;
+   localparam WRITE_INIT       = 4'b1000;
+   localparam WRITE_DATA       = 4'b1001;
+   localparam DMA              = 4'b1010;   
    
    /* INTERNAL LINES */
    // - memory module interconnects 
@@ -103,10 +106,13 @@ module mem_controller(input  logic  clk, rst,
    wire [ 3:0] data_ben;
    wire        data_wen_or;
 
+   reg 	       sdram_initialized, next_sdram_initialized;
+   reg [31:0]  curr_init_addr, next_init_addr;
+   
    reg 	       service_DMA;
    
    // - state variables 
-   reg [7:0]   curr_state, next_state;
+   reg [3:0]   curr_state, next_state;
    reg [31:0]  curr_addr, next_addr;
    reg [31:0]  curr_data_i, next_data_i;
    reg         curr_ren, next_ren;
@@ -132,7 +138,7 @@ module mem_controller(input  logic  clk, rst,
    
    assign data_active = data_ren | data_wen_or;
    assign inst_active = inst_ren;
-   assign data_ben = service_DMA ? 4'b1111 : 95data_wen;
+   assign data_ben = (service_DMA | ~sdram_initialized)  ? 4'b1111 : data_wen;
    assign data_wen_or = data_wen[0] | data_wen[1] | data_wen[2] | data_wen[3];
    
    assign data_ack = curr_d_ack;
@@ -394,6 +400,9 @@ module mem_controller(input  logic  clk, rst,
          curr_d_ack    = 1'b0;
          curr_i_ack    = 1'b0;
 	 curr_dma_skip = 1'b0;
+
+	 sdram_initialized = 1'b0;
+	 curr_init_addr = 32'b0;
       end
       else begin
          curr_state    = next_state;
@@ -404,6 +413,9 @@ module mem_controller(input  logic  clk, rst,
          curr_d_ack    = next_d_ack;
          curr_i_ack    = next_i_ack;
 	 curr_dma_skip = next_dma_skip;
+
+	 sdram_initialized = next_sdram_initialized;
+	 curr_init_addr = next_init_addr;
       end
    end
    
@@ -420,12 +432,18 @@ module mem_controller(input  logic  clk, rst,
       next_dma_skip = curr_dma_skip;
 
       service_DMA = 1'b0;
+      next_sdram_initialized = sdram_initialized;
+      next_init_addr = curr_init_addr;
       
       case (curr_state)
         /* wait for memory request */
         IDLE: begin
+	   /* initialized memory to zeros */
+	   if (~sdram_initialized) begin
+	      next_state = INIT_SDRAM;
+	   end
            /* memory access from data bus */
-	   if (pll_locked) begin
+	   else if (pll_locked) begin
               if (dma_req && ~curr_dma_skip) begin
 		 next_dma_skip = 1'b1;
 		 service_DMA = 1'b1;
@@ -472,6 +490,42 @@ module mem_controller(input  logic  clk, rst,
            end
         end // case: IDLE
 
+	/* initialized all of SDRAM to zeros */
+	INIT_SDRAM: begin
+	   if (curr_init_addr != 22'h200000) begin
+	      next_addr = curr_init_addr;
+	      next_wen = 1'b1;
+	      next_ren = 1'b0;
+	      next_data_i = 32'b0;
+	      next_state = INIT_SDRAM_WRITE;
+
+	      next_init_addr = curr_init_addr + 32'b4;
+	   end
+	   else begin
+	      next_sdram_initialized = 1'b1;
+	      next_state = IDLE;
+	   end
+	end
+	/* write states */
+        INIT_SDRAM_WRITE: begin
+           if (ack_o) begin
+              next_state = INIT_SDRAM_WAIT;
+           end
+           else begin
+              next_state = INIT_SDRAM_WRITE;
+           end
+        end
+        INIT_SDRAM_WAIT: begin
+           next_wen = 1'b0;
+	   next_ren = 1'b0;
+           if (~ack_o) begin
+              next_state = IDLE;
+           end
+           else begin
+              next_state = WRITE_DATA;
+           end
+        end
+	
 	/* transfer control to DMA */
 	DMA: begin
 	   service_DMA = 1'b1;
