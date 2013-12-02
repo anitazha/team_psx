@@ -71,43 +71,50 @@ module mem_controller(input  logic  clk, rst,
                       /* SDRAM CHIP INTERFACE */
                       output logic [12:0] dram_addr,
                       output logic [ 1:0] dram_bank,
-                      output logic        dram_cas_n,
-                      output logic        dram_cke,
-                      output logic        dram_clk,
-                      output logic        dram_cs_n,
+                      output logic 	  dram_cas_n,
+                      output logic 	  dram_cke,
+                      output logic 	  dram_clk,
+                      output logic 	  dram_cs_n,
                       output logic [ 3:0] dram_dqm,
                       //inout  wire  [31:0] dram_dq,
-                      output logic        dram_ras_n,
-                      output logic        dram_we_n,
+                      output logic 	  dram_ras_n,
+                      output logic 	  dram_we_n,
                       output logic [31:0] dram_dq_in,
-                      input  logic [31:0] dram_dq_out,
-                      output logic        dram_oe_out,
+                      input logic [31:0]  dram_dq_out,
+                      output logic 	  dram_oe_out,
                       
                       /* CPU DATA */
-                      input  logic [31:0] data_addr,
-                      input  logic [31:0] data_data_i,
-                      input  logic        data_ren,
-                      input  logic [ 3:0] data_wen,
-                      output logic        data_ack,
+                      input logic [31:0]  data_addr,
+                      input logic [31:0]  data_data_i,
+                      input logic 	  data_ren,
+                      input logic [ 3:0]  data_wen,
+                      output logic 	  data_ack,
                       output logic [31:0] data_data_o,
                       
                       /* CPU INSTRCTION */
-                      input  logic [31:0] inst_addr,
-                      input  logic        inst_ren,
-                      output logic        inst_ack,
+                      input logic [31:0]  inst_addr,
+                      input logic 	  inst_ren,
+                      output logic 	  inst_ack,
                       output logic [31:0] inst_data_o,
                       
                       /* GPU SIGNALS */
-                      output logic        to_gp0, to_gp1,
-                      output logic        gpu_ren,
-                      input  logic        gpu_rdy,
-                      input  logic        gpu_fifo_full,
-                      input  logic [31:0] gpu_stat, gpu_read,
-                      output logic [31:0] gp0, gp1, 
+                      output logic 	  to_gp0, to_gp1,
+                      output logic 	  gpu_ren,
+                      input logic 	  gpu_rdy,
+                      input logic 	  gpu_fifo_full,
+                      input logic [31:0]  gpu_stat, gpu_read,
+                      output logic [31:0] gp0, gp1,
+
+		      /* CONTROLLER */
+		      input logic 	  joy_ack,
+		      input logic 	  joy_data,
+		      output logic 	  joy_att,
+		      output logic 	  joy_clk,
+		      output logic 	  joy_cmd,
                        
                       /* HW REGISTER CONNECTIONS */
-                      input  logic        hblank, vblank,
-                      input  logic        dotclock,
+                      input logic 	  hblank, vblank,
+                      input logic 	  dotclock,
 
                       /* INTERRUPTS */
                       output logic [10:0] interrupts
@@ -213,7 +220,8 @@ module mem_controller(input  logic  clk, rst,
    assign inst_data_o = inst_latch;
 
    assign dram_clk = altpll_0_c0_clk;
-
+   assign pll_locked = 1'b1;
+   
    /* BLOCKRAM CONTROLLER */
    blockram BIOS
      (.clk     (clk),
@@ -250,6 +258,12 @@ module mem_controller(input  logic  clk, rst,
       .gpu_fifo_full (gpu_fifo_full),
       .gpu_stat      (gpu_stat),
       .gpu_read      (gpu_read),
+      /* CONTROLLER */
+      .joy_ack       (joy_ack),
+      .joy_data      (joy_data),
+      .joy_att       (joy_att),
+      .joy_cmd       (joy_cmd),
+      .joy_clk       (joy_clk),
       /* DMA SIGNALS */
       .DMA_DPCR_o    (DMA_DPCR),
       .DMA0_CTRL     (DMA0_CTRL),
@@ -332,8 +346,7 @@ module mem_controller(input  logic  clk, rst,
       /* OTC */
       .dma6_i        (),
       .dma6_o        ());
-   
-     
+        
    /* SDRAM CONTROLLER */
    qsys_sdram_a2_sdram_0 sdram
      (.clk            (clk),
@@ -361,47 +374,6 @@ module mem_controller(input  logic  clk, rst,
       .sd_dq_out      (dram_dq_out),
       .sd_dq_in       (dram_dq_in),
       .sd_oe_out      (dram_oe_out));
-
-   assign pll_locked = 1'b1;
-   /* SDRAM PLL & ASYNC RESET CONTROLLER *//*
-   qsys_sdram_a2_altpll_0 altpll
-     (.clk       (clk),
-      .reset     (rst_controller_out),
-      .read      (),
-      .write     (),
-      .address   (),
-      .readdata  (),
-      .writedata (),
-      .c0        (altpll_0_c0_clk),
-      .areset    (),
-      .locked    (pll_locked),
-      .phasedone ());
-   altera_reset_controller
-     #(.NUM_RESET_INPUTS        (1),
-       .OUTPUT_RESET_SYNC_EDGES ("deassert"),
-       .SYNC_DEPTH              (2)
-       )
-   rst_controller
-     (.reset_in0  (rst),                 // reset_in0.reset
-      .clk        (altpll_0_c0_clk),     //       clk.clk
-      .reset_out  (rst_controller_out),  // reset_out.reset
-      .reset_in1  (1'b0),                // (terminated)
-      .reset_in2  (1'b0),                // (terminated)
-      .reset_in3  (1'b0),                // (terminated)
-      .reset_in4  (1'b0),                // (terminated)
-      .reset_in5  (1'b0),                // (terminated)
-      .reset_in6  (1'b0),                // (terminated)
-      .reset_in7  (1'b0),                // (terminated)
-      .reset_in8  (1'b0),                // (terminated)
-      .reset_in9  (1'b0),                // (terminated)
-      .reset_in10 (1'b0),                // (terminated)
-      .reset_in11 (1'b0),                // (terminated)
-      .reset_in12 (1'b0),                // (terminated)
-      .reset_in13 (1'b0),                // (terminated)
-      .reset_in14 (1'b0),                // (terminated)
-      .reset_in15 (1'b0)                 // (terminated)
-      );*/
-
    
    /* PSX MEMORY CONTROLLERS */
    addr_interpreter addr_interp

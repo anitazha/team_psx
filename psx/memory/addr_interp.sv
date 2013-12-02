@@ -119,8 +119,6 @@ module addr_interpreter(input  logic clk, rst,
    assign hw_wen = hw_wen_out;
    assign hw_ren = hw_ren_out;
    
-   assign addr_interpreter_state = curr_state;
-
    /* timeout counter for sd_valid (resend command if timeout)*/
    always @ (posedge clk, posedge rst) begin
       if (rst) begin

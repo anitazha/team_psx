@@ -38,6 +38,13 @@ module mem_controller(input  logic  clk, rst,
                       input  logic 	  gpu_fifo_full,
                       input  logic [31:0] gpu_stat, gpu_read,
                       output logic [31:0] gp0, gp1, 
+
+		      /* CONTROLLER */
+		      input logic 	  joy_ack,
+		      input logic 	  joy_data,
+		      output logic 	  joy_att,
+		      output logic 	  joy_clk,
+		      output logic 	  joy_cmd,
                        
                       /* HW REGISTER CONNECTIONS */
                       input  logic 	  hblank, vblank,
@@ -184,6 +191,12 @@ module mem_controller(input  logic  clk, rst,
       .gpu_fifo_full (gpu_fifo_full),
       .gpu_stat      (gpu_stat),
       .gpu_read      (gpu_read),
+      /* CONTROLLER */
+      .joy_ack       (joy_ack),
+      .joy_data      (joy_data),
+      .joy_att       (joy_att),
+      .joy_cmd       (joy_cmd),
+      .joy_clk       (joy_clk),
       /* DMA SIGNALS */
       .DMA_DPCR_o    (DMA_DPCR),
       .DMA0_CTRL     (DMA0_CTRL),
