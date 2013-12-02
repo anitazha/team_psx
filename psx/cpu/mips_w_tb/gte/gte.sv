@@ -631,9 +631,9 @@ module gte(
                         nxt_ssz[0] = mult16(c2c.r3[3], c2d.vz[0]) + ssz[0];
                     end
                     6'd3: begin
-                        c2c.flag[1] = (ssx[0][53:44]);
-                        c2c.flag[2] = (ssy[0][53:44]);
-                        c2c.flag[3] = (ssz[0][53:44]);
+                        c2c.flag[1] = (|ssx[0][53:44]);
+                        c2c.flag[2] = (|ssy[0][53:44]);
+                        c2c.flag[3] = (|ssz[0][53:44]);
                     end
                     6'd4: begin
                         c2d.ir[1] = limA1S(ssx[0][43:12]);
@@ -708,9 +708,9 @@ module gte(
                             nxt_ssz[n]   = mult16(c2c.r3[3], c2d.vz[n]) + ssz[n];
                         end
                         ('d3): begin
-                            c2c.flag[1]  = (ssx[n][53:44]);
-                            c2c.flag[2]  = (ssy[n][53:44]);
-                            c2c.flag[3]  = (ssz[n][53:44]);
+                            c2c.flag[1]  = (|ssx[n][53:44]);
+                            c2c.flag[2]  = (|ssy[n][53:44]);
+                            c2c.flag[3]  = (|ssz[n][53:44]);
                             div_num      = c2c.h;
                             div_den      = c2d.sz[n];
                         end

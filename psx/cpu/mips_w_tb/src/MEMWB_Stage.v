@@ -64,7 +64,7 @@ module MEMWB_Stage(
      allowing WB to stall.
     ***/
     
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         WB_RegWrite   <= (reset) ? 0     : ((WB_Stall) ? WB_RegWrite   : ((M_Stall | M_Flush) ? 0 : M_RegWrite));
         WB_MemtoReg   <= (reset) ? 0     : ((WB_Stall) ? WB_MemtoReg                              : M_MemtoReg);
         WB_ReadData   <= (reset) ? 32'b0 : ((WB_Stall) ? WB_ReadData                              : M_ReadData);

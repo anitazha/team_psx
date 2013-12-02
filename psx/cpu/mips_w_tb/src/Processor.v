@@ -203,7 +203,7 @@ module Processor(
     reg IRead, IReadMask;
     assign InstMem_Address = IF_PCOut[31:2];
     assign DataMem_Address = M_ALUResult[31:2];
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         IRead <= (reset) ? 1'b1 : ~InstMem_Ready;
         IReadMask <= (reset) ? 1'b0 : ((IRead & InstMem_Ready) ? 1'b1 : ((~IF_Stall) ? 1'b0 : IReadMask));
     end
@@ -227,7 +227,7 @@ module Processor(
                          .enable(syscall_halt),
                          .reset(reset));
 
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
             halted <= 1'b0;
             halt_count <= 'b0;
@@ -242,14 +242,15 @@ module Processor(
 `endif
 
     /*** PSX Hardware Interrupts ***/
-    wire [10:0] int_mask_out, int_mask_data;
-    wire [10:0] int_stat_out, int_stat_data;
+    wire [10:0] int_mask_out;
+    wire [10:0] int_stat_out;
+    reg  [10:0] int_mask_data, int_stat_data;
     wire int_mask_en = ((PSX_Int_Mask_Addr[31:2] == DataMem_Address) && DataMem_Write);
     wire int_stat_en = ((PSX_Int_Stat_Addr[31:2] == DataMem_Address) && DataMem_Write);
     //wire [31:0] fake_mem_in = ((PSX_Int_Stat_Addr[29:0] == DataMem_Address) ? {int_stat_out, 21'b0} : DataMem_In);
     wire [31:0] fake_mem_in = ((PSX_Int_Stat_Addr[31:2] == DataMem_Address) ? {21'b0, PSX_Interrupts} : DataMem_In);
 
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
             int_mask_data <= 'd0;
             int_stat_data <= 'd0;

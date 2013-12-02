@@ -63,7 +63,7 @@ module IFID_Stage(
      masked when this signal is high, and the interrupt will trigger on the next instruction load to ID.
     ***/
     
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         ID_Instruction <= (reset) ? 32'b0 : ((ID_Stall) ? ID_Instruction : ((IF_Stall | IF_Flush) ? 32'b0 : IF_Instruction));
         ID_PCAdd4      <= (reset) ? 32'b0 : ((ID_Stall) ? ID_PCAdd4                                       : IF_PCAdd4);
         ID_IsBDS       <= (reset) ? 0     : ((ID_Stall) ? ID_IsBDS                                        : IF_IsBDS);

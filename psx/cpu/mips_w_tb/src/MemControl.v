@@ -100,11 +100,11 @@ module MemControl(
     reg  LLSC_Atomic;
     wire LLSC_MemWrite_Mask;
     
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         LLSC_Address <= (reset) ? 30'b0 : (MemRead & LLSC) ? Address[31:2] : LLSC_Address;
     end
     
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
             LLSC_Atomic <= 0;
         end
@@ -125,7 +125,7 @@ module MemControl(
     wire ReadCondition  = MemRead  & ~(EXC_KernelMem | EXC_Word | EXC_Half);
     
     reg RW_Mask;
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         RW_Mask <= (reset) ? 0 : (((MemWrite | MemRead) & DataMem_Ready) ? 1 : ((~M_Stall & ~IF_Stall) ? 0 : RW_Mask));
     end
     assign M_Stall = ReadEnable | (WriteEnable != 4'b0000) | DataMem_Ready    | M_Exception_Stall;

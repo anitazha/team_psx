@@ -125,7 +125,7 @@ module IDEX_Stage(
     assign EX_Shamt = EX_SignExtImm[10:6];
     assign EX_SignExtImm = (EX_SignExtImm_pre[16]) ? {15'h7fff, EX_SignExtImm_pre[16:0]} : {15'h0000, EX_SignExtImm_pre[16:0]};
     
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         EX_Lwc2           <= (reset) ? 0     : ((EX_Stall) ? EX_Lwc2          : ((ID_Stall | ID_Flush) ? 5'b0 : ID_Lwc2));
         EX_Swc2           <= (reset) ? 0     : ((EX_Stall) ? EX_Swc2          : ((ID_Stall | ID_Flush) ? 5'b0 : ID_Swc2));
         EX_CP2Out         <= (reset) ? 0     : ((EX_Stall) ? EX_CP2Out        : ((ID_Stall | ID_Flush) ? 5'b0 : ID_CP2Out));

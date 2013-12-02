@@ -122,7 +122,7 @@ module ALU(
     end
     
     
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
             HILO <= 64'h00000000_00000000;
         end
@@ -171,7 +171,7 @@ module ALU(
     end
     
     // Divider FSM: The divide unit is either available or busy.
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
             div_fsm <= 2'd0;
         end

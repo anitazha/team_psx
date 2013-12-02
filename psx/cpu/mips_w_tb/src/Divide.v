@@ -48,7 +48,7 @@ module Divide(
     assign Stall = active;
 
     // The state machine
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
             active <= 0;
             neg <= 0;
