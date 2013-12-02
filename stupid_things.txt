@@ -10,3 +10,22 @@ too long. When running 'Implement Design' the process will error at opt_design
 
 - When using quartus, DON'T create bidirectional logic anywhere but the top
 module. DON'T propagate inouts through modules, keep them only in the top.
+
+- Even if you put something in always_ff, Quartus will complain and infer
+latches if you don't assign the WHOLE signal in more than one place.
+
+Example of what will infer latches:
+
+always_ff @(posedge clk, posedge rst)
+    if (rst)
+        cop2 <= 'd0;
+    else
+        cop2[0] <= nxt_cop[0];
+
+Example of what will NOT infer latches:
+
+always_ff @(posedge clk, posedge rst)
+    if (rst)
+        cop2 <= 'd0;
+    else
+        cop2 <= nxt_cop;
