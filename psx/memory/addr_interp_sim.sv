@@ -205,7 +205,7 @@ module addr_interpreter(input  logic clk, rst,
 		 next_state = READ;
 	      end
 	      else begin     
-		 next_state = READ_ACK;
+		 next_state = LATCH;
 	      end
 	   end
 	   else if (in_HWREG) begin
@@ -217,18 +217,7 @@ module addr_interpreter(input  logic clk, rst,
 	   end
 	end
 	READ_ACK: begin
-	   if (in_MAIN) begin
-	      if (sd_valid) begin
-		 next_state = LATCH;
-	      end
-	      else if (timeout_counter == 100) begin
-		 next_state = IDLE;
-	      end
-	      else begin
-		 next_state = READ_ACK;
-	      end
-	   end
-	   else if (in_HWREG) begin
+	   if (in_HWREG) begin
 	      hw_ren_out = 1'b1;
 	      if (hw_ack) begin
 		 hw_ren_out = 1'b0;
@@ -243,8 +232,22 @@ module addr_interpreter(input  logic clk, rst,
 	   end
 	end
 	LATCH: begin
-	   next_state = WAIT;
-	   next_ack = 1'b1;
+	   if (in_MAIN) begin
+	      if (sd_valid) begin
+		 next_state = WAIT;
+		 next_ack = 1'b1;
+	      end
+	      else if (timeout_counter == 100) begin
+		 next_state = IDLE;
+	      end
+	      else begin
+		 next_state = LATCH;
+	      end
+	   end
+	   else begin
+	      next_state = WAIT;
+	      next_ack = 1'b1;
+	   end
 	end
 	
 	/* WRITE STATE */
