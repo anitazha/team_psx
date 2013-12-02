@@ -51,16 +51,14 @@ module testbench;
     // The clock
     clock CLK(clk);
     
-    //always @(posedge clk) begin
-        //if ({pc, 2'b0} == 32'hbfc06ecc)
-        //    $stop;
-        //if ({pc, 2'b0} == 32'hbfc01a84)
+    always @(posedge clk) begin
+        if ({mem_addr[25:0], 2'b0} == 28'h0003000)
+            $stop;
+        //else if ({pc, 2'b0} == 32'h0)
         //    $stop;
         //else if (inst == 32'h8FBF0014)
         //    $stop;
-        //else if ({mem_addr, 2'b0} == 32'h801FFEE4)
-        //    $stop;
-    //end
+    end
 
     // The MIPS core
     Processor core (.clock(clk), .reset(~rst_b),
@@ -180,13 +178,20 @@ module testbench;
     //        $finish;
     //end
 
+   // always_ff @(posedge clk) begin
+   //     if (({pc, 2'b0} == 32'h80057ac8) & inst_ready & inst_read) begin
+   //         $display("PC: %x Inst: %x InstRead: %b InstReady: %b",
+   //                 {pc, 2'b0}, inst, inst_read, inst_ready);
+   //         $stop;
+   //     end
+   // end
+    
     initial begin
         rst_b = 0;
         #75;
         rst_b <= 1;
-        $stop;
-        wait(pc == 'b0)
-        $stop;
+        wait (pc == 30'b0)
+        #500 $stop;
     end
 endmodule
 

@@ -67,6 +67,8 @@ module CPZero(
     input  M_CanErr,                // Memory stage can error (i.e. cause exception)
     input  [10:0] PSX_Int_Mask,     // PSX Interrupt Mask
     input  [10:0] PSX_Int_Stat,     // PSX Interrupt State
+    //-- TODO: Hacky hack hack - If Isc Data Cache bit (Status_Custom[0] is set, ignore read/write)
+    output Isc_D_Cache,
     //-- Exception Control Flow --/
     output IF_Exception_Stall,
     output ID_Exception_Stall,
@@ -185,7 +187,7 @@ module CPZero(
     wire Status_SR = 1'd0;     // Soft reset not implemented
     reg  Status_NMI;        // Non-Maskable Interrupt
     wire Status_RES = 1'd0;
-    wire [1:0] Status_Custom = 2'b00;
+    reg [1:0] Status_Custom;  // PSX Isc. Cache Bits
     reg [7:0] Status_IM;    // Interrupt mask
     wire Status_KX = 1'd0;
     wire Status_SX = 1'd0;
@@ -283,6 +285,8 @@ module CPZero(
 
     assign CP0_WriteCond = (Status_CU_0 | KernelMode) & Mtc0 & ~ID_Stall;
 
+    /*** TODO: Hacky hack hack for assigning IscDCache ****/
+    assign Isc_D_Cache = Status_Custom[0];
 
     /***
      Exception Hazard Flow Control Explanation:
@@ -397,12 +401,14 @@ module CPZero(
             Status_IM     <= 8'b0;
             Status_UM     <= 1'd0;
             Status_IE     <= 1'd0;
+            Status_Custom <= 2'b0;  // PSX Isc. Cache Bits
             Cause_IV      <= 1'd0;
             Cause_IP      <= 8'b0;
         end
         else begin
             Count         <= (CP0_WriteCond & (Rd == 5'd9 ) & (Sel == 3'b000)) ? Reg_In       : ((Count == Compare) ? 32'b0 : Count + 1);
             Compare       <= (CP0_WriteCond & (Rd == 5'd11) & (Sel == 3'b000)) ? Reg_In       : Compare;
+            Status_Custom[0] <= (CP0_WriteCond & (Rd == 5'd12) & (Sel == 3'b000)) ? Reg_In[16] : Status_Custom;
             Status_CU_0   <= (CP0_WriteCond & (Rd == 5'd12) & (Sel == 3'b000)) ? Reg_In[28]   : Status_CU_0;
             Status_RE     <= (CP0_WriteCond & (Rd == 5'd12) & (Sel == 3'b000)) ? Reg_In[25]   : Status_RE;
             Status_IM     <= (CP0_WriteCond & (Rd == 5'd12) & (Sel == 3'b000)) ? Reg_In[15:8] : Status_IM;

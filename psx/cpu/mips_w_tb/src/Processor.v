@@ -77,6 +77,7 @@ module Processor(
     wire [31:0] IF_PCAdd4, IF_PC_PreExc, IF_PCIn, IF_PCOut, IF_Instruction;
 
     /*** ID (Instruction Decode) Signals ***/
+    wire Isc_D_Cache;
     wire ID_Stall;
     wire [1:0] ID_PCSrc;
     wire [1:0] ID_RsFwdSel, ID_RtFwdSel;
@@ -203,9 +204,8 @@ module Processor(
     assign InstMem_Address = IF_PCOut[31:2];
     assign DataMem_Address = M_ALUResult[31:2];
     always @(posedge clock) begin
-        $display("PC: %x Inst: %x InstRead: %b InstReady: %b", {InstMem_Address, 2'b0}, InstMem_In, InstMem_Read, InstMem_Ready);
-        IRead <= (reset) ? 1 : ~InstMem_Ready;
-        IReadMask <= (reset) ? 0 : ((IRead & InstMem_Ready) ? 1 : ((~IF_Stall) ? 0 : IReadMask));
+        IRead <= (reset) ? 1'b1 : ~InstMem_Ready;
+        IReadMask <= (reset) ? 1'b0 : ((IRead & InstMem_Ready) ? 1'b1 : ((~IF_Stall) ? 1'b0 : IReadMask));
     end
     assign InstMem_Read = IRead & ~IReadMask;
 
@@ -246,13 +246,24 @@ module Processor(
     wire [10:0] int_stat_out, int_stat_data;
     wire int_mask_en = ((PSX_Int_Mask_Addr[31:2] == DataMem_Address) && DataMem_Write);
     wire int_stat_en = ((PSX_Int_Stat_Addr[31:2] == DataMem_Address) && DataMem_Write);
-    assign int_mask_data[10:8] = ((DataMem_Write[1] & int_mask_en) ? DataMem_Out[10:8] : int_mask_data[10:8]);
-    assign int_mask_data[ 7:0] = ((DataMem_Write[0] & int_mask_en) ? DataMem_Out[ 7:0] : int_mask_data[ 7:0]);
-    assign int_stat_data[10:8] = ((DataMem_Write[1] & int_stat_en) ? DataMem_Out[10:8] : int_stat_data[10:8]);
-    assign int_stat_data[ 7:0] = ((DataMem_Write[0] & int_stat_en) ? DataMem_Out[ 7:0] : int_stat_data[ 7:0]);
     //wire [31:0] fake_mem_in = ((PSX_Int_Stat_Addr[29:0] == DataMem_Address) ? {int_stat_out, 21'b0} : DataMem_In);
     wire [31:0] fake_mem_in = ((PSX_Int_Stat_Addr[31:2] == DataMem_Address) ? {21'b0, PSX_Interrupts} : DataMem_In);
 
+    always @(posedge clock) begin
+        if (reset) begin
+            int_mask_data <= 'd0;
+            int_stat_data <= 'd0;
+        end
+        if (DataMem_Write[0] & int_mask_en) begin
+            int_mask_data[7:0] <= DataMem_Out[7:0];
+            int_stat_data[7:0] <= DataMem_Out[7:0];
+        end
+        if (DataMem_Write[1] & int_mask_en) begin
+            int_mask_data[10:8] <= DataMem_Out[10:8];
+            int_stat_data[10:8] <= DataMem_Out[10:8];
+        end
+    end
+    
     Register #(11,0) PSX_Int_Stat(
                         .Q      (int_stat_out),
                         .D      (int_stat_data),
@@ -269,6 +280,7 @@ module Processor(
 
     /*** Datapath Controller ***/
     Control Controller (
+        .Isc_D_Cache    (Isc_D_Cache),
         .ID_Stall       (ID_Stall),
         .OpCode         (OpCode),
         .Funct          (Funct),
@@ -407,6 +419,7 @@ module Processor(
         .M_CanErr            (M_CanErr),
         .PSX_Int_Mask        (int_mask_out),
         .PSX_Int_Stat        (PSX_Interrupts),
+        .Isc_D_Cache         (Isc_D_Cache),
         .IF_Exception_Stall  (IF_Exception_Stall),
         .ID_Exception_Stall  (ID_Exception_Stall),
         .EX_Exception_Stall  (EX_Exception_Stall),
@@ -443,7 +456,7 @@ module Processor(
         .stall          (ID_Stall),
         .halted         (halted),
         .reg_out        (CP2_RegOut),
-        .avail          (CP2_avail)
+        .out_avail      (CP2_avail)
     );
 
     /*** PC Source Non-Exception Mux ***/
@@ -473,6 +486,7 @@ module Processor(
         .D       (IF_PCIn),
         .Q       (IF_PCOut)
     );
+
 
     /*** PC +4 Adder ***/
     Add PC_Add4 (

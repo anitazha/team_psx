@@ -103,6 +103,8 @@ module io_controller(input  logic clk, rst,
    localparam GPU_READ_GP0 = 32'h1F80_1810;
    localparam GPU_STAT_GP1 = 32'h1F80_1814;
 
+   localparam CACHE_CTRL_ADDR = 32'hFFFE_0130;
+
    /* PSX I/O REGISTERS */
    // - Memory Control 1
    reg [31:0] MEM_CTRL_1 [0:8];    // 0x1F801000 - 0x1F801023
@@ -133,6 +135,8 @@ module io_controller(input  logic clk, rst,
    reg [31:0] CLK_1_8_VALUE;       // 0x1F801120
    reg [31:0] CLK_1_8_CMODE;       //  - 1/8 System Clock
    reg [31:0] CLK_1_8_TARGT;
+
+   reg [31:0] CACHE_CTRL;
    
    /* Internal Lines */
    reg 	      timer_wen, timer_ren;
@@ -151,7 +155,6 @@ module io_controller(input  logic clk, rst,
    reg 	       to_gp0_o, to_gp1_o;
    reg [31:0]  gp0_o, gp1_o;
    reg 	       gpu_ren_o;
-   wire [31:0] go1;
    
    assign shift_addr = {HW_ADDR_HEADER, addr[17:0]};
 
@@ -163,7 +166,7 @@ module io_controller(input  logic clk, rst,
    assign to_gp0 = to_gp0_o;
    assign to_gp1 = to_gp1_o;
    assign gp0 = gp0_o;
-   assign go1 = gp1_o;
+   assign gp1 = gp1_o;
    assign gpu_ren = gpu_ren_o;
 
    /* DMA outputs */
@@ -261,6 +264,8 @@ module io_controller(input  logic clk, rst,
 	 DMA5[0] <= 32'd0; DMA5[1] <= 32'd0; DMA5[2] <= 32'd0;
 	 DMA6[0] <= 32'd0; DMA6[1] <= 32'd0; DMA6[2] <= 32'd0;
 	 DMA_DPCR <= 32'h07654321;
+	 /* Memory Control 3 - Cache Control */
+	 CACHE_CTRL <= 32'd0;
       end 
       else begin
 	 if (curr_state == WRITE) begin
@@ -520,7 +525,14 @@ module io_controller(input  logic clk, rst,
 		 if (ben[0]) DMA_DPCR[ 7: 0] <= data_i[ 7: 0];
 	      end
 		 
-
+	      /* Memory Control 3 */
+	      CACHE_CTRL_ADDR: begin
+		 if (ben[3]) CACHE_CTRL[31:24] <= data_i[31:24];
+		 if (ben[2]) CACHE_CTRL[23:16] <= data_i[23:16];
+		 if (ben[1]) CACHE_CTRL[15: 8] <= data_i[15: 8];
+		 if (ben[0]) CACHE_CTRL[ 7: 0] <= data_i[ 7: 0];
+	      end
+	      
 	      default: begin
 		 // don't care about unused addresses
 	      end
@@ -659,7 +671,10 @@ module io_controller(input  logic clk, rst,
 		data_out <= gpu_read;
 	      GPU_STAT_GP1:
 		data_out <= gpu_stat;
-	      
+
+	      /* Memory Control 3 */
+	      CACHE_CTRL_ADDR:
+		data_out <= CACHE_CTRL;
 
 	      default:
 		data_out <= 32'b0;

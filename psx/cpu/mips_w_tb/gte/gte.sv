@@ -1,5 +1,48 @@
 `default_nettype none
 
+module gte_fsm(
+    input  logic inst_rdy, avail, stall, clk, rst,
+    output logic clr_inst, ld_inst, out_avail, en_cyc);
+
+    enum {WAIT, BUSY} curr_state, next_state;
+
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst)
+            curr_state <= WAIT;
+        else
+            curr_state <= next_state;
+    end
+
+    always_comb begin
+        /* Defaults */
+		  next_state = curr_state;
+        en_cyc   = 1'b0;
+        ld_inst  = 1'b0;
+        clr_inst = 1'b0;
+        out_avail = 1'b0;
+
+        case (curr_state)
+            WAIT: begin
+                out_avail = 'b1;
+                if (inst_rdy & ~stall) begin
+                    ld_inst = 'b1;
+                    next_state = BUSY;
+                end
+                else begin
+                    clr_inst = 'b1;
+                end
+            end
+            BUSY: begin
+                en_cyc = 'b1;
+                if (avail) begin
+                    clr_inst = 'b1;
+                    next_state = WAIT;
+                end
+            end
+        endcase
+    end
+endmodule: gte_fsm
+
 module gte(
     input         clk, rst,
     input         cfc2,       // mov from cop2d
@@ -21,8 +64,13 @@ module gte(
     input         halted,     // used for printing the registers
     input         stall,
     output [31:0] reg_out,    // register data out
-    output        avail       // indicates instruction in progress
+    output        out_avail   // indicates instruction in progress
     );
+
+    always_ff @(posedge clk) begin
+        if (inst_rdy)
+            $stop;
+    end
 
     // instruction register signals
     logic        [5:0] curr_inst;
@@ -73,17 +121,32 @@ module gte(
     logic  [2:0][53:0] rr,   nxt_rr;
     logic  [2:0][53:0] gg,   nxt_gg;
     logic  [2:0][53:0] bb,   nxt_bb;
-    logic       [31:0] div,  nxt_div;
+    logic       [20:0] div,  nxt_div;
     logic        [1:0] n,    nxt_n;
 
     // instruction decode flags
     logic        [1:0] mx, v, cv;
     logic              sf, lm;
 
+    // divider signals
+    logic       [15:0] div_num, div_den, div_quo;
+
+    // internal
+    logic              avail;
+
     // module instantiations
     up_counter #(6) cyc_reg (.Q(curr_cyc), .en(en_cyc), .clr(clr_inst), .*);
     gte_decode   cyc_decode (.rdy(ld_inst), .inst(gte_cmd), .inst_cnt(inst_cnt));
-    gte_fsm      fsm (.*);
+    gte_fsm      GTEfsm (.*);
+
+    // 3 cycle pipelined divider
+    lpm_div alt_divider(
+	        .clock      (clk),
+	        .numer      (div_num),
+	        .denom      (div_den),
+	        .quotient   (div_quo),
+	        .remain     ()
+            );
 
     // latch instruction specific input
     always_ff @(posedge clk, posedge rst) begin
@@ -126,6 +189,154 @@ module gte(
         if (rst) begin
             cop2c <= 'd0;
             cop2d <= 'd0;
+        end
+        else if (ctc2_en) begin
+            // writeback cop2c registers
+            cop2c <= nxt_cop2c;
+        end
+        else if (mtc2_en) begin
+            // writeback cop2d registers
+            cop2d <= nxt_cop2d;
+        end
+        else begin
+            // writeback cop2c registers
+            cop2c[`IDX_R11R12][31:16] <= c2c.r1[2];
+            cop2c[`IDX_R11R12][15:0]  <= c2c.r1[1];
+            cop2c[`IDX_R13R21][31:16] <= c2c.r2[1];
+            cop2c[`IDX_R13R21][15:0]  <= c2c.r1[3];
+            cop2c[`IDX_R22R23][15:0]  <= c2c.r2[2];
+            cop2c[`IDX_R22R23][31:16] <= c2c.r2[3];
+            cop2c[`IDX_R31R32][15:0]  <= c2c.r3[1];
+            cop2c[`IDX_R31R32][31:16] <= c2c.r3[2];
+            cop2c[`IDX_R33][15:0]     <= c2c.r3[3];
+            cop2c[`IDX_TRX]           <= c2c.trx;
+            cop2c[`IDX_TRY]           <= c2c.try;
+            cop2c[`IDX_TRZ]           <= c2c.trz;
+            cop2c[`IDX_L11L12][31:16] <= c2c.l1[2];
+            cop2c[`IDX_L11L12][15:0]  <= c2c.l1[1];
+            cop2c[`IDX_L13L21][31:16] <= c2c.l2[1];
+            cop2c[`IDX_L13L21][15:0]  <= c2c.l1[3];
+            cop2c[`IDX_L22L23][31:16] <= c2c.l2[3];
+            cop2c[`IDX_L22L23][15:0]  <= c2c.l2[2];
+            cop2c[`IDX_L31L32][31:16] <= c2c.l3[2];
+            cop2c[`IDX_L31L32][15:0]  <= c2c.l3[1];
+            cop2c[`IDX_L33][15:0]     <= c2c.l3[3];
+            cop2c[`IDX_RBK]           <= c2c.rbk;
+            cop2c[`IDX_GBK]           <= c2c.gbk;
+            cop2c[`IDX_BBK]           <= c2c.bbk;
+            cop2c[`IDX_LR1LR2][31:16] <= c2c.lr[2];
+            cop2c[`IDX_LR1LR2][15:0]  <= c2c.lr[1];
+            cop2c[`IDX_LR3LG1][31:16] <= c2c.lg[1];
+            cop2c[`IDX_LR3LG1][15:0]  <= c2c.lr[3];
+            cop2c[`IDX_LG2LG3][31:16] <= c2c.lg[3];
+            cop2c[`IDX_LG2LG3][15:0]  <= c2c.lg[2];
+            cop2c[`IDX_LB1LB2][31:16] <= c2c.lb[2];
+            cop2c[`IDX_LB1LB2][15:0]  <= c2c.lb[1];
+            cop2c[`IDX_LB3][15:0]     <= c2c.lb[3];
+            cop2c[`IDX_RFC]           <= c2c.rfc;
+            cop2c[`IDX_GFC]           <= c2c.gfc;
+            cop2c[`IDX_BFC]           <= c2c.bfc;
+            cop2c[`IDX_OFX]           <= c2c.ofx;
+            cop2c[`IDX_OFY]           <= c2c.ofy;
+            cop2c[`IDX_H][15:0]       <= c2c.h;
+            cop2c[`IDX_DQA][15:0]     <= c2c.dqa;
+            cop2c[`IDX_DQB]           <= c2c.dqb;
+            cop2c[`IDX_ZSF3][15:0]    <= c2c.zsf3;
+            cop2c[`IDX_ZSF4][15:0]    <= c2c.zsf4;
+            cop2c[`IDX_FLAG]          <= c2c.flag;
+            // writeback cop2d registers
+            cop2d[`IDX_VXY0][31:16]   <= c2d.vy[0];
+            cop2d[`IDX_VXY0][15:0]    <= c2d.vx[0];
+            cop2d[`IDX_VZ0][15:0]     <= c2d.vz[0];
+            cop2d[`IDX_VXY1][31:16]   <= c2d.vy[1];
+            cop2d[`IDX_VXY1][15:0]    <= c2d.vx[1];
+            cop2d[`IDX_VZ1][15:0]     <= c2d.vz[1];
+            cop2d[`IDX_VXY2][31:16]   <= c2d.vy[2];
+            cop2d[`IDX_VXY2][15:0]    <= c2d.vx[2];
+            cop2d[`IDX_VZ2][15:0]     <= c2d.vz[2];
+            cop2d[`IDX_RGB][31:24]    <= c2d.RGB.cd;
+            cop2d[`IDX_RGB][23:16]    <= c2d.RGB.b;
+            cop2d[`IDX_RGB][15:8]     <= c2d.RGB.g;
+            cop2d[`IDX_RGB][7:0]      <= c2d.RGB.r;
+            cop2d[`IDX_OTZ][15:0]     <= c2d.otz;
+            cop2d[`IDX_IR0]           <= c2d.ir[0];
+            cop2d[`IDX_IR1]           <= c2d.ir[1];
+            cop2d[`IDX_IR2]           <= c2d.ir[2];
+            cop2d[`IDX_IR3]           <= c2d.ir[3];
+            cop2d[`IDX_SXY0][31:16]   <= c2d.sy[0];
+            cop2d[`IDX_SXY0][15:0]    <= c2d.sx[0];
+            cop2d[`IDX_SXY1][31:16]   <= c2d.sy[1];
+            cop2d[`IDX_SXY1][15:0]    <= c2d.sx[1];
+            cop2d[`IDX_SXY2][31:16]   <= c2d.sy[2];
+            cop2d[`IDX_SXY2][15:0]    <= c2d.sx[2];
+            cop2d[`IDX_SXYP][31:16]   <= c2d.syp;
+            cop2d[`IDX_SXYP][15:0]    <= c2d.sxp;
+            cop2d[`IDX_SZ0][15:0]     <= c2d.sz[0];
+            cop2d[`IDX_SZ1][15:0]     <= c2d.sz[1];
+            cop2d[`IDX_SZ2][15:0]     <= c2d.sz[2];
+            cop2d[`IDX_SZ3][15:0]     <= c2d.sz[3];
+            cop2d[`IDX_RGB0][31:24]   <= c2d.rgb[0].cd;
+            cop2d[`IDX_RGB0][23:16]   <= c2d.rgb[0].b;
+            cop2d[`IDX_RGB0][15:8]    <= c2d.rgb[0].g;
+            cop2d[`IDX_RGB0][7:0]     <= c2d.rgb[0].r;
+            cop2d[`IDX_RGB1][31:24]   <= c2d.rgb[1].cd;
+            cop2d[`IDX_RGB1][23:16]   <= c2d.rgb[1].b;
+            cop2d[`IDX_RGB1][15:8]    <= c2d.rgb[1].g;
+            cop2d[`IDX_RGB1][7:0]     <= c2d.rgb[1].r;
+            cop2d[`IDX_RGB2][31:24]   <= c2d.rgb[2].cd;
+            cop2d[`IDX_RGB2][23:16]   <= c2d.rgb[2].b;
+            cop2d[`IDX_RGB2][15:8]    <= c2d.rgb[2].g;
+            cop2d[`IDX_RGB2][7:0]     <= c2d.rgb[2].r;
+            cop2d[`IDX_MAC0]          <= c2d.mac[0];
+            cop2d[`IDX_MAC1]          <= c2d.mac[1];
+            cop2d[`IDX_MAC2]          <= c2d.mac[2];
+            cop2d[`IDX_MAC3]          <= c2d.mac[3];
+            cop2d[`IDX_IRGB][14:10]   <= c2d.irgb.b;
+            cop2d[`IDX_IRGB][9:5]     <= c2d.irgb.g;
+            cop2d[`IDX_IRGB][4:0]     <= c2d.irgb.r;
+            cop2d[`IDX_ORGB][14:10]   <= c2d.orgb.b;
+            cop2d[`IDX_ORGB][9:5]     <= c2d.orgb.g;
+            cop2d[`IDX_ORGB][4:0]     <= c2d.orgb.r;
+            cop2d[`IDX_LZCS]          <= c2d.lzcs;
+            cop2d[`IDX_LZCR]          <= c2d.lzcr;
+        end
+    end
+
+    always_ff @(posedge clk, posedge rst) begin
+        if (rst) begin
+            ipl   <= 'd0;
+            mt    <= 'd0;
+            opx   <= 'd0;
+            opy   <= 'd0;
+            opz   <= 'd0;
+            ipx   <= 'd0;
+            ipy   <= 'd0;
+            ipz   <= 'd0;
+            l1    <= 'd0;
+            l2    <= 'd0;
+            l3    <= 'd0;
+            ll1   <= 'd0;
+            ll2   <= 'd0;
+            ll3   <= 'd0;
+            rrlt  <= 'd0;
+            gglt  <= 'd0;
+            bblt  <= 'd0;
+            p     <= 'd0; 
+            sx    <= 'd0; 
+            sy    <= 'd0;
+            sz    <= 'd0;
+            ssx   <= 'd0;
+            ssy   <= 'd0;
+            ssz   <= 'd0;
+            opz   <= 'd0;
+            ootz  <= 'd0;
+            rr    <= 'd0;
+            gg    <= 'd0;
+            bb    <= 'd0;
+            div   <= 'd0;
+            n     <= 'd0;
+        end
+        else if (avail) begin
             ipl   <= 'd0;
             mt    <= 'd0;
             opx   <= 'd0;
@@ -160,144 +371,49 @@ module gte(
         end
         else begin
             // intermediates
-            ipl   <= (avail) ? 'd0 : nxt_ipl;
-            mt    <= (avail) ? 'd0 : nxt_mt;
-            opx   <= (avail) ? 'd0 : nxt_opx;
-            opy   <= (avail) ? 'd0 : nxt_opy;
-            opz   <= (avail) ? 'd0 : nxt_opz;
-            ipx   <= (avail) ? 'd0 : nxt_ipx;
-            ipy   <= (avail) ? 'd0 : nxt_ipy;
-            ipz   <= (avail) ? 'd0 : nxt_ipz;
-            l1    <= (avail) ? 'd0 : nxt_l1;
-            l2    <= (avail) ? 'd0 : nxt_l2;
-            l3    <= (avail) ? 'd0 : nxt_l3;
-            ll1   <= (avail) ? 'd0 : nxt_ll1;
-            ll2   <= (avail) ? 'd0 : nxt_ll2;
-            ll3   <= (avail) ? 'd0 : nxt_ll3;
-            rrlt  <= (avail) ? 'd0 : nxt_rrlt;
-            gglt  <= (avail) ? 'd0 : nxt_gglt;
-            bblt  <= (avail) ? 'd0 : nxt_bblt;
-            p     <= (avail) ? 'd0 : nxt_p; 
-            sx    <= (avail) ? 'd0 : nxt_sx; 
-            sy    <= (avail) ? 'd0 : nxt_sy;
-            sz    <= (avail) ? 'd0 : nxt_sz;
-            ssx   <= (avail) ? 'd0 : nxt_ssx;
-            ssy   <= (avail) ? 'd0 : nxt_ssy;
-            ssz   <= (avail) ? 'd0 : nxt_ssz;
-            opz   <= (avail) ? 'd0 : nxt_opz;
-            ootz  <= (avail) ? 'd0 : nxt_ootz;
-            rr    <= (avail) ? 'd0 : nxt_rr;
-            gg    <= (avail) ? 'd0 : nxt_gg;
-            bb    <= (avail) ? 'd0 : nxt_bb;
-            div   <= (avail) ? 'd0 : nxt_div;
-            n     <= (avail) ? 'd0 : nxt_n;
-
-            // writeback cop2c registers
-            cop2c[`IDX_R11R12][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_R11R12][31:16] : c2c.r1[2];
-            cop2c[`IDX_R11R12][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_R11R12][15:0]  : c2c.r1[1];
-            cop2c[`IDX_R13R21][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_R13R21][31:16] : c2c.r2[1];
-            cop2c[`IDX_R13R21][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_R13R21][15:0]  : c2c.r1[3];
-            cop2c[`IDX_R22R23][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_R22R23][15:0]  : c2c.r2[2];
-            cop2c[`IDX_R22R23][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_R22R23][31:16] : c2c.r2[3];
-            cop2c[`IDX_R31R32][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_R31R32][15:0]  : c2c.r3[1];
-            cop2c[`IDX_R31R32][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_R31R32][31:16] : c2c.r3[2];
-            cop2c[`IDX_R33][15:0]     <= (ctc2_en) ? nxt_cop2c[`IDX_R33][15:0]     : c2c.r3[3];
-            cop2c[`IDX_TRX]           <= (ctc2_en) ? nxt_cop2c[`IDX_TRX]           : c2c.trx;
-            cop2c[`IDX_TRY]           <= (ctc2_en) ? nxt_cop2c[`IDX_TRY]           : c2c.try;
-            cop2c[`IDX_TRZ]           <= (ctc2_en) ? nxt_cop2c[`IDX_TRZ]           : c2c.trz;
-            cop2c[`IDX_L11L12][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_L11L12][31:16] : c2c.l1[2];
-            cop2c[`IDX_L11L12][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_L11L12][15:0]  : c2c.l1[1];
-            cop2c[`IDX_L13L21][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_L13L21][31:16] : c2c.l2[1];
-            cop2c[`IDX_L13L21][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_L13L21][15:0]  : c2c.l1[3];
-            cop2c[`IDX_L22L23][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_L22L23][31:16] : c2c.l2[3];
-            cop2c[`IDX_L22L23][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_L22L23][15:0]  : c2c.l2[2];
-            cop2c[`IDX_L31L32][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_L31L32][31:16] : c2c.l3[2];
-            cop2c[`IDX_L31L32][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_L31L32][15:0]  : c2c.l3[1];
-            cop2c[`IDX_L33][15:0]     <= (ctc2_en) ? nxt_cop2c[`IDX_L33][15:0]     : c2c.l3[3];
-            cop2c[`IDX_RBK]           <= (ctc2_en) ? nxt_cop2c[`IDX_RBK]           : c2c.rbk;
-            cop2c[`IDX_GBK]           <= (ctc2_en) ? nxt_cop2c[`IDX_GBK]           : c2c.gbk;
-            cop2c[`IDX_BBK]           <= (ctc2_en) ? nxt_cop2c[`IDX_BBK]           : c2c.bbk;
-            cop2c[`IDX_LR1LR2][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_LR1LR2][31:16] : c2c.lr[2];
-            cop2c[`IDX_LR1LR2][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_LR1LR2][15:0]  : c2c.lr[1];
-            cop2c[`IDX_LR3LG1][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_LR3LG1][31:16] : c2c.lg[1];
-            cop2c[`IDX_LR3LG1][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_LR3LG1][15:0]  : c2c.lr[3];
-            cop2c[`IDX_LG2LG3][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_LG2LG3][31:16] : c2c.lg[3];
-            cop2c[`IDX_LG2LG3][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_LG2LG3][15:0]  : c2c.lg[2];
-            cop2c[`IDX_LB1LB2][31:16] <= (ctc2_en) ? nxt_cop2c[`IDX_LB1LB2][31:16] : c2c.lb[2];
-            cop2c[`IDX_LB1LB2][15:0]  <= (ctc2_en) ? nxt_cop2c[`IDX_LB1LB2][15:0]  : c2c.lb[1];
-            cop2c[`IDX_LB3][15:0]     <= (ctc2_en) ? nxt_cop2c[`IDX_LB3][15:0]     : c2c.lb[3];
-            cop2c[`IDX_RFC]           <= (ctc2_en) ? nxt_cop2c[`IDX_RFC]           : c2c.rfc;
-            cop2c[`IDX_GFC]           <= (ctc2_en) ? nxt_cop2c[`IDX_GFC]           : c2c.gfc;
-            cop2c[`IDX_BFC]           <= (ctc2_en) ? nxt_cop2c[`IDX_BFC]           : c2c.bfc;
-            cop2c[`IDX_OFX]           <= (ctc2_en) ? nxt_cop2c[`IDX_OFX]           : c2c.ofx;
-            cop2c[`IDX_OFY]           <= (ctc2_en) ? nxt_cop2c[`IDX_OFY]           : c2c.ofy;
-            cop2c[`IDX_H][15:0]       <= (ctc2_en) ? nxt_cop2c[`IDX_H][15:0]       : c2c.h;
-            cop2c[`IDX_DQA][15:0]     <= (ctc2_en) ? nxt_cop2c[`IDX_DQA][15:0]     : c2c.dqa;
-            cop2c[`IDX_DQB]           <= (ctc2_en) ? nxt_cop2c[`IDX_DQB]           : c2c.dqb;
-            cop2c[`IDX_ZSF3][15:0]    <= (ctc2_en) ? nxt_cop2c[`IDX_ZSF3][15:0]    : c2c.zsf3;
-            cop2c[`IDX_ZSF4][15:0]    <= (ctc2_en) ? nxt_cop2c[`IDX_ZSF4][15:0]    : c2c.zsf4;
-            cop2c[`IDX_FLAG]          <= (ctc2_en) ? nxt_cop2c[`IDX_FLAG]          : c2c.flag;
-
-            // writeback cop2d registers
-            cop2d[`IDX_VXY0][31:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_VXY0][31:16] : c2d.vy[0];
-            cop2d[`IDX_VXY0][15:0]    <= (mtc2_en) ? nxt_cop2d[`IDX_VXY0][15:0]  : c2d.vx[0];
-            cop2d[`IDX_VZ0][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_VZ0][15:0]   : c2d.vz[0];
-            cop2d[`IDX_VXY1][31:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_VXY1][31:16] : c2d.vy[1];
-            cop2d[`IDX_VXY1][15:0]    <= (mtc2_en) ? nxt_cop2d[`IDX_VXY1][15:0]  : c2d.vx[1];
-            cop2d[`IDX_VZ1][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_VZ1][15:0]   : c2d.vz[1];
-            cop2d[`IDX_VXY2][31:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_VXY2][31:16] : c2d.vy[2];
-            cop2d[`IDX_VXY2][15:0]    <= (mtc2_en) ? nxt_cop2d[`IDX_VXY2][15:0]  : c2d.vx[2];
-            cop2d[`IDX_VZ2][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_VZ2][15:0]   : c2d.vz[2];
-            cop2d[`IDX_RGB][31:24]    <= (mtc2_en) ? nxt_cop2d[`IDX_RGB][31:24]  : c2d.RGB.cd;
-            cop2d[`IDX_RGB][23:16]    <= (mtc2_en) ? nxt_cop2d[`IDX_RGB][23:16]  : c2d.RGB.b;
-            cop2d[`IDX_RGB][15:8]     <= (mtc2_en) ? nxt_cop2d[`IDX_RGB][15:8]   : c2d.RGB.g;
-            cop2d[`IDX_RGB][7:0]      <= (mtc2_en) ? nxt_cop2d[`IDX_RGB][7:0]    : c2d.RGB.r;
-            cop2d[`IDX_OTZ][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_OTZ][15:0]   : c2d.otz;
-            cop2d[`IDX_IR0]           <= (mtc2_en) ? nxt_cop2d[`IDX_IR0]         : c2d.ir[0];
-            cop2d[`IDX_IR1]           <= (mtc2_en) ? nxt_cop2d[`IDX_IR1]         : c2d.ir[1];
-            cop2d[`IDX_IR2]           <= (mtc2_en) ? nxt_cop2d[`IDX_IR2]         : c2d.ir[2];
-            cop2d[`IDX_IR3]           <= (mtc2_en) ? nxt_cop2d[`IDX_IR3]         : c2d.ir[3];
-            cop2d[`IDX_SXY0][31:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_SXY0][31:16] : c2d.sy[0];
-            cop2d[`IDX_SXY0][15:0]    <= (mtc2_en) ? nxt_cop2d[`IDX_SXY0][15:0]  : c2d.sx[0];
-            cop2d[`IDX_SXY1][31:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_SXY1][31:16] : c2d.sy[1];
-            cop2d[`IDX_SXY1][15:0]    <= (mtc2_en) ? nxt_cop2d[`IDX_SXY1][15:0]  : c2d.sx[1];
-            cop2d[`IDX_SXY2][31:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_SXY2][31:16] : c2d.sy[2];
-            cop2d[`IDX_SXY2][15:0]    <= (mtc2_en) ? nxt_cop2d[`IDX_SXY2][15:0]  : c2d.sx[2];
-            cop2d[`IDX_SXYP][31:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_SXYP][31:16] : c2d.syp;
-            cop2d[`IDX_SXYP][15:0]    <= (mtc2_en) ? nxt_cop2d[`IDX_SXYP][15:0]  : c2d.sxp;
-            cop2d[`IDX_SZ0][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_SZ0][15:0]   : c2d.sz[0];
-            cop2d[`IDX_SZ1][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_SZ1][15:0]   : c2d.sz[1];
-            cop2d[`IDX_SZ2][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_SZ2][15:0]   : c2d.sz[2];
-            cop2d[`IDX_SZ3][15:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_SZ3][15:0]   : c2d.sz[3];
-            cop2d[`IDX_RGB0][31:24]   <= (mtc2_en) ? nxt_cop2d[`IDX_RGB0][31:24] : c2d.rgb[0].cd;
-            cop2d[`IDX_RGB0][23:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_RGB0][23:16] : c2d.rgb[0].b;
-            cop2d[`IDX_RGB0][15:8]    <= (mtc2_en) ? nxt_cop2d[`IDX_RGB0][15:8]  : c2d.rgb[0].g;
-            cop2d[`IDX_RGB0][7:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_RGB0][7:0]   : c2d.rgb[0].r;
-            cop2d[`IDX_RGB1][31:24]   <= (mtc2_en) ? nxt_cop2d[`IDX_RGB1][31:24] : c2d.rgb[1].cd;
-            cop2d[`IDX_RGB1][23:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_RGB1][23:16] : c2d.rgb[1].b;
-            cop2d[`IDX_RGB1][15:8]    <= (mtc2_en) ? nxt_cop2d[`IDX_RGB1][15:8]  : c2d.rgb[1].g;
-            cop2d[`IDX_RGB1][7:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_RGB1][7:0]   : c2d.rgb[1].r;
-            cop2d[`IDX_RGB2][31:24]   <= (mtc2_en) ? nxt_cop2d[`IDX_RGB2][31:24] : c2d.rgb[2].cd;
-            cop2d[`IDX_RGB2][23:16]   <= (mtc2_en) ? nxt_cop2d[`IDX_RGB2][23:16] : c2d.rgb[2].b;
-            cop2d[`IDX_RGB2][15:8]    <= (mtc2_en) ? nxt_cop2d[`IDX_RGB2][15:8]  : c2d.rgb[2].g;
-            cop2d[`IDX_RGB2][7:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_RGB2][7:0]   : c2d.rgb[2].r;
-            cop2d[`IDX_MAC0]          <= (mtc2_en) ? nxt_cop2d[`IDX_MAC0]        : c2d.mac[0];
-            cop2d[`IDX_MAC1]          <= (mtc2_en) ? nxt_cop2d[`IDX_MAC1]        : c2d.mac[1];
-            cop2d[`IDX_MAC2]          <= (mtc2_en) ? nxt_cop2d[`IDX_MAC2]        : c2d.mac[2];
-            cop2d[`IDX_MAC3]          <= (mtc2_en) ? nxt_cop2d[`IDX_MAC3]        : c2d.mac[3];
-            cop2d[`IDX_IRGB][14:10]   <= (mtc2_en) ? nxt_cop2d[`IDX_IRGB][14:10] : c2d.irgb.b;
-            cop2d[`IDX_IRGB][9:5]     <= (mtc2_en) ? nxt_cop2d[`IDX_IRGB][9:5]   : c2d.irgb.g;
-            cop2d[`IDX_IRGB][4:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_IRGB][4:0]   : c2d.irgb.r;
-            cop2d[`IDX_ORGB][14:10]   <= (mtc2_en) ? nxt_cop2d[`IDX_ORGB][14:10] : c2d.orgb.b;
-            cop2d[`IDX_ORGB][9:5]     <= (mtc2_en) ? nxt_cop2d[`IDX_ORGB][9:5]   : c2d.orgb.g;
-            cop2d[`IDX_ORGB][4:0]     <= (mtc2_en) ? nxt_cop2d[`IDX_ORGB][4:0]   : c2d.orgb.r;
-            cop2d[`IDX_LZCS]          <= (mtc2_en) ? nxt_cop2d[`IDX_LZCS]        : c2d.lzcs;
-            cop2d[`IDX_LZCR]          <= (mtc2_en) ? nxt_cop2d[`IDX_LZCR]        : c2d.lzcr;
+            ipl   <= nxt_ipl;
+            mt    <= nxt_mt;
+            opx   <= nxt_opx;
+            opy   <= nxt_opy;
+            opz   <= nxt_opz;
+            ipx   <= nxt_ipx;
+            ipy   <= nxt_ipy;
+            ipz   <= nxt_ipz;
+            l1    <= nxt_l1;
+            l2    <= nxt_l2;
+            l3    <= nxt_l3;
+            ll1   <= nxt_ll1;
+            ll2   <= nxt_ll2;
+            ll3   <= nxt_ll3;
+            rrlt  <= nxt_rrlt;
+            gglt  <= nxt_gglt;
+            bblt  <= nxt_bblt;
+            p     <= nxt_p; 
+            sx    <= nxt_sx; 
+            sy    <= nxt_sy;
+            sz    <= nxt_sz;
+            ssx   <= nxt_ssx;
+            ssy   <= nxt_ssy;
+            ssz   <= nxt_ssz;
+            opz   <= nxt_opz;
+            ootz  <= nxt_ootz;
+            rr    <= nxt_rr;
+            gg    <= nxt_gg;
+            bb    <= nxt_bb;
+            div   <= nxt_div;
+            n     <= nxt_n;
         end
     end
 
     always_comb begin
         // defaults
+        div_den       = 'd1;
+        div_num       = 'd0;
+        mx_vec1       = 'd0;
+        mx_vec2       = 'd0;
+        mx_vec3       = 'd0;
+        v_vec         = 'd0;
+        cv_vec        = 'd0;
         nxt_ipl       = ipl;
         nxt_mt        = mt;
         nxt_opx       = opx;
@@ -529,38 +645,42 @@ module gte(
                         c2d.sz[1] = c2d.sz[2];
                         c2d.sz[2] = c2d.sz[3];
                         c2d.sz[3] = limC(ssz[0][43:12]);
+                        div_num = c2c.h;
+                        div_den = c2d.sz[3];
                     end
-                    6'd6: begin
-                        nxt_div = (c2c.h/c2d.sz[3]);
+                    // 6'd6: NOP NOP NOP
+                    // 6'd7: NOP NOP NOP
+                    6'd8: begin
+                        nxt_div = div_quo;
                     end
-                    6'd7: begin
+                    6'd9: begin
                         nxt_div = (div > 'h1FFFF) ? 'h1FFFF : div;
                         c2c.flag[17] = (div > 'h1FFFF);
                     end
-                    6'd8: begin
+                    6'd10: begin
                         nxt_sx[0] = c2c.ofx + mult16(c2d.ir[1], div);
                         nxt_sy[0] = c2c.ofy + mult16(c2d.ir[2], div);
                         c2c.flag[4] = (sx[0][53:43] != 'd0);
                     end
-                    6'd9: begin
+                    6'd11: begin
                         nxt_p = c2c.dqb + mult16(c2c.dqa, div);
                         c2c.flag[4] = (sy[0][53:43] != 'd0);
                     end
-                    6'd10: begin
+                    6'd12: begin
                         c2d.ir[0] = limE(p[43:12]);
                         c2c.flag[4] = (p[53:43] != 'd0);
                     end
-                    6'd11: begin
+                    6'd13: begin
                         c2d.sx[0] = c2d.sx[1];
                         c2d.sx[1] = c2d.sx[2];
                         c2d.sx[2] = limD1(sx[0][47:16]);
                     end
-                    6'd12: begin
+                    6'd14: begin
                         c2d.sy[0] = c2d.sy[1];
                         c2d.sy[1] = c2d.sy[2];
                         c2d.sy[2] = limD2(sy[0][47:16]);
                     end
-                    6'd13: begin
+                    6'd15: begin
                         c2d.mac[0] = p[31:0];
                         c2d.mac[1] = ssx[0][43:12];
                         c2d.mac[2] = ssy[0][43:12];
@@ -569,60 +689,68 @@ module gte(
                 endcase
             end
             `INST_RTPT: begin
-                case(curr_cyc)
-                    /***** Loop over the following 3 times ******/
-                    ((n*'d7) + 'd0): begin
-                        nxt_ssx[n]   = mult16(c2c.r1[1], c2d.vx[n]) + c2c.trx;
-                        nxt_ssy[n]   = mult16(c2c.r2[1], c2d.vx[n]) + c2c.try;
-                        nxt_ssz[n]   = mult16(c2c.r3[1], c2d.vx[n]) + c2c.trz;
-                    end
-                    ((n*'d7) + 'd1): begin
-                        nxt_ssx[n]   = mult16(c2c.r1[2], c2d.vy[n]) + ssx[n];
-                        nxt_ssy[n]   = mult16(c2c.r2[2], c2d.vy[n]) + ssy[n];
-                        nxt_ssz[n]   = mult16(c2c.r3[2], c2d.vy[n]) + ssz[n];
-                    end
-                    ((n*'d7) + 'd2): begin
-                        nxt_ssx[n]   = mult16(c2c.r1[3], c2d.vz[n]) + ssx[n];
-                        nxt_ssy[n]   = mult16(c2c.r2[3], c2d.vz[n]) + ssy[n];
-                        nxt_ssz[n]   = mult16(c2c.r3[3], c2d.vz[n]) + ssz[n];
-                    end
-                    ((n*'d7) + 'd3): begin
-                        c2c.flag[1]  = (ssx[n][53:44]);
-                        c2c.flag[2]  = (ssy[n][53:44]);
-                        c2c.flag[3]  = (ssz[n][53:44]);
-                        nxt_div      = (c2c.h/c2d.sz[n]);
-                    end
-                    ((n*'d7) + 'd4): begin
-                        nxt_div      = (div > 'h1FFFF) ? 'h1FFFF : div;
-                        c2c.flag[17] = (div > 'h1FFFF);
-                    end
-                    ((n*'d7) + 'd5): begin
-                        nxt_sx[n]    = c2c.ofx + mult16(c2d.ir[1], div);
-                        nxt_sy[n]    = c2c.ofy + mult16(c2d.ir[2], div);
-                        nxt_p        = c2c.dqb + mult16(c2c.dqa, div);
-                    end
-                    ((n*'d7) + 'd6): begin
-                        nxt_sx[n]    = limD1(sx[n][47:16]);
-                        nxt_sy[n]    = limD2(sy[n][47:16]);
-                        c2c.flag[4]  = (p[53:43] != 'd0);
-                        nxt_n        = ((n < 'd2) ? (n + 'd1) : 'd0);
-                    end
-                    /************ End loop block ****************/
-                    6'd21: begin
-                        c2d.sz[0]    = c2d.sz[3];
-                        c2d.sz[1]    = limC(ssz[0][43:12]);
-                        c2d.sz[2]    = limC(ssz[1][43:12]);
-                        c2d.sz[3]    = limC(ssz[2][43:12]);
-                        c2d.ir[0]    = limE(p[43:12]);
-                        c2d.ir[1]    = limA1S(ssx[2][47:16]);
-                        c2d.ir[2]    = limA2S(ssy[2][47:16]);
-                        c2d.ir[3]    = limA3S(ssz[2][47:16]);
-                        c2d.mac[0]   = p[31:0];
-                        c2d.mac[1]   = ssx[2][43:12];
-                        c2d.mac[2]   = ssy[2][43:12];
-                        c2d.mac[3]   = ssz[2][43:12];
-                    end
-                endcase
+                if (curr_cyc < 'd30) begin
+                    case(curr_cyc %'d10)
+                        /***** Loop over the following 3 times ******/
+                        ('d0): begin
+                            nxt_ssx[n]   = mult16(c2c.r1[1], c2d.vx[n]) + c2c.trx;
+                            nxt_ssy[n]   = mult16(c2c.r2[1], c2d.vx[n]) + c2c.try;
+                            nxt_ssz[n]   = mult16(c2c.r3[1], c2d.vx[n]) + c2c.trz;
+                        end
+                        ('d1): begin
+                            nxt_ssx[n]   = mult16(c2c.r1[2], c2d.vy[n]) + ssx[n];
+                            nxt_ssy[n]   = mult16(c2c.r2[2], c2d.vy[n]) + ssy[n];
+                            nxt_ssz[n]   = mult16(c2c.r3[2], c2d.vy[n]) + ssz[n];
+                        end
+                        ('d2): begin
+                            nxt_ssx[n]   = mult16(c2c.r1[3], c2d.vz[n]) + ssx[n];
+                            nxt_ssy[n]   = mult16(c2c.r2[3], c2d.vz[n]) + ssy[n];
+                            nxt_ssz[n]   = mult16(c2c.r3[3], c2d.vz[n]) + ssz[n];
+                        end
+                        ('d3): begin
+                            c2c.flag[1]  = (ssx[n][53:44]);
+                            c2c.flag[2]  = (ssy[n][53:44]);
+                            c2c.flag[3]  = (ssz[n][53:44]);
+                            div_num      = c2c.h;
+                            div_den      = c2d.sz[n];
+                        end
+                        //('d4): NOPNOPNOPNOP
+                        //('d5): NOPNOPNOPNOP
+                        ('d6): begin
+                            nxt_div      = div_quo;
+                        end
+                        ('d7): begin
+                            nxt_div      = (div > 'h1FFFF) ? 'h1FFFF : div;
+                            c2c.flag[17] = (div > 'h1FFFF);
+                        end
+                        ('d8): begin
+                            nxt_sx[n]    = c2c.ofx + mult16(c2d.ir[1], div);
+                            nxt_sy[n]    = c2c.ofy + mult16(c2d.ir[2], div);
+                            nxt_p        = c2c.dqb + mult16(c2c.dqa, div);
+                        end
+                        ('d9): begin
+                            nxt_sx[n]    = limD1(sx[n][47:16]);
+                            nxt_sy[n]    = limD2(sy[n][47:16]);
+                            c2c.flag[4]  = (p[53:43] != 'd0);
+                            nxt_n        = ((n < 'd2) ? (n + 'd1) : 'd0);
+                        end
+                        /************ End loop block ****************/
+                    endcase
+                end
+                else if (curr_cyc == 'd30) begin
+                    c2d.sz[0]    = c2d.sz[3];
+                    c2d.sz[1]    = limC(ssz[0][43:12]);
+                    c2d.sz[2]    = limC(ssz[1][43:12]);
+                    c2d.sz[3]    = limC(ssz[2][43:12]);
+                    c2d.ir[0]    = limE(p[43:12]);
+                    c2d.ir[1]    = limA1S(ssx[2][47:16]);
+                    c2d.ir[2]    = limA2S(ssy[2][47:16]);
+                    c2d.ir[3]    = limA3S(ssz[2][47:16]);
+                    c2d.mac[0]   = p[31:0];
+                    c2d.mac[1]   = ssx[2][43:12];
+                    c2d.mac[2]   = ssy[2][43:12];
+                    c2d.mac[3]   = ssz[2][43:12];
+                end
             end
             `INST_NCDS: begin
                 case(curr_cyc)
@@ -720,80 +848,86 @@ module gte(
                 endcase
             end
             `INST_NCDT: begin
-                case(curr_cyc)
-                    /***** Loop over the following 3 times ******/
-                    ((n*'d14) + 'd0): begin
-                        nxt_ll1[n] = mult16(c2c.l1[1], c2d.vx[n]);
-                        nxt_ll2[n] = mult16(c2c.l2[1], c2d.vx[n]);
-                    end
-                    ((n*'d14) + 'd1): begin
-                        nxt_ll3[n] = mult16(c2c.l3[1], c2d.vx[n]);
-                        nxt_ll1[n] = mult16(c2c.l1[2], c2d.vy[n]) + ll1[n];
-                    end
-                    ((n*'d14) + 'd2): begin
-                        nxt_ll2[n] = mult16(c2c.l2[2], c2d.vy[n]) + ll2[n];
-                        nxt_ll3[n] = mult16(c2c.l3[2], c2d.vy[n]) + ll3[n];
-                    end
-                    ((n*'d14) + 'd3): begin
-                        nxt_ll1[n] = mult16(c2c.l1[3], c2d.vz[n]) + ll1[n];
-                        nxt_ll2[n] = mult16(c2c.l2[3], c2d.vz[n]) + ll2[n];
-                    end
-                    ((n*'d14) + 'd4): begin
-                        nxt_ll3[n] = mult16(c2c.l3[3], c2d.vz[n]) + ll3[n];
-                        nxt_rrlt[n] = mult16(c2c.lr[1], limA1U(ll1[n][43:12])) + c2c.rbk;
-                    end
-                    ((n*'d14) + 'd5): begin
-                        nxt_gglt[n] = mult16(c2c.lg[1], limA1U(ll1[n][43:12])) + c2c.gbk;
-                        nxt_bblt[n] = mult16(c2c.lb[1], limA1U(ll1[n][43:12])) + c2c.bbk;
-                    end
-                    ((n*'d14) + 'd6): begin
-                        nxt_rrlt[n] = mult16(c2c.lr[2], limA2U(ll2[n][43:12])) + rrlt[n];
-                        nxt_gglt[n] = mult16(c2c.lg[2], limA2U(ll2[n][43:12])) + gglt[n];
-                    end
-                    ((n*'d14) + 'd7): begin
-                        nxt_bblt[n] = mult16(c2c.lb[2], limA2U(ll2[n][43:12])) + bblt[n];
-                        nxt_rrlt[n] = mult16(c2c.lr[3], limA3U(ll3[n][43:12])) + rrlt[n];
-                    end
-                    ((n*'d14) + 'd8): begin
-                        nxt_gglt[n] = mult16(c2c.lg[3], limA3U(ll3[n][43:12])) + gglt[n];
-                        nxt_bblt[n] = mult16(c2c.lb[3], limA3U(ll3[n][43:12])) + bblt[n];
-                    end
-                    ((n*'d14) + 'd9): begin
-                        nxt_rr[n] = mult16(c2d.RGB.r, limA1U(rrlt[n][43:12]));
-                        nxt_gg[n] = mult16(c2d.RGB.g, limA1U(gglt[n][43:12]));
-                    end
-                    ((n*'d14) + 'd10): begin
-                        nxt_bb[n] = mult16(c2d.RGB.b, limA1U(bblt[n][43:12]));
-                        nxt_rr[n] = mult16(c2d.ir[0], limA1S(c2c.rfc-rr[n])) + rr[n];
-                    end
-                    ((n*'d14) + 'd11): begin
-                        nxt_gg[n] = mult16(c2d.ir[0], limA2S(c2c.gfc-gg[n])) + gg[n];
-                        nxt_bb[n] = mult16(c2d.ir[0], limA3S(c2c.bfc-bb[n])) + bb[n];
-                    end
-                    ((n*'d14) + 'd12): begin
-                        c2c.flag[1] = (rr[n][53:43] != 0);
-                        c2c.flag[2] = (gg[n][53:43] != 0);
-                        c2c.flag[3] = (bb[n][53:43] != 0);
-                    end
-                    ((n*'d14) + 'd13): begin
-                        c2d.rgb[n].cd = c2d.RGB.cd;
-                        c2d.rgb[n].r = limB1(rr[n][47:16]);
-                        c2d.rgb[n].g = limB2(gg[n][47:16]);
-                        c2d.rgb[n].b = limB3(bb[n][47:16]);
-                        nxt_n        = ((n < 'd2) ? (n + 'd1) : 'd0);
-                    end
-                    /************ End loop block ****************/
-                    6'd42: begin
-                        c2d.ir[1]  = limA1U(rr[2][43:12]);
-                        c2d.ir[2]  = limA2U(gg[2][43:12]);
-                        c2d.ir[3]  = limA3U(bb[2][43:12]);
-                    end
-                    6'd43: begin
-                        c2d.mac[1] = rr[2][43:12];
-                        c2d.mac[2] = gg[2][43:12];
-                        c2d.mac[3] = bb[2][43:12];
-                    end
-                endcase
+                if (curr_cyc < 'd42) begin
+                    case(curr_cyc % 'd14)
+                        /***** Loop over the following 3 times ******/
+                        ('d0): begin
+                            nxt_ll1[n] = mult16(c2c.l1[1], c2d.vx[n]);
+                            nxt_ll2[n] = mult16(c2c.l2[1], c2d.vx[n]);
+                        end
+                        ('d1): begin
+                            nxt_ll3[n] = mult16(c2c.l3[1], c2d.vx[n]);
+                            nxt_ll1[n] = mult16(c2c.l1[2], c2d.vy[n]) + ll1[n];
+                        end
+                        ('d2): begin
+                            nxt_ll2[n] = mult16(c2c.l2[2], c2d.vy[n]) + ll2[n];
+                            nxt_ll3[n] = mult16(c2c.l3[2], c2d.vy[n]) + ll3[n];
+                        end
+                        ('d3): begin
+                            nxt_ll1[n] = mult16(c2c.l1[3], c2d.vz[n]) + ll1[n];
+                            nxt_ll2[n] = mult16(c2c.l2[3], c2d.vz[n]) + ll2[n];
+                        end
+                        ('d4): begin
+                            nxt_ll3[n] = mult16(c2c.l3[3], c2d.vz[n]) + ll3[n];
+                            nxt_rrlt[n] = mult16(c2c.lr[1], limA1U(ll1[n][43:12])) + c2c.rbk;
+                        end
+                        ('d5): begin
+                            nxt_gglt[n] = mult16(c2c.lg[1], limA1U(ll1[n][43:12])) + c2c.gbk;
+                            nxt_bblt[n] = mult16(c2c.lb[1], limA1U(ll1[n][43:12])) + c2c.bbk;
+                        end
+                        ('d6): begin
+                            nxt_rrlt[n] = mult16(c2c.lr[2], limA2U(ll2[n][43:12])) + rrlt[n];
+                            nxt_gglt[n] = mult16(c2c.lg[2], limA2U(ll2[n][43:12])) + gglt[n];
+                        end
+                        ('d7): begin
+                            nxt_bblt[n] = mult16(c2c.lb[2], limA2U(ll2[n][43:12])) + bblt[n];
+                            nxt_rrlt[n] = mult16(c2c.lr[3], limA3U(ll3[n][43:12])) + rrlt[n];
+                        end
+                        ('d8): begin
+                            nxt_gglt[n] = mult16(c2c.lg[3], limA3U(ll3[n][43:12])) + gglt[n];
+                            nxt_bblt[n] = mult16(c2c.lb[3], limA3U(ll3[n][43:12])) + bblt[n];
+                        end
+                        ('d9): begin
+                            nxt_rr[n] = mult16(c2d.RGB.r, limA1U(rrlt[n][43:12]));
+                            nxt_gg[n] = mult16(c2d.RGB.g, limA1U(gglt[n][43:12]));
+                        end
+                        ('d10): begin
+                            nxt_bb[n] = mult16(c2d.RGB.b, limA1U(bblt[n][43:12]));
+                            nxt_rr[n] = mult16(c2d.ir[0], limA1S(c2c.rfc-rr[n])) + rr[n];
+                        end
+                        ('d11): begin
+                            nxt_gg[n] = mult16(c2d.ir[0], limA2S(c2c.gfc-gg[n])) + gg[n];
+                            nxt_bb[n] = mult16(c2d.ir[0], limA3S(c2c.bfc-bb[n])) + bb[n];
+                        end
+                        ('d12): begin
+                            c2c.flag[1] = (rr[n][53:43] != 0);
+                            c2c.flag[2] = (gg[n][53:43] != 0);
+                            c2c.flag[3] = (bb[n][53:43] != 0);
+                        end
+                        ('d13): begin
+                            c2d.rgb[n].cd = c2d.RGB.cd;
+                            c2d.rgb[n].r = limB1(rr[n][47:16]);
+                            c2d.rgb[n].g = limB2(gg[n][47:16]);
+                            c2d.rgb[n].b = limB3(bb[n][47:16]);
+                            nxt_n        = ((n < 'd2) ? (n + 'd1) : 'd0);
+                        end
+                    endcase
+                end
+                else begin
+                    case(curr_cyc)
+                        /************ End loop block ****************/
+                        6'd42: begin
+                            c2d.ir[1]  = limA1U(rr[2][43:12]);
+                            c2d.ir[2]  = limA2U(gg[2][43:12]);
+                            c2d.ir[3]  = limA3U(bb[2][43:12]);
+                        end
+                        6'd43: begin
+                            c2d.mac[1] = rr[2][43:12];
+                            c2d.mac[2] = gg[2][43:12];
+                            c2d.mac[3] = bb[2][43:12];
+                        end
+                    endcase
+                end
             end
             `INST_NCCS: begin
                 case(curr_cyc)
@@ -876,61 +1010,61 @@ module gte(
                 endcase
             end
             `INST_NCCT: begin
-                case(curr_cyc)
+                case(curr_cyc % 'd13)
                     /***** Loop over the following 3 times ******/
-                    ((n*'d13) + 'd0): begin
+                    ('d0): begin
                         nxt_ll1[n] = mult16(c2c.l1[1], c2d.vx[n]);
                         nxt_ll3[n] = mult16(c2c.l3[1], c2d.vx[n]);
                     end
-                    ((n*'d13) + 'd1): begin
+                    ('d1): begin
                         nxt_ll2[n] = mult16(c2c.l2[1], c2d.vx[n]);
                         nxt_ll1[n] = mult16(c2c.l1[2], c2d.vy[n]) + ll1[n];
                     end
-                    ((n*'d13) + 'd2): begin
+                    ('d2): begin
                         nxt_ll2[n] = mult16(c2c.l2[2], c2d.vy[n]) + ll2[n];
                         nxt_ll3[n] = mult16(c2c.l3[2], c2d.vy[n]) + ll3[n];
                     end
-                    ((n*'d13) + 'd3): begin
+                    ('d3): begin
                         nxt_rrlt[n] = mult16(c2c.lr[1], limA1U(ll1[n][43:12])) + c2c.rbk;
                         nxt_gglt[n] = mult16(c2c.lg[1], limA2U(ll1[n][43:12])) + c2c.gbk;
                     end
-                    ((n*'d13) + 'd4): begin
+                    ('d4): begin
                         nxt_bblt[n] = mult16(c2c.lb[1], limA3U(ll1[n][43:12])) + c2c.bbk;
                         nxt_rrlt[n] = mult16(c2c.lr[2], limA1U(ll2[n][43:12])) + rrlt[n];
                     end
-                    ((n*'d13) + 'd5): begin
+                    ('d5): begin
                         nxt_gglt[n] = mult16(c2c.lg[2], limA2U(ll2[n][43:12])) + gglt[n];
                         nxt_bblt[n] = mult16(c2c.lb[2], limA3U(ll2[n][43:12])) + bblt[n];
                     end
-                    ((n*'d13) + 'd6): begin
+                    ('d6): begin
                         nxt_rrlt[n] = mult16(c2c.lr[3], limA1U(ll3[n][43:12])) + rrlt[n];
                         nxt_gglt[n] = mult16(c2c.lg[3], limA2U(ll3[n][43:12])) + gglt[n];
                     end
-                    ((n*'d13) + 'd7): begin
+                    ('d7): begin
                         nxt_bblt[n] = mult16(c2c.lb[3], limA3U(ll3[n][43:12])) + bblt[n];
                         nxt_rr[0]  = mult16(c2d.RGB.r, limA1U(rrlt[n][43:12]));
                     end
-                    ((n*'d13) + 'd8): begin
+                    ('d8): begin
                         nxt_gg[0]  = mult16(c2d.RGB.g, limA2U(gglt[n][43:12]));
                         nxt_bb[0]  = mult16(c2d.RGB.b, limA3U(bblt[n][43:12]));
                     end
-                    ((n*'d13) + 'd9): begin
+                    ('d9): begin
                         c2c.flag[1] = (rr[n][53:44] != 'd0);
                         c2c.flag[2] = (gg[n][53:44] != 'd0);
                         c2c.flag[3] = (bb[n][53:44] != 'd0);
                     end
-                    ((n*'d13) + 'd10): begin
+                    ('d10): begin
                         c2d.rgb[n].cd = c2d.RGB.cd;
                         c2d.rgb[n].r = limB1(rr[n][47:16]);
                         c2d.rgb[n].g = limB2(gg[n][47:16]);
                         c2d.rgb[n].b = limB3(bb[n][47:16]);
                     end
-                    ((n*'d13) + 'd11): begin
+                    ('d11): begin
                         c2d.ir[1]  = limA1U(rr[2][43:12]);
                         c2d.ir[2]  = limA2U(gg[2][43:12]);
                         c2d.ir[3]  = limA3U(bb[2][43:12]);
                     end
-                    ((n*'d13) + 'd12): begin
+                    ('d12): begin
                         c2d.mac[1] = rr[2][43:12];
                         c2d.mac[2] = gg[2][43:12];
                         c2d.mac[3] = bb[2][43:12];
@@ -1136,52 +1270,52 @@ module gte(
                 endcase
             end
             `INST_NCT: begin
-                case(curr_cyc)
+                case(curr_cyc % 'd10)
                     /***** Loop over the following 3 times ******/
-                    ((n*'d10) + 'd0): begin
+                    ('d0): begin
                         nxt_ll1[n] = mult16(c2c.l1[1], c2d.vx[n]);
                         nxt_ll2[n] = mult16(c2c.l2[1], c2d.vx[n]);
                     end
-                    ((n*'d10) + 'd1): begin
+                    ('d1): begin
                         nxt_ll3[n] = mult16(c2c.l3[1], c2d.vx[n]);
                         nxt_ll1[n] = mult16(c2c.l1[2], c2d.vy[n]) + ll1[n];
                     end
-                    ((n*'d10) + 'd2): begin
+                    ('d2): begin
                         nxt_ll2[n] = mult16(c2c.l2[2], c2d.vy[n]) + ll2[n];
                         nxt_ll3[n] = mult16(c2c.l3[2], c2d.vy[n]) + ll3[n];
                     end
-                    ((n*'d10) + 'd3): begin
+                    ('d3): begin
                         nxt_ll1[n] = mult16(c2c.l1[3], c2d.vz[n]) + ll1[n];
                         nxt_ll2[n] = mult16(c2c.l2[3], c2d.vz[n]) + ll2[n];
                         nxt_ll3[n] = mult16(c2c.l3[3], c2d.vz[n]) + ll3[n];
                     end
-                    ((n*'d10) + 'd4): begin
+                    ('d4): begin
                         nxt_rr[n] = mult16(c2c.lr[1], limA1U(ll1[n][43:12])) + c2c.rbk;
                         nxt_gg[n] = mult16(c2c.lg[1], limA1U(ll1[n][43:12])) + c2c.gbk;
                         nxt_bb[n] = mult16(c2c.lb[1], limA1U(ll1[n][43:12])) + c2c.bbk;
                     end
-                    ((n*'d10) + 'd5): begin
+                    ('d5): begin
                         nxt_rr[n] = mult16(c2c.lr[2], limA1U(ll2[n][43:12])) + rr[n];
                         nxt_gg[n] = mult16(c2c.lg[2], limA1U(ll2[n][43:12])) + gg[n];
                         nxt_bb[n] = mult16(c2c.lb[2], limA1U(ll2[n][43:12])) + bb[n];
                     end
-                    ((n*'d10) + 'd6): begin
+                    ('d6): begin
                         nxt_rr[n] = mult16(c2c.lr[3], limA1U(ll3[n][43:12])) + rr[n];
                         nxt_gg[n] = mult16(c2c.lg[3], limA1U(ll3[n][43:12])) + gg[n];
                         nxt_bb[n] = mult16(c2c.lb[3], limA1U(ll3[n][43:12])) + bb[n];
                     end
-                    ((n*'d10) + 'd7): begin
+                    ('d7): begin
                         c2c.flag[1] = (rr[0][53:44] != 'd0);
                         c2c.flag[2] = (gg[0][53:44] != 'd0);
                         c2c.flag[3] = (bb[0][53:44] != 'd0);
                     end
-                    ((n*'d10) + 'd8): begin
+                    ('d8): begin
                         c2d.rgb[n].cd = c2d.RGB.cd;
                         c2d.rgb[n].r = limB1(rr[n][47:16]);
                         c2d.rgb[n].g = limB2(gg[n][47:16]);
                         c2d.rgb[n].b = limB3(bb[n][47:16]);
                     end
-                    ((n*'d10) + 'd9): begin
+                    ('d9): begin
                         c2d.ir[1]  = limA1U(rr[2][43:12]);
                         c2d.ir[2]  = limA2U(gg[2][43:12]);
                         c2d.ir[3]  = limA3U(bb[2][43:12]);
@@ -1364,41 +1498,47 @@ module gte(
                 endcase
             end
             `INST_DPCT: begin
-                case(curr_cyc)
-                    /***** Loop over the following 3 times ******/
-                    ((n*'d5) + 'd0): begin
-                        nxt_rr[n] = mult16(c2d.ir[0], limA1S(c2c.rfc-c2d.RGB.r)) + c2d.rgb[n].r;
-                        nxt_gg[n] = mult16(c2d.ir[0], limA2S(c2c.gfc-c2d.RGB.g)) + c2d.rgb[n].g;
-                        nxt_bb[n] = mult16(c2d.ir[0], limA2S(c2c.gfc-c2d.RGB.b)) + c2d.rgb[n].b;
-                    end
-                    ((n*'d5) + 'd1): begin
-                        c2c.flag[1] = (rr[n][53:44] != 'd0);
-                        c2c.flag[2] = (gg[n][53:44] != 'd0);
-                        c2c.flag[3] = (bb[n][53:44] != 'd0);
-                    end
-                    ((n*'d5) + 'd2): begin
-                        c2d.rgb[n].cd = c2d.RGB.cd;
-                        c2d.rgb[n].r  = limB1(rr[n][47:16]);
-                    end
-                    ((n*'d5) + 'd3): begin
-                        c2d.rgb[n].g  = limB2(gg[n][47:16]);
-                    end
-                    ((n*'d5) + 'd4): begin
-                        c2d.rgb[n].b  = limB3(bb[n][47:16]);
-                        nxt_n         = ((n < 'd2) ? (n + 'd1) : 'd0);
-                    end
-                    /************ End loop block ****************/
-                    6'd15: begin
-                        c2d.ir[1] = limA1S(rr[2][48:17]);
-                        c2d.ir[2] = limA2S(gg[2][48:17]);
-                        c2d.ir[3] = limA3S(bb[2][48:17]);
-                    end
-                    6'd16: begin
-                        c2d.mac[1] = rr[2];
-                        c2d.mac[2] = gg[2];
-                        c2d.mac[3] = bb[2];
-                    end
-                endcase
+                if (curr_cyc < 'd14) begin
+                    case(curr_cyc % 'd5)
+                        /***** Loop over the following 3 times ******/
+                        ('d0): begin
+                            nxt_rr[n] = mult16(c2d.ir[0], limA1S(c2c.rfc-c2d.RGB.r)) + c2d.rgb[n].r;
+                            nxt_gg[n] = mult16(c2d.ir[0], limA2S(c2c.gfc-c2d.RGB.g)) + c2d.rgb[n].g;
+                            nxt_bb[n] = mult16(c2d.ir[0], limA2S(c2c.gfc-c2d.RGB.b)) + c2d.rgb[n].b;
+                        end
+                        ('d1): begin
+                            c2c.flag[1] = (rr[n][53:44] != 'd0);
+                            c2c.flag[2] = (gg[n][53:44] != 'd0);
+                            c2c.flag[3] = (bb[n][53:44] != 'd0);
+                        end
+                        ('d2): begin
+                            c2d.rgb[n].cd = c2d.RGB.cd;
+                            c2d.rgb[n].r  = limB1(rr[n][47:16]);
+                        end
+                        ('d3): begin
+                            c2d.rgb[n].g  = limB2(gg[n][47:16]);
+                        end
+                        ('d4): begin
+                            c2d.rgb[n].b  = limB3(bb[n][47:16]);
+                            nxt_n         = ((n < 'd2) ? (n + 'd1) : 'd0);
+                        end
+                        /************ End loop block ****************/
+                    endcase
+                end
+                else begin
+                    case(curr_cyc)
+                        6'd15: begin
+                            c2d.ir[1] = limA1S(rr[2][48:17]);
+                            c2d.ir[2] = limA2S(gg[2][48:17]);
+                            c2d.ir[3] = limA3S(bb[2][48:17]);
+                        end
+                        6'd16: begin
+                            c2d.mac[1] = rr[2];
+                            c2d.mac[2] = gg[2];
+                            c2d.mac[3] = bb[2];
+                        end
+                    endcase
+                end
             end
             `INST_SQR: begin
                 case(curr_cyc)
@@ -1704,8 +1844,8 @@ module gte(
         input        sel;
         logic [31:0] lower_bound;
         
-        assign lower_bound = sel ? 32'h0 : {{16{1'b1}}, 16'h8000};
         begin
+				lower_bound = sel ? 32'h0 : {{16{1'b1}}, 16'h8000};
             {c2c.flag[24], limA1C} = bound16(val, lower_bound, 32'h7FFF);
         end
     endfunction
@@ -1715,8 +1855,8 @@ module gte(
         input        sel;
         logic [31:0] lower_bound;
         
-        assign lower_bound = sel ? 32'h0 : {{16{1'b1}}, 16'h8000};
         begin
+				lower_bound = sel ? 32'h0 : {{16{1'b1}}, 16'h8000};
             {c2c.flag[23], limA2C} = bound16(val, lower_bound, 32'h7FFF);
         end
     endfunction
@@ -1726,8 +1866,8 @@ module gte(
         input        sel;
         logic [31:0] lower_bound;
         
-        assign lower_bound = sel ? 32'h0 : {{16{1'b1}}, 16'h8000};
         begin
+				lower_bound = sel ? 32'h0 : {{16{1'b1}}, 16'h8000};
             {c2c.flag[22], limA3C} = bound16(val, lower_bound, 32'h7FFF);
         end
     endfunction
@@ -1780,7 +1920,8 @@ module gte(
             {c2c.flag[12], limE} = bound16(val, 32'h0, 32'hFFF);
         end
     endfunction
-
+	 
+`ifdef SIM
 	// synthesis translate_off
 	integer fd, i;
 	always @(halted) begin
@@ -1824,48 +1965,9 @@ module gte(
 			$fclose(fd);
 		end
 	end
+`endif
 	// synthesis translate_on
 endmodule: gte
-
-module gte_fsm(
-    input  logic inst_rdy, avail, stall, clk, rst,
-    output logic clr_inst, ld_inst, en_cyc);
-
-    enum {WAIT, BUSY} curr_state, next_state;
-
-    always_ff @(posedge clk, posedge rst) begin
-        if (rst)
-            curr_state <= WAIT;
-        else
-            curr_state <= next_state;
-    end
-
-    always_comb begin
-        /* Defaults */
-        en_cyc   = 1'b0;
-        ld_inst  = 1'b0;
-        clr_inst = 1'b0;
-
-        case (curr_state)
-            WAIT: begin
-                if (inst_rdy & ~stall) begin
-                    ld_inst = 'b1;
-                    next_state = BUSY;
-                end
-                else begin
-                    clr_inst = 'b1;
-                end
-            end
-            BUSY: begin
-                en_cyc = 'b1;
-                if (avail) begin
-                    clr_inst = 'b1;
-                    next_state = WAIT;
-                end
-            end
-        endcase
-    end
-endmodule: gte_fsm
 
 module gte_decode(
     input  logic [5:0] inst,
@@ -1877,8 +1979,8 @@ module gte_decode(
             inst_cnt = 'd0;
         else begin
             case (inst)
-                `INST_RTPS:  inst_cnt = 'd14;
-                `INST_RTPT:  inst_cnt = 'd22;
+                `INST_RTPS:  inst_cnt = 'd16;
+                `INST_RTPT:  inst_cnt = 'd31;
                 `INST_MVMVA: inst_cnt = 'd8;
                 `INST_DCPL:  inst_cnt = 'd8;
                 `INST_DPCS:  inst_cnt = 'd8;

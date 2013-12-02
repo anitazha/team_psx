@@ -69,6 +69,7 @@ module addr_interpreter(input  logic clk, rst,
    localparam HWREG_TAG_2 = 32'h9F80_1000;
    localparam HWREG_TAG_3 = 32'hBF80_1000;
    localparam HWREG_SIZE  = 32'h0000_2000;
+   localparam MEM_CTRL_3  = 32'hFFFE_0130;
 
    /* INTERNAL LINES */
    reg [6:0]   curr_state,  next_state;
@@ -97,7 +98,8 @@ module addr_interpreter(input  logic clk, rst,
 		      (addr >= SCPAD_TAG_2 & addr < SCPAD_TAG_2+SCPAD_SIZE));
    assign in_HWREG = ((addr >= HWREG_TAG_1 & addr < HWREG_TAG_1+HWREG_SIZE) ||
 		      (addr >= HWREG_TAG_2 & addr < HWREG_TAG_2+HWREG_SIZE) ||
-		      (addr >= HWREG_TAG_3 & addr < HWREG_TAG_3+HWREG_SIZE));
+		      (addr >= HWREG_TAG_3 & addr < HWREG_TAG_3+HWREG_SIZE) ||
+		      (addr == MEM_CTRL_3));
 
    assign data_o = data_out;
    assign ack    = curr_ack;
@@ -273,8 +275,7 @@ module addr_interpreter(input  logic clk, rst,
 	   end
 	   else begin
 	      /* error */
-          next_ack = 1'b1;
-	      next_state = WAIT;
+	      next_state = IDLE;
 	   end
 	end
 	WRITE_ACK: begin

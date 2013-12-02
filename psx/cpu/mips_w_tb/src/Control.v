@@ -19,6 +19,7 @@
  *   the effective operation of the processor through each pipeline stage.
  */
 module Control(
+    input  Isc_D_Cache,
     input  ID_Stall,
     input  [5:0] OpCode,
     input  [5:0] Funct,
@@ -88,8 +89,8 @@ module Control(
     assign TrapCond      = Datapath[9];
     assign RegDst        = Datapath[8];
     assign LLSC          = Datapath[7];
-    assign MemRead       = Datapath[6];
-    assign MemWrite      = Datapath[5];
+    assign MemRead       = (Isc_D_Cache) ? 1'b0 : Datapath[6];
+    assign MemWrite      = (Isc_D_Cache) ? 1'b0 : Datapath[5];
     assign MemHalf       = Datapath[4];
     assign MemByte       = Datapath[3];
     assign MemSignExtend = Datapath[2];
