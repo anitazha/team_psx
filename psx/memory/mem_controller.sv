@@ -1,6 +1,6 @@
 
 
-module mem_controller(input  logic  clk, rst,
+module mem_controller(input  logic  clk, clk_50, rst,
                       
                       /* SDRAM CHIP INTERFACE */
                       output logic [12:0] dram_addr,
@@ -40,11 +40,11 @@ module mem_controller(input  logic  clk, rst,
                       output logic [31:0] gp0, gp1, 
 
 		      /* CONTROLLER */
-		      input logic 	  joy_ack,
-		      input logic 	  joy_data,
-		      output logic 	  joy_att,
-		      output logic 	  joy_clk,
-		      output logic 	  joy_cmd,
+		      //input logic 	  joy_ack,
+		      //input logic 	  joy_data,
+		      //output logic 	  joy_att,
+		      //output logic 	  joy_clk,
+		      //output logic 	  joy_cmd,
                        
                       /* HW REGISTER CONNECTIONS */
                       input  logic 	  hblank, vblank,
@@ -283,7 +283,7 @@ module mem_controller(input  logic  clk, rst,
      
    /* SDRAM CONTROLLER */
    qsys_sdram_a2_sdram_0 sdram
-     (.clk            (clk),
+     (.clk            (clk_50),
       .reset_n        (~rst_controller_out),
       /* sdram controller lines */
       .az_addr        (sd_addr),
@@ -311,7 +311,7 @@ module mem_controller(input  logic  clk, rst,
 
    /* SDRAM PLL & ASYNC RESET CONTROLLER */
    qsys_sdram_a2_altpll_0 altpll
-     (.clk       (clk),
+     (.clk       (clk_50),
       .reset     (rst_controller_out),
       .read      (),
       .write     (),
