@@ -2018,13 +2018,14 @@ module gpu(
       GPU_read_reg_ld_V2C = 1'b0;
       GPU_read_reg_new_V2C = GPU_read_reg;
 
-      main_bus_rdy = 1'b0;
+      main_bus_rdy = 1'b1;
       main_bus_re_hold_new = main_bus_re_hold;
       GPU_status_new.VRAM2CPU_rdy = 1'b0;
       
       case (v2c_state)
 	WAIT_V2C: begin
 	   if (v2c_on) begin
+	      main_bus_rdy = 1'b0;
 	      v2c_rdy_next = 1'b0;
 	      v2c_x_next = cmd.x0;
 	      v2c_y_next = cmd.y0;
@@ -2035,6 +2036,7 @@ module gpu(
 	   if (v2c_y > cmd.y1) begin
 	      v2c_rdy_next = 1'b1;
 	      v2c_state_next = WAIT_V2C;
+	      main_bus_rdy = 1'b0;
 	   end
 	   else if (main_bus_re_hold & gpu_en) begin
 	      v2c_vram_addr = {v2c_y[8:0], v2c_x[9:0]};
@@ -2044,6 +2046,8 @@ module gpu(
 	      GPU_read_reg_new_V2C[15:0] = vram_bus_in;
 
 	      main_bus_re_hold_new = 1'b0;
+	      main_bus_rdy = 1'b0;
+	      
 	      if (v2c_x == cmd.x1) begin
 		 v2c_x_next = cmd.x0;
 		 v2c_y_next = v2c_y + 12'd1;
@@ -2056,13 +2060,14 @@ module gpu(
 	   end // if (main_bus_re_hold & gpu_en)
 	   else if (main_bus_re) begin
 	      main_bus_re_hold_new = 1'b1;
+	      main_bus_rdy = 1'b0;
 	   end
 	   else if ((v2c_y > cmd.y0) | (v2c_x > cmd.x0)) begin
-	      main_bus_rdy = 1'b1;
 	      GPU_status_new.VRAM2CPU_rdy = 1'b1;
 	   end
 	end // case: GETMEM1_V2C
 	GETMEM2_V2C: begin
+	   main_bus_rdy = 1'b0;
 	   if (gpu_en) begin
 	      v2c_vram_addr = {v2c_y[8:0], v2c_x[9:0]};
 	      v2c_vram_re = 1'b1;
@@ -2313,6 +2318,8 @@ module gpu(
 	    next_color_sub_stage.in_shape[text_i] = color_stage.in_shape[text_i];
 	    next_shader_stage.in_shape[text_i] = color_sub_stage.in_shape[text_i];
 
+	    next_shader_stage.transparency[text_i] = (cmd.transparency == SEMI);
+
 	    f_u[text_i] = 32'd0;
 	    f_v[text_i] = 32'd0;
 	    
@@ -2392,6 +2399,9 @@ module gpu(
 	       if (tx_color[text_i] == 16'd0) begin
 		  next_shader_stage.in_shape[text_i] = 1'b0;
 	       end
+	       else if ((tx_color[text_i] == 1'b0) && (cmd.transparency == SEMI)) begin
+		  next_shader_stage.transparency[text_i] = 1'b0;
+	       end
 
 	       next_shader_stage.r[text_i] = {tx_color[text_i][4:0], 3'b0};
 	       next_shader_stage.g[text_i] = {tx_color[text_i][9:5], 3'b0};
@@ -2438,11 +2448,13 @@ module gpu(
    assign next_shader_sub_stage.x = shader_stage.x;
    assign next_shader_sub_stage.y = shader_stage.y;
    assign next_shader_sub_stage.in_shape = shader_stage.in_shape;
+   assign next_shader_sub_stage.transparency = shader_stage.transparency;
 
    assign next_wb_stage.valid = shader_sub_stage.valid;
    assign next_wb_stage.x = shader_sub_stage.x;
    assign next_wb_stage.y = shader_sub_stage.y;
    assign next_wb_stage.in_shape = shader_sub_stage.in_shape;
+   assign next_wb_stage.transparency = shader_sub_stage.transparency;
    
    /* Determie whether or not to stall this stage */
    assign shade_stall = ((cmd.shade == SHADE) & 
@@ -2626,15 +2638,15 @@ module gpu(
 		       wb_hold_next[15] = 1'b1;
 		    end
 		    
-		    if (cmd.transparency == SEMI) begin
+		    if (wb_stage.transparency) begin
 		       case (cmd.semi_trans_mode)
 			 2'd0: begin
-			    wb_r = ((vram_bus_in[4:0] >> 'd1) + 
-				    (wb_stage.r[wb_count][7:3] >> 'd1));
-			    wb_g = ((vram_bus_in[9:5] >> 'd1) + 
-				    (wb_stage.g[wb_count][7:3] >> 'd1));
-			    wb_b = ((vram_bus_in[14:10] >> 'd1) + 
-				    (wb_stage.b[wb_count][7:3] >> 'd1));
+			    wb_r = ((vram_bus_in[4:1]) + 
+				    (wb_stage.r[wb_count][7:4]));
+			    wb_g = ((vram_bus_in[9:6]) + 
+				    (wb_stage.g[wb_count][7:4]));
+			    wb_b = ((vram_bus_in[14:11]) + 
+				    (wb_stage.b[wb_count][7:4]));
 			 end
 			 2'd1: begin
 			    wb_r = ((vram_bus_in[4:0]) +
@@ -2654,11 +2666,11 @@ module gpu(
 			 end
 			 2'd3: begin
 			    wb_r = ((vram_bus_in[4:0]) +
-				    (wb_stage.r[wb_count][7:3] >> 'd2));
+				    (wb_stage.r[wb_count][7:5]));
 			    wb_g = ((vram_bus_in[9:5]) +
-				    (wb_stage.g[wb_count][7:3] >> 'd2));
+				    (wb_stage.g[wb_count][7:5]));
 			    wb_b = ((vram_bus_in[14:10]) +
-				    (wb_stage.b[wb_count][7:3] >> 'd2));
+				    (wb_stage.b[wb_count][7:5]));
 			 end
 		       endcase // case (cmd.semi_trans_mode)
 		    end // if (cmd.transparency == SEMI)

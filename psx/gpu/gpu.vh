@@ -122,6 +122,7 @@ typedef struct packed {
    logic [`GPU_PIPELINE_WIDTH-1:0][11:0]   x;
    logic [`GPU_PIPELINE_WIDTH-1:0][11:0]   y;
    logic [`GPU_PIPELINE_WIDTH-1:0] 	   in_shape;
+   logic [`GPU_PIPELINE_WIDTH-1:0] 	   transparency;
    logic [`GPU_PIPELINE_WIDTH-1:0][7:0]    r, g, b;
 } shader_stage_t;
 
@@ -131,6 +132,7 @@ typedef struct packed {
    logic [`GPU_PIPELINE_WIDTH-1:0][11:0] x;
    logic [`GPU_PIPELINE_WIDTH-1:0][11:0] y;
    logic [`GPU_PIPELINE_WIDTH-1:0] 	 in_shape;
+   logic [`GPU_PIPELINE_WIDTH-1:0] 	 transparency;
    logic [`GPU_PIPELINE_WIDTH-1:0][31:0] int_r, int_g, int_b;
    logic [`GPU_PIPELINE_WIDTH-1:0][7:0]  r, g, b;
 } shader_sub_stage_t;
@@ -141,5 +143,6 @@ typedef struct packed {
    logic [`GPU_PIPELINE_WIDTH-1:0][11:0]   x;
    logic [`GPU_PIPELINE_WIDTH-1:0][11:0]   y;
    logic [`GPU_PIPELINE_WIDTH-1:0] 	   in_shape;
+   logic [`GPU_PIPELINE_WIDTH-1:0] 	   transparency;
    logic [`GPU_PIPELINE_WIDTH-1:0][7:0]    r, g, b;
 } wb_stage_t;
