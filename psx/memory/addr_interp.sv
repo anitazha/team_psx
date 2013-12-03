@@ -1,6 +1,6 @@
 
 
-module addr_interpreter(input  logic clk, rst,
+module addr_interpreter(input  logic clk, clk_50, rst,
 			input  logic [31:0] addr,
 			input  logic [31:0] data_i,
 			input  logic 	    ren, wen,
@@ -82,6 +82,9 @@ module addr_interpreter(input  logic clk, rst,
    reg 	       hw_wen_out, hw_ren_out;
    reg 	       sc_wen_out;
    reg [31:0]  data_out;
+
+   reg 	       sd_valid_i;
+   reg [1:0]   valid_wait;
    
    wire        in_BIOS, in_MAIN, in_PPORT, in_SCPAD, in_HWREG;
    
@@ -133,7 +136,24 @@ module addr_interpreter(input  logic clk, rst,
 	 end
       end
    end
-   
+
+   /* latch sd_valid from the faster clock */
+   always @ (posedge clk_50, posedge rst) begin
+      if (rst) begin
+	 sd_valid_i <= 1'b0;
+	 valid_wait <= 2'b00;
+      end
+      else begin
+	 if (valid_wait) begin
+	    valid_wait <= valid_wait + 2'b01;
+	 end
+	 else begin
+	    sd_valid_i <= sd_valid;
+	    valid_wait <= 2'b01;
+	 end
+      end
+   end
+
    /* READ - latch value from memory */
    always @ (posedge clk, posedge rst) begin
       if (rst) begin
@@ -143,7 +163,7 @@ module addr_interpreter(input  logic clk, rst,
 	 if (curr_state == LATCH && in_BIOS) begin
 	    data_out <= blk_data;
 	 end
-	 else if (curr_state == LATCH && in_MAIN && sd_valid) begin
+	 else if (curr_state == LATCH && in_MAIN) begin
 	    data_out <= sd_data_o;
 	 end
 	 else if (curr_state == LATCH && in_SCPAD) begin
@@ -218,7 +238,7 @@ module addr_interpreter(input  logic clk, rst,
 	end
 	READ_ACK: begin
 	   if (in_MAIN) begin
-	      if (sd_valid) begin
+	      if (sd_valid_i) begin
 		 next_state = LATCH;
 	      end
 	      else if (timeout_counter == 100) begin

@@ -39,7 +39,7 @@ module RegisterFile(
 
     // Sequential (clocked) write.
     // 'WriteReg' is the register index to write. 'RegWrite' is the command.
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         if (reset) begin
             for (i=0; i<32; i=i+1) begin
                 registers[i] <= 0;

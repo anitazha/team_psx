@@ -26,7 +26,7 @@ module Register #(parameter WIDTH = 32, INIT = 0)(
     initial
         Q = INIT;
 
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         Q <= (reset) ? INIT : ((enable) ? D : Q);
     end
 

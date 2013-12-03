@@ -94,7 +94,7 @@ module EXMEM_Stage(
     // Mask of RegWrite if a Move Conditional failed.
     wire MovcRegWrite = (EX_Movn & ~EX_BZero) | (EX_Movz & EX_BZero);
     
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         M_Lwc2          <= (reset) ? 0     : ((M_Stall) ? M_Lwc2          : ((EX_Stall | EX_Flush) ? 0 : EX_Lwc2));
         M_Swc2          <= (reset) ? 0     : ((M_Stall) ? M_Swc2          : ((EX_Stall | EX_Flush) ? 0 : EX_Swc2));
         M_CP2Out        <= (reset) ? 0     : ((M_Stall) ? M_CP2Out        : ((EX_Stall | EX_Flush) ? 0 : EX_CP2Out));

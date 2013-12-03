@@ -51,14 +51,14 @@ module testbench;
     // The clock
     clock CLK(clk);
     
-    always @(posedge clk) begin
-        if ({mem_addr[25:0], 2'b0} == 28'h0003000)
-            $stop;
-        //else if ({pc, 2'b0} == 32'h0)
-        //    $stop;
-        //else if (inst == 32'h8FBF0014)
-        //    $stop;
-    end
+    //always @(posedge clk) begin
+    //    if ({mem_addr[25:0], 2'b0} == 28'h0003000)
+    //        $stop;
+    //    //else if ({pc, 2'b0} == 32'h0)
+    //    //    $stop;
+    //    //else if (inst == 32'h8FBF0014)
+    //    //    $stop;
+    //end
 
     // The MIPS core
     Processor core (.clock(clk), .reset(~rst_b),

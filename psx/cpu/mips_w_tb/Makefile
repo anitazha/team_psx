@@ -14,7 +14,7 @@ VCSLOG = vcs.log
 
 CC = vcs
 #CCFLAGS = -sverilog -nc -debug -line +lint=all,noVCDE,noFIAAS +warn=all -l $(VCSLOG)
-CCFLAGS = -sverilog -nc -debug -line +warn=all -timescale=1ns/1ps -l $(VCSLOG)
+CCFLAGS = -full64 -sverilog -nc -debug -line +warn=all -timescale=1ns/1ps -l $(VCSLOG)
 
 TIMESTAMP := outputs/$(shell date +%m%d-%H%M%S)
 OUTPUT ?= $(TIMESTAMP)
@@ -57,13 +57,12 @@ default:
 	@echo -e ""
 	@echo -e ""
 	@echo -e "$bTARGET:$n"
-	@echo -e "\t$bcompile$n"
-	@echo -e "\t    compiles Verilog found in $usrc$n directory;"
+	@echo -e "\t$bsim$n"
+	@echo -e "\t    simulates Verilog using 447 test files;"
 	@echo -e "\t    places all outputs in $bOUTPUT$n"
 	@echo -e ""
-	@echo -e "\t$bsim$n"
-	@echo -e "\t    compiles Verilog found in $usrc$n directory;"
-	@echo -e "\t    simulates Verilog using $bINPUT$n as input;"
+	@echo -e "\t$bpsx$n"
+	@echo -e "\t    simulates Verilog using PSX memory controller;"
 	@echo -e "\t    places all outputs in $bOUTPUT$n"
 	@echo -e ""
 	@echo -e "\t$bverify$n"
@@ -78,11 +77,6 @@ default:
 	@echo -e "\t$bsynth$n"
 	@echo -e "\t    compiles Verilog found in $usrc$n directory;"
 	@echo -e "\t    synthesizes Verilog with XST"
-	@echo -e "\t    places all outputs in $bOUTPUT$n"
-	@echo -e ""
-	@echo -e "\t$bbios$n"
-	@echo -e "\t    compiles Verilog found in $usrc$n directory;"
-	@echo -e "\t    simulates Verilog using $bsrc/bios.dat$n as input;"
 	@echo -e "\t    places all outputs in $bOUTPUT$n"
 	@echo -e ""
 	@echo -e ""
@@ -135,14 +129,27 @@ assemble:
 	@echo -e "$mAssembling input in $(OUTPUT)..."
 	spim447 -notrap -vasm $(INPUT) $(OUTPUT)/sim/mem;
 
-
 ###################################################################
 ### Simulate Verilog
 ###################################################################
 
-sim: compile
+sim: compile assemble
 	@echo -e "$mSimulating Verilog in $(OUTPUT)..."
+	cd $(OUTPUT)/sim; ./simv -l vcssim.log
+	@if grep 'Warning*' $(OUTPUT)/sim/vcssim.log > /dev/null; \
+		then echo -e '$m$rSimulator log has warnings!$n'; fi
+	@echo -e "$mSimulation of $(INPUT) has completed in $(OUTPUT)."
 	@echo -e "$mTo run with the VCS GUI, navigate to $b$(OUTPUT)/sim $nand execute $b./simv -gui$n"
+	@echo -e "$mTo view the simulation output, execute the following command: $bcat $(OUTPUT)/sim/vcssim.log$n"
+
+
+###################################################################
+### Simulate PSX Stuff
+###################################################################
+
+psx: compile
+	@echo -e "$mSimulating Verilog in $(OUTPUT)..."
+	@echo -e "$mTo run with the VCS GUI, navigate to $b$(OUTPUT)/sim $nand execute $b./simv -l vcssim.log -gui$n"
 
 ###################################################################
 ### Simulate DAT Files

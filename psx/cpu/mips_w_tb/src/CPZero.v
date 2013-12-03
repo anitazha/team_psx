@@ -151,7 +151,7 @@ module CPZero(
     reg  [3:0] Cause_ExcCode_bits;
 
     reg reset_r;
-    always @(posedge clock) begin
+    always @(posedge clock or posedge reset) begin
         reset_r <= reset;
     end
 
