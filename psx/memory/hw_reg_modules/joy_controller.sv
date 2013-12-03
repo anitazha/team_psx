@@ -84,6 +84,7 @@ module joy_controller(input logic clk, rst,
 		       ((rx_irq_m == 2'b10) & (rx_byte_cnt == 4'd4)) |
 		       ((rx_irq_m == 2'b11) & (rx_byte_cnt == 4'd8));
    assign irq_flag_2 = joy_ctrl_out[12] & joy_stat_out[7];	       
+   assign rx_irq_m = joy_ctrl_out[9:8];
    
    assign baud_reload_factor = joy_mode_out[1:0];
    assign TXEN = joy_ctrl_out[0];

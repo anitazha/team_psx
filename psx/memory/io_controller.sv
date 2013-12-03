@@ -109,70 +109,72 @@ module io_controller(input  logic clk, rst,
 
    /* PSX I/O REGISTERS */
    // - Memory Control 1
-   reg [31:0]                            MEM_CTRL_1 [0:8];    // 0x1F801000 - 0x1F801023
+   reg [31:0]  MEM_CTRL_1 [0:8];    // 0x1F801000 - 0x1F801023
    // - Peripheral I/O
-   reg [31:0]                            PERIPHERAL_IO [0:7]; // 0x1F801040 - 0x1F80105F
+   reg [31:0]  PERIPHERAL_IO [0:7]; // 0x1F801040 - 0x1F80105F
    // - Memory Control 2
-   reg [31:0]                            MEM_CTRL_2;          // 0x1F801060
+   reg [31:0]  MEM_CTRL_2;          // 0x1F801060
    // - Interrupt Control
-   reg [31:0]                            I_STAT;              // 0x1F801070
-   reg [31:0]                            I_MASK;              // 0x1F801074
+   reg [31:0]  I_STAT;              // 0x1F801070
+   reg [31:0]  I_MASK;              // 0x1F801074
    // - DMA Registers
-   reg [31:0]                            DMA0 [0:2];          // 0x1F801080
-   reg [31:0]                            DMA1 [0:2];          // 0x1F801090
-   reg [31:0]                            DMA2 [0:2];          // 0x1F8010A0
-   reg [31:0]                            DMA3 [0:2];          // 0x1F8010B0
-   reg [31:0]                            DMA4 [0:2];          // 0x1F8010C0
-   reg [31:0]                            DMA5 [0:2];          // 0x1F8010D0
-   reg [31:0]                            DMA6 [0:2];          // 0x1F8010E0
-   reg [31:0]                            DMA_DPCR;            // 0x1F8010F0
-   reg [31:0]                            DMA_DICR;            // 0x1F8010F4
+   reg [31:0]  DMA0 [0:2];          // 0x1F801080
+   reg [31:0]  DMA1 [0:2];          // 0x1F801090
+   reg [31:0]  DMA2 [0:2];          // 0x1F8010A0
+   reg [31:0]  DMA3 [0:2];          // 0x1F8010B0
+   reg [31:0]  DMA4 [0:2];          // 0x1F8010C0
+   reg [31:0]  DMA5 [0:2];          // 0x1F8010D0
+   reg [31:0]  DMA6 [0:2];          // 0x1F8010E0
+   reg [31:0]  DMA_DPCR;            // 0x1F8010F0
+   reg [31:0]  DMA_DICR;            // 0x1F8010F4
    // - Timers
-   reg [31:0]                            DOT_CLK_VALUE;       // 0x1F801100
-   reg [31:0]                            DOT_CLK_CMODE;       //  - Dotclock
-   reg [31:0]                            DOT_CLK_TARGT;
-   reg [31:0]                            HZT_CLK_VALUE;       // 0x1F801110
-   reg [31:0]                            HZT_CLK_CMODE;       //  - Horizontal Retrace
-   reg [31:0]                            HZT_CLK_TARGT;
-   reg [31:0]                            CLK_1_8_VALUE;       // 0x1F801120
-   reg [31:0]                            CLK_1_8_CMODE;       //  - 1/8 System Clock
-   reg [31:0]                            CLK_1_8_TARGT;
+   reg [31:0]  DOT_CLK_VALUE;       // 0x1F801100
+   reg [31:0]  DOT_CLK_CMODE;       //  - Dotclock
+   reg [31:0]  DOT_CLK_TARGT;
+   reg [31:0]  HZT_CLK_VALUE;       // 0x1F801110
+   reg [31:0]  HZT_CLK_CMODE;       //  - Horizontal Retrace
+   reg [31:0]  HZT_CLK_TARGT;
+   reg [31:0]  CLK_1_8_VALUE;       // 0x1F801120
+   reg [31:0]  CLK_1_8_CMODE;       //  - 1/8 System Clock
+   reg [31:0]  CLK_1_8_TARGT;
    // - Cache Control
-   reg [31:0]                            CACHE_CTRL;
+   reg [31:0]  CACHE_CTRL;
 
    /* always_comb shits */
-   reg [31:0]                            next_MEM_CTRL_1 [0:8];    // 0x1F801000 - 0x1F801023
-   reg [31:0]                            next_PERIPHERAL_IO [4:7]; // 0x1F801040 - 0x1F80105F
-   reg [31:0]                            next_MEM_CTRL_2;          // 0x1F801060
-   reg [31:0]                            next_DMA0 [0:2];          // 0x1F801080
-   reg [31:0]                            next_DMA1 [0:2];          // 0x1F801090
-   reg [31:0]                            next_DMA2 [0:2];          // 0x1F8010A0
-   reg [31:0]                            next_DMA3 [0:2];          // 0x1F8010B0
-   reg [31:0]                            next_DMA4 [0:2];          // 0x1F8010C0
-   reg [31:0]                            next_DMA5 [0:2];          // 0x1F8010D0
-   reg [31:0]                            next_DMA6 [0:2];          // 0x1F8010E0
-   reg [31:0]                            next_DMA_DPCR;            // 0x1F8010F0
-   reg [31:0]                            next_CACHE_CTRL;
+   reg [31:0]  next_MEM_CTRL_1 [0:8];    // 0x1F801000 - 0x1F801023
+   reg [31:0]  next_PERIPHERAL_IO [4:7]; // 0x1F801040 - 0x1F80105F
+   reg [31:0]  next_MEM_CTRL_2;          // 0x1F801060
+   reg [31:0]  next_DMA0 [0:2];          // 0x1F801080
+   reg [31:0]  next_DMA1 [0:2];          // 0x1F801090
+   reg [31:0]  next_DMA2 [0:2];          // 0x1F8010A0
+   reg [31:0]  next_DMA3 [0:2];          // 0x1F8010B0
+   reg [31:0]  next_DMA4 [0:2];          // 0x1F8010C0
+   reg [31:0]  next_DMA5 [0:2];          // 0x1F8010D0
+   reg [31:0]  next_DMA6 [0:2];          // 0x1F8010E0
+   reg [31:0]  next_DMA_DPCR;            // 0x1F8010F0
+   reg [31:0]  next_CACHE_CTRL;
    
    
    /* Internal Lines */
-   reg                                   timer_wen, timer_ren;
-   reg                                   int_wen;
-   reg                                   dma_irq_wen;
-   reg                                   joy_wen, joy_ren;
+   reg 	       timer_wen, timer_ren;
+   reg 	       int_wen;
+   reg 	       dma_irq_wen;
+   reg 	       joy_wen, joy_ren;
 
-   reg [31:0]                            DMA_DICR_new;
+   reg [31:0]  DMA_DICR_new;
    
-   reg [4:0]                             curr_state, next_state;
+   reg [4:0]   curr_state, next_state;
    
-   wire [31:0]                           shift_addr;
+   wire [31:0] shift_addr;
 
-   reg [31:0]                            data_out, next_data_out;
-   reg                                   ack_out;
+   reg [31:0]  data_out, next_data_out;
+   reg 	       ack_out;
 
-   reg                                   to_gp0_o, to_gp1_o;
-   reg [31:0]                            gp0_o, gp1_o;
-   reg                                   gpu_ren_o;
+   reg 	       to_gp0_o, to_gp1_o;
+   reg [31:0]  gp0_o, gp1_o;
+   reg 	       gpu_ren_o;
+
+   wire        rx_fifo_not_empty;
    
    assign shift_addr = {HW_ADDR_HEADER, addr[12:0]};
 
@@ -254,11 +256,11 @@ module io_controller(input  logic clk, rst,
                                .irq_vblank (),
                                .irq_gpu    (),
                                .irq_cdrom  (),
-                               .irq_dma    (~DMA_DICR[31]),
-                               .irq_timer0 (DOT_CLK_CMODE[10]),
-                               .irq_timer1 (HZT_CLK_CMODE[10]),
-                               .irq_timer2 (CLK_1_8_CMODE[10]),
-                               .irq_ctlmem (~PERIPHERAL_IO[1][9]),
+                               .irq_dma    (DMA_DICR[31]),
+                               .irq_timer0 (~DOT_CLK_CMODE[10]),
+                               .irq_timer1 (~HZT_CLK_CMODE[10]),
+                               .irq_timer2 (~CLK_1_8_CMODE[10]),
+                               .irq_ctlmem (PERIPHERAL_IO[1][9]),
                                .irq_sio    (),
                                .irq_spu    (),
                                .irq_ctrl   (),
@@ -747,6 +749,20 @@ module io_controller(input  logic clk, rst,
            MEM_CTRL_1_ADDR + 8'h20:
              next_data_out <= MEM_CTRL_1[8];
 
+           /* Peripheral I/O */
+           SIO_DATA:
+             next_data_out <= PERIPHERAL_IO[4];
+           SIO_STAT:
+             next_data_out <= PERIPHERAL_IO[5];
+           SIO_MODE:
+             next_data_out <= PERIPHERAL_IO[6];
+           SIO_MISC:
+             next_data_out <= PERIPHERAL_IO[7];
+
+           /* Memory Control 2 */
+           RAM_SIZE:
+             next_data_out <= MEM_CTRL_2;
+           
            /* Timers */
            TIMER0_ADDR + 4'h0:
              next_data_out <= DOT_CLK_VALUE;

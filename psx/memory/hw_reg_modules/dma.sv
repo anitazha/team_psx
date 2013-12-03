@@ -574,7 +574,6 @@ module dma_controller(input  logic sys_clk, rst,
 
    reg [2:0]   curr_state, next_state;
    
-   reg [ 6:0]  active_channel;
    reg 	       dma0_start, dma1_start, dma2_start, dma3_start,
 	       dma4_start, dma5_start, dma6_start;
    reg 	       dma_done_o;
@@ -644,36 +643,6 @@ module dma_controller(input  logic sys_clk, rst,
    assign dma_addr = dma_addr_o;
    assign dma_wen = dma_wen_o;
    assign dma_ren = dma_ren_o;
-
-
-   /*assign dma_ren_o = ((active_channel == 7'b0000001) & dma0_ren) |
-		      ((active_channel == 7'b0000010) & dma1_ren) |
-		      ((active_channel == 7'b0000100) & dma2_ren) |
-		      ((active_channel == 7'b0001000) & dma3_ren) |
-		      ((active_channel == 7'b0010000) & dma4_ren) |
-		      ((active_channel == 7'b0100000) & dma5_ren) |
-		      ((active_channel == 7'b1000000) & dma6_ren);
-   assign dma_wen_o = ((active_channel == 7'b0000001) & dma0_wen) |
-		      ((active_channel == 7'b0000010) & dma1_wen) |
-		      ((active_channel == 7'b0000100) & dma2_wen) |
-		      ((active_channel == 7'b0001000) & dma3_wen) |
-		      ((active_channel == 7'b0010000) & dma4_wen) |
-		      ((active_channel == 7'b0100000) & dma5_wen) |
-		      ((active_channel == 7'b1000000) & dma6_wen);
-   assign dma_addr_o = ((active_channel == 7'b0000001) & dma0_addr) |
-		       ((active_channel == 7'b0000010) & dma1_addr) |
-		       ((active_channel == 7'b0000100) & dma2_addr) |
-		       ((active_channel == 7'b0001000) & dma3_addr) |
-		       ((active_channel == 7'b0010000) & dma4_addr) |
-		       ((active_channel == 7'b0100000) & dma5_addr) |
-		       ((active_channel == 7'b1000000) & dma6_addr);
-   assign data_to_mem_o = ((active_channel == 7'b0000001) & dma0_to_mem) |
-			  ((active_channel == 7'b0000010) & dma1_to_mem) |
-			  ((active_channel == 7'b0000100) & dma2_to_mem) |
-			  ((active_channel == 7'b0001000) & dma3_to_mem) |
-			  ((active_channel == 7'b0010000) & dma4_to_mem) |
-			  ((active_channel == 7'b0100000) & dma5_to_mem) |
-			  ((active_channel == 7'b1000000) & dma6_to_mem);*/
    
    /* Forward dma channel to memory interface */
    always @ (negedge sys_clk) begin
@@ -920,18 +889,6 @@ module dma_controller(input  logic sys_clk, rst,
       .dma_addr       (dma6_addr),
       .data_to_mem    (dma6_to_mem));
 		    
-   
-   /* latch active channel */
-   always @ (posedge sys_clk, posedge rst) begin
-      if (rst) begin
-	 active_channel <= 7'b0000000;
-      end
-      else begin
-	 if (curr_state == ASSIGN) begin
-	    active_channel <= t_priority;
-	 end
-      end
-   end
 
    /* FSM next state logic */
    always @ (posedge sys_clk, posedge rst) begin
@@ -1023,7 +980,13 @@ module dma_interrupts(input  logic sys_clk, rst,
    assign irq_men = DICR[23];
    assign irq_en  = DICR[22:16];
 
-   assign DICR[31] = ((DICR[22:16] & DICR[30:24]) > 7'b0) | DICR[15];
+   assign DICR[31] = DICR[15] | ((DICR[22] & DICR[30]) |
+				 (DICR[21] & DICR[29]) |
+				 (DICR[20] & DICR[28]) |
+				 (DICR[19] & DICR[27]) |
+				 (DICR[18] & DICR[26]) |
+				 (DICR[17] & DICR[25]) |
+				 (DICR[16] & DICR[24]));
    
    /* DICR register logic */
    always @ (posedge sys_clk, posedge rst) begin
