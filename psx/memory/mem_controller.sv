@@ -114,6 +114,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
    wire [31:0] dma_gp0, cpu_gp0;
    wire        dma_gpu_ren, cpu_gpu_ren;
    wire [ 6:0] DMA_MADR_incr, DMA_MADR_decr, DMA_MADR_new, DMA_BCR_decr;
+   wire [13:0] DMA_CHCR_clr;
    wire [31:0] DMA_DPCR;
    wire [31:0] DMA0_MADR, DMA1_MADR, DMA2_MADR, DMA3_MADR,
                DMA4_MADR, DMA5_MADR, DMA6_MADR;
@@ -131,9 +132,6 @@ module mem_controller(input  logic  clk, clk_50, rst,
    wire [ 3:0] data_ben;
    wire        data_wen_or;
 
-   //reg         sdram_initialized, next_sdram_initialized;
-   //reg [31:0]  curr_init_addr, next_init_addr;
-   
    reg         service_DMA;
    
    // - state variables 
@@ -228,6 +226,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
       .DMA_MADR_decr (DMA_MADR_decr),
       .DMA_MADR_new  (DMA_MADR_new),
       .DMA_BCR_decr  (DMA_BCR_decr),
+      .DMA_CHCR_clr  (DMA_CHCR_clr),
       .DMA0_MADR     (DMA0_MADR),
       .DMA1_MADR     (DMA1_MADR),
       .DMA2_MADR     (DMA2_MADR),
@@ -258,6 +257,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
       .DMA_MADR_decr (DMA_MADR_decr),
       .DMA_MADR_new  (DMA_MADR_new),
       .DMA_BCR_decr  (DMA_BCR_decr),
+      .DMA_CHCR_clr  (DMA_CHCR_clr),
       .DMA0_MADR     (DMA0_MADR),
       .DMA1_MADR     (DMA1_MADR),
       .DMA2_MADR     (DMA2_MADR),

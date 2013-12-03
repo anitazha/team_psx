@@ -39,6 +39,7 @@ module dma_channel(input  logic        sys_clk, rst,
 		   output logic        madr_new,
 		   output logic [31:0] madr_addr,
 		   output logic        bcr_decr,
+		   output logic [ 1:0] chcr_clr,
 		   
 		   /* dma channel signals */
 		   input  logic        chan_rdy,
@@ -90,7 +91,8 @@ module dma_channel(input  logic        sys_clk, rst,
    reg [ 7:0]  curr_mode2_cnt, next_mode2_cnt;
    
    reg 	       tip, next_tip;
-
+   reg 	       first_tx, next_first_tx;
+   
    reg 	       dma_done_o;
    reg 	       dma_irq_o;
    
@@ -99,6 +101,7 @@ module dma_channel(input  logic        sys_clk, rst,
    reg 	       madr_decr_o;
    reg 	       madr_new_o;
    reg 	       bcr_decr_o;
+   reg [ 1:0]  chcr_clr_o;
 
    reg [31:0]  chan_data_o;
    reg 	       chan_ren_o;
@@ -124,7 +127,7 @@ module dma_channel(input  logic        sys_clk, rst,
    assign req_o = ((sync_mode == SYNC_MODE0) & dma_chcr[24] & dma_chcr[28]) |
 		  ((sync_mode == SYNC_MODE1) & dma_chcr[24]) |
 		  ((sync_mode == SYNC_MODE2) & dma_chcr[24]);
-   assign dma_req = req_o;
+   assign dma_req = tip;
 
    assign data_to_mem = curr_data;
    assign dma_ren = curr_ren;
@@ -137,7 +140,8 @@ module dma_channel(input  logic        sys_clk, rst,
    assign madr_decr = madr_decr_o;
    assign madr_new = madr_new_o;
    assign bcr_decr = bcr_decr_o;
-
+   assign chcr_clr = chcr_clr_o;
+   
    assign chan_data_out = chan_data_o;
    assign chan_ren = chan_ren_o;
    assign chan_wen = chan_wen_o;
@@ -164,6 +168,7 @@ module dma_channel(input  logic        sys_clk, rst,
 	 curr_addr = 32'b0;
 	 
 	 tip = 1'b0;
+	 first_tx = 1'b0;
 
 	 curr_mode0_addr = 32'b0;
 	 curr_mode2_pntr = 32'b0;
@@ -178,6 +183,7 @@ module dma_channel(input  logic        sys_clk, rst,
 	 curr_addr  = next_addr;
 	 
 	 tip = next_tip;
+	 first_tx = next_first_tx;
 	 
 	 curr_mode0_addr = next_mode0_addr;
 	 curr_mode2_pntr = next_mode2_pntr;
@@ -196,6 +202,7 @@ module dma_channel(input  logic        sys_clk, rst,
       next_addr  = curr_addr;
       
       next_tip = tip;
+      next_first_tx = first_tx;
       
       next_mode0_addr = curr_mode0_addr;
       next_mode2_pntr = curr_mode2_pntr;
@@ -210,11 +217,12 @@ module dma_channel(input  logic        sys_clk, rst,
       madr_new_o  = 1'b0;
       bcr_decr_o  = 1'b0;
       madr_addr_o = 32'b0;
+      chcr_clr_o  = 2'b00;
 
       chan_data_o = 32'b0;
       chan_ren_o = 1'b0;
       chan_wen_o = 1'b0;
-      
+
       case (curr_state)
 	/* wait for permission to start */
 	IDLE: begin
@@ -222,7 +230,17 @@ module dma_channel(input  logic        sys_clk, rst,
 	      next_state = START;
 	   end
 	   else begin
-	      next_state = IDLE;
+	      if (((sync_mode == SYNC_MODE0) & dma_chcr[24] & dma_chcr[28]) |
+		  ((sync_mode == SYNC_MODE1) & dma_chcr[24]) |
+		  ((sync_mode == SYNC_MODE2) & dma_chcr[24])) begin
+		 chcr_clr_o[1] = 1'b1;
+		 next_tip = 1'b1;
+		 next_first_tx = 1'b1;
+		 next_state = IDLE;
+	      end
+	      else begin
+		 next_state = IDLE;
+	      end
 	   end
 	end
 
@@ -236,16 +254,15 @@ module dma_channel(input  logic        sys_clk, rst,
 		   next_state = IDLE;
 		   dma_done_o = 1'b1;
 		   next_tip = 1'b0;
-
+		   chcr_clr_o[0] = 1'b1;
 		   dma_irq_o = 1'b1;
 		end
 		else begin
 		   /* check to see if a transfer is already in progress */
-		   if (~tip) begin
-		      /* if not initialize tx address and counter */
-		      next_tip = 1'b1;
+		   if (first_tx) begin
+		      next_first_tx = 1'b0;
 		      next_mode0_addr = dma_madr;
-		      next_mode0_cnt = dma_bcr[15:0];
+		      next_mode0_cnt = blk_size;
 		      next_state = MODE0_INIT;
 		   end
 		   else begin
@@ -263,14 +280,14 @@ module dma_channel(input  logic        sys_clk, rst,
 		   end
 		end
 	     end
-	     /* MODE 1 - for MDEC, SPU and CDROM */
+	     /* MODE 1 - for MDEC, SPU, and CDROM */
 	     SYNC_MODE1: begin
 		/* don't do anything if transfer already completed */
 		if (dma_bcr[31:16] == 16'b0) begin
 		   next_state = IDLE;
 		   dma_done_o = 1'b1;
 		   next_tip = 1'b0;
-
+		   chcr_clr_o[0] = 1'b1;
 		   dma_irq_o = 1'b1;
 		end
 		else begin
@@ -291,7 +308,7 @@ module dma_channel(input  logic        sys_clk, rst,
 		   next_state = IDLE;
 		   dma_done_o = 1'b1;
 		   next_tip = 1'b0;
-
+		   chcr_clr_o[0] = 1'b1;
 		   dma_irq_o = 1'b1;
 		end
 		else begin
@@ -521,6 +538,7 @@ module dma_controller(input  logic sys_clk, rst,
 		      output logic [31:0] DMA5_MADR,
 		      output logic [31:0] DMA6_MADR,
 		      output logic [ 6:0] DMA_BCR_decr,
+		      output logic [13:0] DMA_CHCR_clr,
 		      output logic [ 6:0] DMA_IRQ,
 		      
 		      /* memory read-write signals */
@@ -714,6 +732,7 @@ module dma_controller(input  logic sys_clk, rst,
       .madr_addr      (DMA0_MADR),
       .madr_new       (DMA_MADR_new[0]),
       .bcr_decr       (DMA_BCR_decr[0]),
+      .chcr_clr       (DMA_CHCR_clr[1:0]),
       .chan_rdy       (dma0_i[33]),
       .chan_fifo_full (dma0_i[32]),
       .chan_data_in   (dma0_i[31:0]),
@@ -741,6 +760,7 @@ module dma_controller(input  logic sys_clk, rst,
       .madr_addr      (DMA1_MADR),
       .madr_new       (DMA_MADR_new[1]),
       .bcr_decr       (DMA_BCR_decr[1]),
+      .chcr_clr       (DMA_CHCR_clr[3:2]),
       .chan_rdy       (dma1_i[33]),
       .chan_fifo_full (dma1_i[32]),
       .chan_data_in   (dma1_i[31:0]),
@@ -768,6 +788,7 @@ module dma_controller(input  logic sys_clk, rst,
       .madr_addr      (DMA2_MADR),
       .madr_new       (DMA_MADR_new[2]),
       .bcr_decr       (DMA_BCR_decr[2]),
+      .chcr_clr       (DMA_CHCR_clr[5:4]),
       .chan_rdy       (dma2_i[33]),
       .chan_fifo_full (dma2_i[32]),
       .chan_data_in   (dma2_i[31:0]),
@@ -795,6 +816,7 @@ module dma_controller(input  logic sys_clk, rst,
       .madr_addr      (DMA3_MADR),
       .madr_new       (DMA_MADR_new[3]),
       .bcr_decr       (DMA_BCR_decr[3]),
+      .chcr_clr       (DMA_CHCR_clr[7:6]),
       .chan_rdy       (dma3_i[33]),
       .chan_fifo_full (dma3_i[32]),
       .chan_data_in   (dma3_i[31:0]),
@@ -822,6 +844,7 @@ module dma_controller(input  logic sys_clk, rst,
       .madr_addr      (DMA4_MADR),
       .madr_new       (DMA_MADR_new[4]),
       .bcr_decr       (DMA_BCR_decr[4]),
+      .chcr_clr       (DMA_CHCR_clr[9:8]),
       .chan_rdy       (dma4_i[33]),
       .chan_fifo_full (dma4_i[32]),
       .chan_data_in   (dma4_i[31:0]),
@@ -849,6 +872,7 @@ module dma_controller(input  logic sys_clk, rst,
       .madr_addr      (DMA5_MADR),
       .madr_new       (DMA_MADR_new[5]),
       .bcr_decr       (DMA_BCR_decr[5]),
+      .chcr_clr       (DMA_CHCR_clr[11:10]),
       .chan_rdy       (dma5_i[33]),
       .chan_fifo_full (dma5_i[32]),
       .chan_data_in   (dma5_i[31:0]),
@@ -876,6 +900,7 @@ module dma_controller(input  logic sys_clk, rst,
       .madr_addr      (DMA6_MADR),
       .madr_new       (DMA_MADR_new[6]),
       .bcr_decr       (DMA_BCR_decr[6]),
+      .chcr_clr       (DMA_CHCR_clr[13:12]),
       .chan_rdy       (dma6_i[33]),
       .chan_fifo_full (dma6_i[32]),
       .chan_data_in   (dma6_i[31:0]),
@@ -969,7 +994,7 @@ module dma_interrupts(input  logic sys_clk, rst,
 		      output logic [31:0] DICR_o);
 
    /* Internal Lines */
-   reg [31:0] 	DICR;
+   reg [31:0] 	DICR, next_DICR;
    reg 		irq_men;
    reg [ 0:6] 	irq_en;
 
@@ -979,90 +1004,75 @@ module dma_interrupts(input  logic sys_clk, rst,
    assign DICR_o = DICR;
    assign irq_men = DICR[23];
    assign irq_en  = DICR[22:16];
-
-   assign DICR[31] = DICR[15] | ((DICR[22] & DICR[30]) |
-				 (DICR[21] & DICR[29]) |
-				 (DICR[20] & DICR[28]) |
-				 (DICR[19] & DICR[27]) |
-				 (DICR[18] & DICR[26]) |
-				 (DICR[17] & DICR[25]) |
-				 (DICR[16] & DICR[24]));
    
    /* DICR register logic */
    always @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
-	 DICR[30:0] <= 31'b0;
-	 irq0_reset <= 1'b1;
-	 irq1_reset <= 1'b1;
-	 irq2_reset <= 1'b1;
-	 irq3_reset <= 1'b1;
-	 irq4_reset <= 1'b1;
-	 irq5_reset <= 1'b1;
-	 irq6_reset <= 1'b1;
+	 DICR <= 32'b0;
       end
       else begin
-	 if (wen) begin
-	    DICR[ 5: 0] <= DICR_i[5:0];
-	    DICR[14: 6] <= 8'b0;
-	    DICR[23:15] <= DICR_i[23:15];
-	    
-	    if (DICR_i[24]) begin
-	       DICR[24] <= 1'b0;
-	       irq0_reset <= 1'b1;
-	    end
-	    if (DICR_i[25]) begin
-	       DICR[25] <= 1'b0;
-	       irq1_reset <= 1'b1;
-	    end
-	    if (DICR_i[26]) begin
-	       DICR[26] <= 1'b0;
-	       irq2_reset <= 1'b1;
-	    end
-	    if (DICR_i[27]) begin
-	       DICR[27] <= 1'b0;
-	       irq3_reset <= 1'b1;
-	    end
-	    if (DICR_i[28]) begin
-	       DICR[28] <= 1'b0;
-	       irq4_reset <= 1'b1;
-	    end
-	    if (DICR_i[29]) begin
-	       DICR[29] <= 1'b0;
-	       irq5_reset <= 1'b1;
-	    end
-	    if (DICR_i[30]) begin
-	       DICR[30] <= 1'b0;
-	       irq6_reset <= 1'b1;
-	    end
+	 DICR <= next_DICR;
+      end
+   end
+   always_comb begin
+      /* defaults */
+      next_DICR[30:0] = DICR[30:0];
+      next_DICR[31]   = DICR[15] | ((DICR[22] & DICR[30]) |
+				    (DICR[21] & DICR[29]) |
+				    (DICR[20] & DICR[28]) |
+				    (DICR[19] & DICR[27]) |
+				    (DICR[18] & DICR[26]) |
+				    (DICR[17] & DICR[25]) |
+				    (DICR[16] & DICR[24]));
+      if (wen) begin
+	 next_DICR[ 5: 0] = DICR_i[5:0];
+	 next_DICR[14: 6] = 8'b0;
+	 next_DICR[23:15] = DICR_i[23:15];
+
+	 if (DICR_i[24]) begin
+	    next_DICR[24] = 1'b0;
 	 end
-	 else begin
-	    if (irq0_reset & irq_men & irq_en[0] & irqs[0]) begin
-	       DICR[24] <= irqs[0];
-	       irq0_reset <= 1'b0;
+	 if (DICR_i[25]) begin
+	    next_DICR[25] = 1'b0;
+	 end
+	 if (DICR_i[26]) begin
+	    next_DICR[26] = 1'b0;
+	 end
+	 if (DICR_i[27]) begin
+	    next_DICR[27] = 1'b0;
+	 end
+	 if (DICR_i[28]) begin
+	    next_DICR[28] = 1'b0;
+	 end
+	 if (DICR_i[29]) begin
+	    next_DICR[29] = 1'b0;
+	 end
+	 if (DICR_i[30]) begin
+	    next_DICR[30] = 1'b0;
+	 end
+      end
+      else begin
+	 if (irq_men) begin
+	    if (irq_en[0] & irqs[0]) begin
+	       next_DICR[24] = 1'b1;
 	    end
-	    if (irq1_reset & irq_men & irq_en[1] & irqs[1]) begin
-	       DICR[25] <= irqs[1];
-	       irq1_reset <= 1'b0;
+	    if (irq_en[1] & irqs[1]) begin
+	       next_DICR[25] = 1'b1;
 	    end
-	    if (irq2_reset & irq_men & irq_en[2] & irqs[2]) begin
-	       DICR[26] <= irqs[2];
-	       irq2_reset <= 1'b0;
+	    if (irq_en[2] & irqs[2]) begin
+	       next_DICR[26] = 1'b1;
 	    end
-	    if (irq3_reset & irq_men & irq_en[3] & irqs[3]) begin
-	       DICR[27] <= irqs[3];
-	       irq3_reset <= 1'b0;
+	    if (irq_en[3] & irqs[3]) begin
+	       next_DICR[27] = 1'b1;
 	    end
-	    if (irq4_reset & irq_men & irq_en[4] & irqs[4]) begin
-	       DICR[28] <= irqs[4];
-	       irq4_reset <= 1'b0;
+	    if (irq_en[4] & irqs[4]) begin
+	       next_DICR[28] = 1'b1;
 	    end
-	    if (irq5_reset & irq_men & irq_en[5] & irqs[5]) begin
-	       DICR[29] <= irqs[5];
-	       irq5_reset <= 1'b0;
+	    if (irq_en[5] & irqs[5]) begin
+	       next_DICR[29] = 1'b1;
 	    end
-	    if (irq6_reset & irq_men & irq_en[6] & irqs[6]) begin
-	       DICR[30] <= irqs[6];
-	       irq6_reset <= 1'b0;
+	    if (irq_en[6] & irqs[6]) begin
+	       next_DICR[30] = 1'b1;
 	    end
 	 end
       end
