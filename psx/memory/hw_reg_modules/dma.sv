@@ -302,6 +302,7 @@ module dma_channel(input  logic        sys_clk, rst,
 		   if (tx_direction) begin
 		      next_wen = 1'b0;
 		      next_ren = 1'b1;
+		      next_addr = dma_madr;
 		      next_state = READ_ACK;
 		   end
 		   else begin
