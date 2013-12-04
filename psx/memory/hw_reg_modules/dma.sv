@@ -63,6 +63,7 @@ module dma_channel(input  logic        sys_clk, rst,
    localparam SYNC_MODE1 = 2'b01;
    localparam SYNC_MODE2 = 2'b10;
    // - states
+   localparam SLEEP      = 12'b0000_0000_0000;
    localparam IDLE       = 12'b0000_0000_0001;
    localparam START      = 12'b0000_0000_0010;
    localparam MODE0_INIT = 12'b0000_0000_0100;
@@ -145,7 +146,7 @@ module dma_channel(input  logic        sys_clk, rst,
    assign chan_data_out = chan_data_o;
    assign chan_ren = chan_ren_o;
    assign chan_wen = chan_wen_o;
-
+   
    /* latch data from channel */
    always @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
@@ -224,10 +225,17 @@ module dma_channel(input  logic        sys_clk, rst,
       chan_wen_o = 1'b0;
 
       case (curr_state)
+	/* sleep */
+	SLEEP: begin
+	   dma_irq_o = 1'b1;
+	   next_state = IDLE;
+	end	
 	/* wait for permission to start */
 	IDLE: begin
-	   if (dma_start) begin
-	      next_state = START;
+	   if (tip) begin
+	      if (dma_start) begin
+		 next_state = START;
+	      end
 	   end
 	   else begin
 	      if (((sync_mode == SYNC_MODE0) & dma_chcr[24] & dma_chcr[28]) |
@@ -250,8 +258,8 @@ module dma_channel(input  logic        sys_clk, rst,
 	     /* MODE 0 - for OTC and CDROM */
 	     SYNC_MODE0: begin
 		/* don't do anything if transfer already completed */
-		if (curr_mode0_cnt == 16'b1) begin
-		   next_state = IDLE;
+		if (curr_mode0_cnt == 16'b1 && curr_data == 32'h00FFFFFF) begin
+		   next_state = SLEEP;
 		   dma_done_o = 1'b1;
 		   next_tip = 1'b0;
 		   chcr_clr_o[0] = 1'b1;
@@ -284,7 +292,7 @@ module dma_channel(input  logic        sys_clk, rst,
 	     SYNC_MODE1: begin
 		/* don't do anything if transfer already completed */
 		if (dma_bcr[31:16] == 16'b0) begin
-		   next_state = IDLE;
+		   next_state = SLEEP;
 		   dma_done_o = 1'b1;
 		   next_tip = 1'b0;
 		   chcr_clr_o[0] = 1'b1;
@@ -305,7 +313,7 @@ module dma_channel(input  logic        sys_clk, rst,
 	     SYNC_MODE2: begin
 		/* don't do anything if transfer already completed */
 		if (dma_madr == END_CODE) begin
-		   next_state = IDLE;
+		   next_state = SLEEP;
 		   dma_done_o = 1'b1;
 		   next_tip = 1'b0;
 		   chcr_clr_o[0] = 1'b1;
@@ -334,7 +342,6 @@ module dma_channel(input  logic        sys_clk, rst,
 	   if (curr_mode0_cnt == 16'b1) begin
 	      next_data = END_CODE;
 	      next_addr = curr_mode0_addr;
-	      next_tip = 1'b0;
 	      next_wen = 1'b1;
 	      next_ren = 1'b0;
 	      next_state = WRITE_ACK;
@@ -994,12 +1001,9 @@ module dma_interrupts(input  logic sys_clk, rst,
 		      output logic [31:0] DICR_o);
 
    /* Internal Lines */
-   reg [31:0] 	DICR, next_DICR;
-   reg 		irq_men;
-   reg [ 0:6] 	irq_en;
-
-   reg 		irq1_reset, irq2_reset, irq3_reset, irq4_reset,
-		irq5_reset, irq6_reset, irq0_reset;
+   logic [31:0] DICR, next_DICR;
+   logic 	irq_men;
+   logic [ 0:6] irq_en;
 
    assign DICR_o = DICR;
    assign irq_men = DICR[23];

@@ -76,7 +76,6 @@ module mem_controller(input  logic  clk, rst,
                       output logic 	  dram_clk,
                       output logic 	  dram_cs_n,
                       output logic [ 3:0] dram_dqm,
-                      //inout  wire  [31:0] dram_dq,
                       output logic 	  dram_ras_n,
                       output logic 	  dram_we_n,
                       output logic [31:0] dram_dq_in,
@@ -381,7 +380,6 @@ module mem_controller(input  logic  clk, rst,
    /* PSX MEMORY CONTROLLERS */
    addr_interpreter addr_interp
      (.clk            (clk),
-      .clk_50         (clk),
       .rst            (rst),
       .addr           (interp_addr),
       .data_i         (interp_data_i),
@@ -568,6 +566,9 @@ module mem_controller(input  logic  clk, rst,
            if (dma_done) begin
               next_state = IDLE;
            end
+	   else if (~dma_req) begin
+	      next_state = IDLE;
+	   end
            else begin
               next_state = DMA;
            end

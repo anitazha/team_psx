@@ -713,20 +713,20 @@ module io_controller(input  logic clk, rst,
                                    DMA6[1][3], DMA6[1][4], DMA6[1][5]});
 	 /* DMA CHCR registers */
 	 if (DMA_CHCR_clr[ 0]) next_DMA0[2][24] = 1'b0;
-	 if (DMA_CHCR_clr[ 2]) next_DMA0[2][24] = 1'b0;
-	 if (DMA_CHCR_clr[ 4]) next_DMA0[2][24] = 1'b0;
-	 if (DMA_CHCR_clr[ 6]) next_DMA0[2][24] = 1'b0;
-	 if (DMA_CHCR_clr[ 8]) next_DMA0[2][24] = 1'b0;
-	 if (DMA_CHCR_clr[10]) next_DMA0[2][24] = 1'b0;
-	 if (DMA_CHCR_clr[12]) next_DMA0[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 2]) next_DMA1[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 4]) next_DMA2[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 6]) next_DMA3[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 8]) next_DMA4[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[10]) next_DMA5[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[12]) next_DMA6[2][24] = 1'b0;
 	 
 	 if (DMA_CHCR_clr[ 1]) next_DMA0[2][28] = 1'b0;
-	 if (DMA_CHCR_clr[ 3]) next_DMA0[2][28] = 1'b0;
-	 if (DMA_CHCR_clr[ 5]) next_DMA0[2][28] = 1'b0;
-	 if (DMA_CHCR_clr[ 7]) next_DMA0[2][28] = 1'b0;
-	 if (DMA_CHCR_clr[ 9]) next_DMA0[2][28] = 1'b0;
-	 if (DMA_CHCR_clr[11]) next_DMA0[2][28] = 1'b0;
-	 if (DMA_CHCR_clr[13]) next_DMA0[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 3]) next_DMA1[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 5]) next_DMA2[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 7]) next_DMA3[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 9]) next_DMA4[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[11]) next_DMA5[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[13]) next_DMA6[2][28] = 1'b0;
       end
    end 
 
