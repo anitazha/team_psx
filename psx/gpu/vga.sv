@@ -1,6 +1,6 @@
 module vga
-  (input  logic clk_33MHz, rst,
-   output logic HS, VS, blank,
+  (input  logic CLOCK_50, reset,
+   output logic HS, VS, v_blank, h_blank,
    output logic [9:0] row,
    output logic [9:0] col);
 
@@ -8,7 +8,6 @@ module vga
    logic        col_clear, col_enable;
    logic [9:0] row_count;
    logic       row_clear, row_enable;
-   logic       h_blank, v_blank;
    
   // Row counter counts from 0 to 520   
   //     count of   0 - 479 is display time (and thus row_count is correct here)
@@ -39,7 +38,5 @@ module vga
   assign col_enable = 1'b1;
   assign HS = (col_count < 11'd1312) | (col_count > 11'd1503);
   assign h_blank = col_count > 11'd1279;
-
-  assign blank = h_blank | v_blank;
    
 endmodule : vga
