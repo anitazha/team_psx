@@ -41,7 +41,8 @@ module io_controller(input  logic clk, rst,
                      input logic [ 6:0]  DMA_MADR_incr,
                      input logic [ 6:0]  DMA_MADR_decr,
                      input logic [ 6:0]  DMA_MADR_new,
-                     input logic [ 6:0]  DMA_BCR_decr, 
+                     input logic [ 6:0]  DMA_BCR_decr,
+		     input logic [13:0]  DMA_CHCR_clr,
                      input logic [ 6:0]  DMA_IRQ,
                      input logic [31:0]  DMA0_MADR,
                      input logic [31:0]  DMA1_MADR,
@@ -303,15 +304,15 @@ module io_controller(input  logic clk, rst,
          CACHE_CTRL <= 32'd0;
       end
       else begin
-         MEM_CTRL_1[0] <= next_MEM_CTRL[0];
-         MEM_CTRL_1[1] <= next_MEM_CTRL[1];
-         MEM_CTRL_1[2] <= next_MEM_CTRL[2];
-         MEM_CTRL_1[3] <= next_MEM_CTRL[3];
-         MEM_CTRL_1[4] <= next_MEM_CTRL[4];
-         MEM_CTRL_1[5] <= next_MEM_CTRL[5];
-         MEM_CTRL_1[6] <= next_MEM_CTRL[6];
-         MEM_CTRL_1[7] <= next_MEM_CTRL[7];
-         MEM_CTRL_1[8] <= next_MEM_CTRL[8];
+         MEM_CTRL_1[0] <= next_MEM_CTRL_1[0];
+         MEM_CTRL_1[1] <= next_MEM_CTRL_1[1];
+         MEM_CTRL_1[2] <= next_MEM_CTRL_1[2];
+         MEM_CTRL_1[3] <= next_MEM_CTRL_1[3];
+         MEM_CTRL_1[4] <= next_MEM_CTRL_1[4];
+         MEM_CTRL_1[5] <= next_MEM_CTRL_1[5];
+         MEM_CTRL_1[6] <= next_MEM_CTRL_1[6];
+         MEM_CTRL_1[7] <= next_MEM_CTRL_1[7];
+         MEM_CTRL_1[8] <= next_MEM_CTRL_1[8];
          PERIPHERAL_IO[4] <= next_PERIPHERAL_IO[4];
          PERIPHERAL_IO[5] <= next_PERIPHERAL_IO[5];
          PERIPHERAL_IO[6] <= next_PERIPHERAL_IO[6];
@@ -345,15 +346,15 @@ module io_controller(input  logic clk, rst,
    
    always_comb begin
       /* Defaults */
-      next_MEM_CTRL[0] = MEM_CTRL[0];
-      next_MEM_CTRL[1] = MEM_CTRL[1];
-      next_MEM_CTRL[2] = MEM_CTRL[2];
-      next_MEM_CTRL[3] = MEM_CTRL[3];
-      next_MEM_CTRL[4] = MEM_CTRL[4];
-      next_MEM_CTRL[5] = MEM_CTRL[5];
-      next_MEM_CTRL[6] = MEM_CTRL[6];
-      next_MEM_CTRL[7] = MEM_CTRL[7];
-      next_MEM_CTRL[8] = MEM_CTRL[8];
+      next_MEM_CTRL_1[0] = MEM_CTRL_1[0];
+      next_MEM_CTRL_1[1] = MEM_CTRL_1[1];
+      next_MEM_CTRL_1[2] = MEM_CTRL_1[2];
+      next_MEM_CTRL_1[3] = MEM_CTRL_1[3];
+      next_MEM_CTRL_1[4] = MEM_CTRL_1[4];
+      next_MEM_CTRL_1[5] = MEM_CTRL_1[5];
+      next_MEM_CTRL_1[6] = MEM_CTRL_1[6];
+      next_MEM_CTRL_1[7] = MEM_CTRL_1[7];
+      next_MEM_CTRL_1[8] = MEM_CTRL_1[8];
       next_PERIPHERAL_IO[4] = PERIPHERAL_IO[4];
       next_PERIPHERAL_IO[5] = PERIPHERAL_IO[5];
       next_PERIPHERAL_IO[6] = PERIPHERAL_IO[6];
@@ -676,8 +677,8 @@ module io_controller(input  logic clk, rst,
          end
          /* DMA BCR registers */
          if (DMA_BCR_decr[0]) 
-           next_DMA0[1][31:16] = (DMA0[1][31:16] - 
-                                  {10'b0, 
+           next_DMA0[1][31:16] = (DMA0[1][31:16] -
+				  {10'b0, 
                                    DMA0[1][0], DMA0[1][1], DMA0[1][2], 
                                    DMA0[1][3], DMA0[1][4], DMA0[1][5]});
          if (DMA_BCR_decr[1]) 
@@ -710,6 +711,22 @@ module io_controller(input  logic clk, rst,
                                   {10'b0, 
                                    DMA6[1][0], DMA6[1][1], DMA6[1][2], 
                                    DMA6[1][3], DMA6[1][4], DMA6[1][5]});
+	 /* DMA CHCR registers */
+	 if (DMA_CHCR_clr[ 0]) next_DMA0[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 2]) next_DMA1[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 4]) next_DMA2[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 6]) next_DMA3[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[ 8]) next_DMA4[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[10]) next_DMA5[2][24] = 1'b0;
+	 if (DMA_CHCR_clr[12]) next_DMA6[2][24] = 1'b0;
+	 
+	 if (DMA_CHCR_clr[ 1]) next_DMA0[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 3]) next_DMA1[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 5]) next_DMA2[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 7]) next_DMA3[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[ 9]) next_DMA4[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[11]) next_DMA5[2][28] = 1'b0;
+	 if (DMA_CHCR_clr[13]) next_DMA6[2][28] = 1'b0;
       end
    end 
 

@@ -73,9 +73,6 @@ module mem_controller(input  logic  clk, clk_50, rst,
                       );
 
    /* PARAMETERS - state declarations */
-   //localparam INIT_SDRAM       = 4'b0000;
-   //localparam INIT_SDRAM_WRITE = 4'b0001;
-   //localparam INIT_SDRAM_WAIT  = 4'b0010;
    localparam IDLE             = 4'b0011;
    localparam READ_DATA_INIT   = 4'b0100;
    localparam READ_INST_INIT   = 4'b0101;
@@ -114,6 +111,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
    wire [31:0] dma_gp0, cpu_gp0;
    wire        dma_gpu_ren, cpu_gpu_ren;
    wire [ 6:0] DMA_MADR_incr, DMA_MADR_decr, DMA_MADR_new, DMA_BCR_decr;
+   wire [13:0] DMA_CHCR_clr;
    wire [31:0] DMA_DPCR;
    wire [31:0] DMA0_MADR, DMA1_MADR, DMA2_MADR, DMA3_MADR,
                DMA4_MADR, DMA5_MADR, DMA6_MADR;
@@ -131,9 +129,6 @@ module mem_controller(input  logic  clk, clk_50, rst,
    wire [ 3:0] data_ben;
    wire        data_wen_or;
 
-   //reg         sdram_initialized, next_sdram_initialized;
-   //reg [31:0]  curr_init_addr, next_init_addr;
-   
    reg         service_DMA;
    
    // - state variables 
@@ -163,7 +158,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
    
    assign data_active = data_ren | data_wen_or;
    assign inst_active = inst_ren;
-   assign data_ben = (service_DMA | ~sdram_initialized)  ? 4'b1111 : data_wen;
+   assign data_ben = (service_DMA)  ? 4'b1111 : data_wen;
    assign data_wen_or = data_wen[0] | data_wen[1] | data_wen[2] | data_wen[3];
    
    assign data_ack = curr_d_ack;
@@ -228,6 +223,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
       .DMA_MADR_decr (DMA_MADR_decr),
       .DMA_MADR_new  (DMA_MADR_new),
       .DMA_BCR_decr  (DMA_BCR_decr),
+      .DMA_CHCR_clr  (DMA_CHCR_clr),
       .DMA0_MADR     (DMA0_MADR),
       .DMA1_MADR     (DMA1_MADR),
       .DMA2_MADR     (DMA2_MADR),
@@ -258,6 +254,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
       .DMA_MADR_decr (DMA_MADR_decr),
       .DMA_MADR_new  (DMA_MADR_new),
       .DMA_BCR_decr  (DMA_BCR_decr),
+      .DMA_CHCR_clr  (DMA_CHCR_clr),
       .DMA0_MADR     (DMA0_MADR),
       .DMA1_MADR     (DMA1_MADR),
       .DMA2_MADR     (DMA2_MADR),
@@ -416,8 +413,8 @@ module mem_controller(input  logic  clk, clk_50, rst,
             inst_latch <= data_o;
          end
       end
-   end                                            
-   
+   end
+
    /* FSM next state logic */
    always @ (posedge clk, posedge rst) begin
       if (rst) begin
@@ -429,9 +426,6 @@ module mem_controller(input  logic  clk, clk_50, rst,
          curr_d_ack    = 1'b0;
          curr_i_ack    = 1'b0;
          curr_dma_skip = 1'b0;
-
-         //sdram_initialized = 1'b0;
-         //curr_init_addr = 32'b0;
       end
       else begin
          curr_state    = next_state;
@@ -442,9 +436,6 @@ module mem_controller(input  logic  clk, clk_50, rst,
          curr_d_ack    = next_d_ack;
          curr_i_ack    = next_i_ack;
          curr_dma_skip = next_dma_skip;
-
-         //sdram_initialized = next_sdram_initialized;
-         //curr_init_addr = next_init_addr;
       end
    end
    
@@ -461,8 +452,6 @@ module mem_controller(input  logic  clk, clk_50, rst,
       next_dma_skip = curr_dma_skip;
 
       service_DMA = 1'b0;
-      //next_sdram_initialized = sdram_initialized;
-      //next_init_addr = curr_init_addr;
       
       case (curr_state)
         /* wait for memory request */
@@ -514,42 +503,6 @@ module mem_controller(input  logic  clk, clk_50, rst,
               next_state = IDLE;
            end
         end
-
-        // /* initialized all of SDRAM to zeros */
-        // INIT_SDRAM: begin
-        //    if (curr_init_addr != 22'h200000) begin
-        //       next_addr = curr_init_addr;
-        //       next_wen = 1'b1;
-        //       next_ren = 1'b0;
-        //       next_data_i = 32'b0;
-        //       next_state = INIT_SDRAM_WRITE;
-
-        //       next_init_addr = curr_init_addr + 32'h4;
-        //    end
-        //    else begin
-        //       next_sdram_initialized = 1'b1;
-        //       next_state = IDLE;
-        //    end
-        // end
-        // /* write states */
-        // INIT_SDRAM_WRITE: begin
-        //    if (ack_o) begin
-        //       next_state = INIT_SDRAM_WAIT;
-        //    end
-        //    else begin
-        //       next_state = INIT_SDRAM_WRITE;
-        //    end
-        // end
-        // INIT_SDRAM_WAIT: begin
-        //    next_wen = 1'b0;
-        //    next_ren = 1'b0;
-        //    if (~ack_o) begin
-        //       next_state = IDLE;
-        //    end
-        //    else begin
-        //       next_state = INIT_SDRAM_WAIT;
-        //    end
-        // end
         
         /* transfer control to DMA */
         DMA: begin
@@ -557,6 +510,9 @@ module mem_controller(input  logic  clk, clk_50, rst,
            if (dma_done) begin
               next_state = IDLE;
            end
+	   else if (~dma_req) begin
+	      next_state = IDLE;
+	   end
            else begin
               next_state = DMA;
            end

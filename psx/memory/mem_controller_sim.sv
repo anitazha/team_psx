@@ -76,7 +76,6 @@ module mem_controller(input  logic  clk, rst,
                       output logic 	  dram_clk,
                       output logic 	  dram_cs_n,
                       output logic [ 3:0] dram_dqm,
-                      //inout  wire  [31:0] dram_dq,
                       output logic 	  dram_ras_n,
                       output logic 	  dram_we_n,
                       output logic [31:0] dram_dq_in,
@@ -162,6 +161,7 @@ module mem_controller(input  logic  clk, rst,
    wire [31:0] dma_gp0, cpu_gp0;
    wire        dma_gpu_ren, cpu_gpu_ren;
    wire [ 6:0] DMA_MADR_incr, DMA_MADR_decr, DMA_MADR_new, DMA_BCR_decr;
+   wire [13:0] DMA_CHCR_clr;
    wire [31:0] DMA_DPCR;
    wire [31:0] DMA0_MADR, DMA1_MADR, DMA2_MADR, DMA3_MADR,
                DMA4_MADR, DMA5_MADR, DMA6_MADR;
@@ -277,6 +277,7 @@ module mem_controller(input  logic  clk, rst,
       .DMA_MADR_decr (DMA_MADR_decr),
       .DMA_MADR_new  (DMA_MADR_new),
       .DMA_BCR_decr  (DMA_BCR_decr),
+      .DMA_CHCR_clr  (DMA_CHCR_clr),
       .DMA0_MADR     (DMA0_MADR),
       .DMA1_MADR     (DMA1_MADR),
       .DMA2_MADR     (DMA2_MADR),
@@ -307,6 +308,7 @@ module mem_controller(input  logic  clk, rst,
       .DMA_MADR_decr (DMA_MADR_decr),
       .DMA_MADR_new  (DMA_MADR_new),
       .DMA_BCR_decr  (DMA_BCR_decr),
+      .DMA_CHCR_clr  (DMA_CHCR_clr),
       .DMA0_MADR     (DMA0_MADR),
       .DMA1_MADR     (DMA1_MADR),
       .DMA2_MADR     (DMA2_MADR),
@@ -475,12 +477,7 @@ module mem_controller(input  logic  clk, rst,
       case (curr_state)
         /* wait for memory request */
         IDLE: begin
-           /* initialized memory to zeros */
-           if (~sdram_initialized) begin
-              next_state = INIT_SDRAM;
-           end
-           /* memory access from data bus */
-           else if (pll_locked) begin
+           if (pll_locked) begin
               if (dma_req && ~curr_dma_skip) begin
                  next_dma_skip = 1'b1;
                  service_DMA = 1'b1;
@@ -569,6 +566,9 @@ module mem_controller(input  logic  clk, rst,
            if (dma_done) begin
               next_state = IDLE;
            end
+	   else if (~dma_req) begin
+	      next_state = IDLE;
+	   end
            else begin
               next_state = DMA;
            end
