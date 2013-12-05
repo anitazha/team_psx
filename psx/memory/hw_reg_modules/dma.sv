@@ -148,7 +148,7 @@ module dma_channel(input  logic        sys_clk, rst,
    assign chan_wen = chan_wen_o;
    
    /* latch data from channel */
-   always @ (posedge sys_clk, posedge rst) begin
+   always_ff @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
 	 chan_data_latch = 32'b0;
       end
@@ -160,7 +160,7 @@ module dma_channel(input  logic        sys_clk, rst,
    end
    
    /* FSM next state logic */
-   always @ (posedge sys_clk, posedge rst) begin
+   always_ff @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
 	 curr_state = IDLE;
 	 curr_wen = 1'b0;
@@ -302,6 +302,7 @@ module dma_channel(input  logic        sys_clk, rst,
 		   if (tx_direction) begin
 		      next_wen = 1'b0;
 		      next_ren = 1'b1;
+		      next_addr = dma_madr;
 		      next_state = READ_ACK;
 		   end
 		   else begin
@@ -670,7 +671,7 @@ module dma_controller(input  logic sys_clk, rst,
    assign dma_ren = dma_ren_o;
    
    /* Forward dma channel to memory interface */
-   always @ (negedge sys_clk) begin
+   always_ff @ (negedge sys_clk) begin
       case (t_priority)
 	7'b0000001: begin
 	   dma_ren_o = dma0_ren;
@@ -923,7 +924,7 @@ module dma_controller(input  logic sys_clk, rst,
 		    
 
    /* FSM next state logic */
-   always @ (posedge sys_clk, posedge rst) begin
+   always_ff @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
 	 curr_state = IDLE;
       end
@@ -1002,35 +1003,32 @@ module dma_interrupts(input  logic sys_clk, rst,
 
    /* Internal Lines */
    logic [31:0] DICR, next_DICR;
-   logic 	irq_men;
-   logic [ 0:6] irq_en;
 
    assign DICR_o = DICR;
-   assign irq_men = DICR[23];
-   assign irq_en  = DICR[22:16];
    
    /* DICR register logic */
-   always @ (posedge sys_clk, posedge rst) begin
+   always_ff @ (posedge sys_clk, posedge rst) begin
       if (rst) begin
-	 DICR <= 32'b0;
+	 DICR[31:0] <= 'b0;
       end
       else begin
-	 DICR <= next_DICR;
+	 DICR[31:0] <= next_DICR[31:0];
       end
    end
+
    always_comb begin
       /* defaults */
       next_DICR[30:0] = DICR[30:0];
-      next_DICR[31]   = DICR[15] | ((DICR[22] & DICR[30]) |
+      next_DICR[31]   = DICR[15] | ((DICR[22] & DICR[30]) | 
 				    (DICR[21] & DICR[29]) |
-				    (DICR[20] & DICR[28]) |
+				    (DICR[20] & DICR[28]) | 
 				    (DICR[19] & DICR[27]) |
-				    (DICR[18] & DICR[26]) |
+				    (DICR[18] & DICR[26]) | 
 				    (DICR[17] & DICR[25]) |
 				    (DICR[16] & DICR[24]));
+
       if (wen) begin
 	 next_DICR[ 5: 0] = DICR_i[5:0];
-	 next_DICR[14: 6] = 8'b0;
 	 next_DICR[23:15] = DICR_i[23:15];
 
 	 if (DICR_i[24]) begin
@@ -1055,29 +1053,27 @@ module dma_interrupts(input  logic sys_clk, rst,
 	    next_DICR[30] = 1'b0;
 	 end
       end
-      else begin
-	 if (irq_men) begin
-	    if (irq_en[0] & irqs[0]) begin
-	       next_DICR[24] = 1'b1;
-	    end
-	    if (irq_en[1] & irqs[1]) begin
-	       next_DICR[25] = 1'b1;
-	    end
-	    if (irq_en[2] & irqs[2]) begin
-	       next_DICR[26] = 1'b1;
-	    end
-	    if (irq_en[3] & irqs[3]) begin
-	       next_DICR[27] = 1'b1;
-	    end
-	    if (irq_en[4] & irqs[4]) begin
-	       next_DICR[28] = 1'b1;
-	    end
-	    if (irq_en[5] & irqs[5]) begin
-	       next_DICR[29] = 1'b1;
-	    end
-	    if (irq_en[6] & irqs[6]) begin
-	       next_DICR[30] = 1'b1;
-	    end
+      else if (DICR[23]) begin
+	 if (DICR[16] & irqs[0]) begin
+	    next_DICR[24] = 1'b1;
+	 end
+	 if (DICR[17] & irqs[1]) begin
+	    next_DICR[25] = 1'b1;
+	 end
+	 if (DICR[18] & irqs[2]) begin
+	    next_DICR[26] = 1'b1;
+	 end
+	 if (DICR[19] & irqs[3]) begin
+	    next_DICR[27] = 1'b1;
+	 end
+	 if (DICR[20] & irqs[4]) begin
+	    next_DICR[28] = 1'b1;
+	 end
+	 if (DICR[21] & irqs[5]) begin
+	    next_DICR[29] = 1'b1;
+	 end
+	 if (DICR[22] & irqs[6]) begin
+	    next_DICR[30] = 1'b1;
 	 end
       end
    end
