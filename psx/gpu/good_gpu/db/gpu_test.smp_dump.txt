@@ -1,0 +1,66 @@
+
+State Machine - |top|inst_state
+Name inst_state.FETCH inst_state.WAIT inst_state.LOAD 
+inst_state.WAIT 0 0 0 
+inst_state.LOAD 0 1 1 
+inst_state.FETCH 1 1 0 
+
+State Machine - |top|gpu:gp|wb_state
+Name wb_state.HOLDTX_WB wb_state.GETTX_WB wb_state.GETMEM_WB wb_state.WAIT_WB wb_state.TOMEM_WB 
+wb_state.WAIT_WB 0 0 0 0 0 
+wb_state.GETMEM_WB 0 0 1 1 0 
+wb_state.GETTX_WB 0 1 0 1 0 
+wb_state.HOLDTX_WB 1 0 0 1 0 
+wb_state.TOMEM_WB 0 0 0 1 1 
+
+State Machine - |top|gpu:gp|v2c_state
+Name v2c_state.WAIT_V2C v2c_state.GETMEM2_V2C v2c_state.GETMEM1_V2C 
+v2c_state.WAIT_V2C 0 0 0 
+v2c_state.GETMEM1_V2C 1 0 1 
+v2c_state.GETMEM2_V2C 1 1 0 
+
+State Machine - |top|gpu:gp|c2v_state
+Name c2v_state.WAIT_C2V c2v_state.TOMEM_C2V c2v_state.GETMEM_C2V 
+c2v_state.WAIT_C2V 0 0 0 
+c2v_state.GETMEM_C2V 1 0 1 
+c2v_state.TOMEM_C2V 1 1 0 
+
+State Machine - |top|gpu:gp|v2v_state
+Name v2v_state.TOMEM_V2V v2v_state.GETMEM2_V2V v2v_state.GETMEM1_V2V v2v_state.WAIT_V2V 
+v2v_state.WAIT_V2V 0 0 0 0 
+v2v_state.GETMEM1_V2V 0 0 1 1 
+v2v_state.GETMEM2_V2V 0 1 0 1 
+v2v_state.TOMEM_V2V 1 0 0 1 
+
+State Machine - |top|gpu:gp|fill_state
+Name fill_state.TOMEM_FILL 
+fill_state.WAIT_FILL 0 
+fill_state.TOMEM_FILL 1 
+
+State Machine - |top|gpu:gp|clut_state
+Name clut_state.GETMEM_CLUT 
+clut_state.WAIT_CLUT 0 
+clut_state.GETMEM_CLUT 1 
+
+State Machine - |top|gpu:gp|xy_gen_state
+Name xy_gen_state.SIT_AROUND xy_gen_state.COMPLETE xy_gen_state.CHURN_BUTTER 
+xy_gen_state.SIT_AROUND 0 0 0 
+xy_gen_state.CHURN_BUTTER 1 0 1 
+xy_gen_state.COMPLETE 1 1 0 
+
+State Machine - |top|gpu:gp|decode_state
+Name decode_state.GO_CLUT decode_state.GO_MEM decode_state.DRAWING decode_state.WAIT_MEM decode_state.GET_CLUT decode_state.GET_CL2 decode_state.GET_CL1 decode_state.GET_TX2 decode_state.GET_TX1 decode_state.GET_TX0 decode_state.GET_XY2 decode_state.GET_XY1 decode_state.GET_XY0 decode_state.WAIT 
+decode_state.WAIT 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+decode_state.GET_XY0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 
+decode_state.GET_XY1 0 0 0 0 0 0 0 0 0 0 0 1 0 1 
+decode_state.GET_XY2 0 0 0 0 0 0 0 0 0 0 1 0 0 1 
+decode_state.GET_TX0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 
+decode_state.GET_TX1 0 0 0 0 0 0 0 0 1 0 0 0 0 1 
+decode_state.GET_TX2 0 0 0 0 0 0 0 1 0 0 0 0 0 1 
+decode_state.GET_CL1 0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+decode_state.GET_CL2 0 0 0 0 0 1 0 0 0 0 0 0 0 1 
+decode_state.GET_CLUT 0 0 0 0 1 0 0 0 0 0 0 0 0 1 
+decode_state.WAIT_MEM 0 0 0 1 0 0 0 0 0 0 0 0 0 1 
+decode_state.DRAWING 0 0 1 0 0 0 0 0 0 0 0 0 0 1 
+decode_state.GO_MEM 0 1 0 0 0 0 0 0 0 0 0 0 0 1 
+decode_state.GO_CLUT 1 0 0 0 0 0 0 0 0 0 0 0 0 1 
