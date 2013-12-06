@@ -81,7 +81,7 @@ module cdrom(
    logic [1:0] 			 param_count, decode_param_count_next, send_param_count_next;
    logic 			 send_go, recv_go, recv_stop;
    
-   logic 			 decode_param_fifo_re, decode_param_fifo_clr;
+   logic 			 decode_param_fifo_clr;
    logic 			 decode_resp_fifo_we;
    logic [7:0] 			 decode_resp_fifo_in;
    
@@ -93,8 +93,12 @@ module cdrom(
    logic 			 RASPI_EN_R, RASPI_EN_S;
 
    logic 			 recv_data_fifo_we;
-   logic 			 recv_data_fifo_in;   
- 
+   logic 			 recv_data_fifo_in;
+
+   logic [7:0] 			 send_cmd, send_cmd_next;
+   logic 			 send_first, send_first_next;
+   logic 			 send_param_fifo_re;
+   
    /* Status register */
    always_ff @(posedge clk, posedge rst) begin
       if (rst) begin
@@ -102,6 +106,16 @@ module cdrom(
       end
       else begin
 	 CD_status_reg <= CD_status_reg_next;
+      end
+   end
+
+   /* RASPI_CLK generator */
+   always_ff @(posedge clk, posedge rst) begin
+      if (rst) begin
+	 RASPI_CLK <= 1'b0;
+      end
+      else begin
+	 RASPI_CLK <= ~RASPI_CLK;
       end
    end
 
@@ -178,7 +192,7 @@ module cdrom(
 	       .rst(rst));
 
    assign param_fifo_we = to_addr2 & (CD_status_reg.port == 2'd0);
-   assign param_fifo_re = decode_param_fifo_re;
+   assign param_fifo_re = send_param_fifo_re;
    assign param_fifo_clr = decode_param_fifo_clr | (cmd_reg == CD_CMD_RESET);
    assign param_fifo_in = CD_addr2_in;
    
@@ -286,10 +300,13 @@ module cdrom(
       if (rst) begin
 	 send_state <= WAIT_S;
 	 recv_state <= WAIT_R;
+	 send_first <= 1'b1;
       end
       else begin
 	 send_state <= send_state_next;
 	 recv_state <= recv_state_next;
+	 send_first <= send_first_next;
+	 send_cmd <= send_cmd_next;
       end
    end
    
@@ -301,24 +318,29 @@ module cdrom(
       RASPI_CMD_S = 4'd0;
 
       send_param_count_next = param_count;
-
+      send_param_fifo_re = 1'b0;
+      send_first_next = send_first;
+      send_cmd_next <= send_cmd;
+      
       case (send_state)
 	WAIT_S: begin
 	   if (send_go) begin
 	      send_state_next = SET_CMDL_S;
+	      send_first_next = 1'b1;
+	      send_cmd <= cmd_reg;
 	   end
 	end
 	SET_CMDL_S: begin
-	   RASPI_CMD = cmd_reg[3:0];
+	   RASPI_CMD = send_cmd[3:0];
 	   send_state_next = SET_ENL_S;
 	end
 	SET_ENL_S: begin
-	   RASPI_CMD = cmd_reg[3:0];
+	   RASPI_CMD = send_cmd[3:0];
 	   RASPI_EN = 1'b1;
 	   send_state_next = WAIT_ACKL_S;
 	end
 	WAIT_ACKL_S: begin
-	   RASPI_CMD = cmd_reg[3:0];
+	   RASPI_CMD = send_cmd[3:0];
 	   RASPI_EN = 1'b1;
 
 	   if (RASPI_ACK) begin
@@ -326,7 +348,7 @@ module cdrom(
 	   end
 	end
 	WAIT_NACKL_S: begin
-	   RASPI_CMD = cmd_reg[3:0];
+	   RASPI_CMD = send_cmd[3:0];
 	   RASPI_EN = 1'b0;
 
 	   if (~RASPI_ACK) begin
@@ -334,17 +356,17 @@ module cdrom(
 	   end
 	end
 	SET_CMDH_S: begin
-	   RASPI_CMD = cmd_reg[7:4];
+	   RASPI_CMD = send_cmd[7:4];
 	   send_state_next = SET_ENH_S;
 	end
 	SET_ENH_S: begin
-	   RASPI_CMD = cmd_reg[7:4];
+	   RASPI_CMD = send_cmd[7:4];
 	   RASPI_EN = 1'b1;
 
 	   send_state_next = WAIT_ACKH_S;
 	end
 	WAIT_ACKH_S: begin
-	   RASPI_CMD = cmd_reg[7:4];
+	   RASPI_CMD = send_cmd[7:4];
 	   RASPI_EN = 1'b1;
 
 	   if (RASPI_ACK) begin
@@ -352,13 +374,22 @@ module cdrom(
 	   end
 	end // case: WAIT_ACKL
 	WAIT_NACKH_S: begin
-	   RASPI_CMD = cmd_reg[7:4];
+	   RASPI_CMD = send_cmd[7:4];
 	   RASPI_EN = 1'b0;
 
 	   if (~RASPI_ACK & (param_count == 2'd0)) begin
 	      send_state_next = DONE_S;
 	   end
 	   else if (~RASPI_ACK) begin
+	      send_cmd_next = param_fifo_out;
+
+	      if (~send_first) begin
+		 send_param_fifo_re = 1'b1;
+	      end
+	      else begin
+		 send_first_next = 1'b0;
+	      end
+	      
 	      send_param_count_next = param_count - 2'd1;
 	      send_state_next = SET_CMDL_S;
 	   end
