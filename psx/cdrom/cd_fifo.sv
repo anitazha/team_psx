@@ -3,7 +3,7 @@ module fifo8x16(
 		input logic 	    clk, rst,
 		input logic 	    we, re_8, re_16, clr,
 		input logic [7:0]   data_in,
-		output logic [16:0] data_out,
+		output logic [15:0] data_out,
 		output logic 	    full, empty);
    
    /* Interal lines */
