@@ -1959,13 +1959,12 @@ module gpu(
 		 c2v_vram_data = c2v_hold;
 		 
 		 if (c2v_low_read) begin
-		 c2v_low_read_next = 1'b0;
+		    c2v_low_read_next = 1'b0;
 		 end
 		 else begin
-		 c2v_fifo_re = 1'b1;
+		    c2v_fifo_re = 1'b1;
 		    c2v_low_read_next = 1'b1;
-			 end
-			 
+		 end
 	      end
 	      else begin
 		 if (c2v_low_read) begin
@@ -2350,8 +2349,19 @@ module gpu(
 				 v_trans_y * color_stage.y[text_i] + v_trans_c);
 	       end
 	       else begin
-		  f_u[text_i] = {(cmd.u0 + color_stage.x[text_i] - cmd.x0), 8'b0};
-		  f_v[text_i] = {(cmd.v0 + color_stage.y[text_i] - cmd.y0), 8'b0};
+		  if (xy_flip_reg[0]) begin
+		     f_u[text_i] = {(cmd.u0 + cmd.x1 - color_stage.x[text_i]), 8'b0};
+		  end
+		  else begin
+		     f_u[text_i] = {(cmd.u0 + color_stage.x[text_i] - cmd.x0), 8'b0};
+		  end
+
+		  if (xy_flip_reg[1]) begin
+		     f_v[text_i] = {(cmd.v0 + cmd.x1 - color_stage.y[text_i]), 8'b0};
+		  end
+		  else begin
+		     f_v[text_i] = {(cmd.v0 + color_stage.y[text_i] - cmd.y0), 8'b0};
+		  end
 	       end // else: !if(cmd.shape == POLY)
 	       
 	       /* Saturate the result (if its out of bounds) */
