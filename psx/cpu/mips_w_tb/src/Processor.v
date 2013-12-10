@@ -3,7 +3,7 @@
  *       In MemControl it can be toggled, but under the section of this file
  *       where we declare PSX Hardware Interrupts, it is hardcoded.
  */
-`define SIM
+//`define SIM
 
 /*
  * File         : Processor.v
@@ -255,6 +255,7 @@ module Processor(
             int_mask_data <= 'd0;
             int_stat_data <= 'd0;
         end
+		  else begin
         if (DataMem_Write[0] & int_mask_en) begin
             int_mask_data[7:0] <= DataMem_Out[7:0];
             int_stat_data[7:0] <= DataMem_Out[7:0];
@@ -263,6 +264,7 @@ module Processor(
             int_mask_data[10:8] <= DataMem_Out[10:8];
             int_stat_data[10:8] <= DataMem_Out[10:8];
         end
+		  end
     end
     
     Register #(11,0) PSX_Int_Stat(

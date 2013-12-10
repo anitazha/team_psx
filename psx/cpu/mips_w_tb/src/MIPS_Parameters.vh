@@ -36,9 +36,9 @@
 parameter [31:0] EXC_Vector_Base_Reset          = 32'hBFC0_0000;    // MIPS Standard is 0xBFC0_0000
 //parameter [31:0] EXC_Vector_Base_Reset          = 32'h0040_0000;    // .text start in 447 testbench
 parameter [31:0] EXC_Vector_Base_Other_NoBoot   = 32'h8000_0000;    // MIPS Standard is 0x8000_0000
-parameter [31:0] EXC_Vector_Base_Other_Boot     = 32'hBFC0_0200;    // MIPS Standard is 0xBFC0_0200
-parameter [31:0] EXC_Vector_Offset_General      = 32'h0000_0180;    // MIPS Standard is 0x0000_0180
-parameter [31:0] EXC_Vector_Offset_Special      = 32'h0000_0200;    // MIPS Standard is 0x0000_0200
+parameter [31:0] EXC_Vector_Base_Other_Boot     = 32'hBFC0_0100;    // MIPS Standard is 0xBFC0_0200
+parameter [31:0] EXC_Vector_Offset_General      = 32'h0000_0080;    // MIPS Standard is 0x0000_0180
+parameter [31:0] EXC_Vector_Offset_Special      = 32'h0000_0000;    // MIPS Standard is 0x0000_0200
 
 /*** PSX Hardware Register Locations ***/
 
@@ -64,7 +64,7 @@ parameter [31:0] UMem_Lower = 32'h08000000;
      endianness. A processor in user mode may switch to reverse endianness, which will be
      the opposite of this parameter.
 */
-parameter Big_Endian = 1'b0;
+parameter Big_Endian = 1'b1;
 
 /*** Encodings for MIPS32 Release 1 Architecture ***/
 

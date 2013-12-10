@@ -204,7 +204,7 @@ module mem_controller(input  logic  clk, rst,
    
    assign data_active = data_ren | data_wen_or;
    assign inst_active = inst_ren;
-   assign data_ben = (service_DMA | ~sdram_initialized) ? 4'b1111 : data_wen;
+   assign data_ben = (service_DMA /*| ~sdram_initialized*/) ? 4'b1111 : data_wen;
    assign data_wen_or = data_wen[0] | data_wen[1] | data_wen[2] | data_wen[3];
    
    assign data_ack = curr_d_ack;
@@ -504,11 +504,11 @@ module mem_controller(input  logic  clk, rst,
         /* wait for memory request */
         IDLE: begin
            /* initialized memory to zeros */
-           if (~sdram_initialized) begin
-              next_state = INIT_SDRAM;
-           end
+           //if (~sdram_initialized) begin
+           //   next_state = INIT_SDRAM;
+           //end
            /* memory access from data bus */
-           else if (pll_locked) begin
+           if (pll_locked) begin
               if (dma_req && ~curr_dma_skip) begin
                  next_dma_skip = 1'b1;
                  service_DMA = 1'b1;
@@ -556,40 +556,40 @@ module mem_controller(input  logic  clk, rst,
         end
 
         /* initialized all of SDRAM to zeros */
-        INIT_SDRAM: begin
-           if (curr_init_addr != 22'h200000) begin
-              next_addr = curr_init_addr;
-              next_wen = 1'b1;
-              next_ren = 1'b0;
-              next_data_i = 32'b0;
-              next_state = INIT_SDRAM_WRITE;
+        //INIT_SDRAM: begin
+        //   if (curr_init_addr != 22'h200000) begin
+        //      next_addr = curr_init_addr;
+        //      next_wen = 1'b1;
+        //      next_ren = 1'b0;
+        //      next_data_i = 32'b0;
+        //      next_state = INIT_SDRAM_WRITE;
 
-              next_init_addr = curr_init_addr + 32'h4;
-           end
-           else begin
-              next_sdram_initialized = 1'b1;
-              next_state = IDLE;
-           end
-        end
-        /* write states */
-        INIT_SDRAM_WRITE: begin
-           if (ack_o) begin
-              next_state = INIT_SDRAM_WAIT;
-           end
-           else begin
-              next_state = INIT_SDRAM_WRITE;
-           end
-        end
-        INIT_SDRAM_WAIT: begin
-           next_wen = 1'b0;
-           next_ren = 1'b0;
-           if (~ack_o) begin
-              next_state = IDLE;
-           end
-           else begin
-              next_state = INIT_SDRAM_WAIT;
-           end
-        end
+        //      next_init_addr = curr_init_addr + 32'h4;
+        //   end
+        //   else begin
+        //      next_sdram_initialized = 1'b1;
+        //      next_state = IDLE;
+        //   end
+        //end
+        ///* write states */
+        //INIT_SDRAM_WRITE: begin
+        //   if (ack_o) begin
+        //      next_state = INIT_SDRAM_WAIT;
+        //   end
+        //   else begin
+        //      next_state = INIT_SDRAM_WRITE;
+        //   end
+        //end
+        //INIT_SDRAM_WAIT: begin
+        //   next_wen = 1'b0;
+        //   next_ren = 1'b0;
+        //   if (~ack_o) begin
+        //      next_state = IDLE;
+        //   end
+        //   else begin
+        //      next_state = INIT_SDRAM_WAIT;
+        //   end
+        //end
         
         /* transfer control to DMA */
         DMA: begin

@@ -15,7 +15,7 @@ module gte_fsm(
 
     always_comb begin
         /* Defaults */
-		  next_state = curr_state;
+		next_state = curr_state;
         en_cyc   = 1'b0;
         ld_inst  = 1'b0;
         clr_inst = 1'b0;

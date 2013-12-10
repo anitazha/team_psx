@@ -14,7 +14,7 @@ VCSLOG = vcs.log
 
 CC = vcs
 #CCFLAGS = -sverilog -nc -debug -line +lint=all,noVCDE,noFIAAS +warn=all -l $(VCSLOG)
-CCFLAGS = -full64 -sverilog -nc -debug -line +warn=all -timescale=1ns/1ps -l $(VCSLOG)
+CCFLAGS = -sverilog -nc -debug -line +warn=all -timescale=1ns/1ps -l $(VCSLOG)
 
 TIMESTAMP := outputs/$(shell date +%m%d-%H%M%S)
 OUTPUT ?= $(TIMESTAMP)

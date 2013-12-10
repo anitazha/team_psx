@@ -4,28 +4,38 @@ A grand list of errors and issues we ran into that didn't have a
 clear solution.
 
 - When using debug cores in vivado, make sure the path to the project is not 
-too long. When running 'Implement Design' the process will error at opt_design
+  too long. When running 'Implement Design' the process will error @ opt_design
 
 - sudo everything
 
 - When using quartus, DON'T create bidirectional logic anywhere but the top
-module. DON'T propagate inouts through modules, keep them only in the top.
+  module. DON'T propagate inouts through modules, keep them only in the top.
 
 - Even if you put something in always_ff, Quartus will complain and infer
-latches if you don't assign the WHOLE signal in more than one place.
+  latches if you don't assign the WHOLE signal in more than one place.
 
-Example of what will infer latches:
+  Example of what will infer latches:
+  always_ff @(posedge clk, posedge rst)
+      if (rst)
+          cop2 <= 'd0;
+      else
+          cop2[0] <= nxt_cop[0];
 
-always_ff @(posedge clk, posedge rst)
-    if (rst)
-        cop2 <= 'd0;
-    else
-        cop2[0] <= nxt_cop[0];
+  Example of what will NOT infer latches:
+  always_ff @(posedge clk, posedge rst)
+      if (rst)
+          cop2 <= 'd0;
+      else
+          cop2 <= nxt_cop;
 
-Example of what will NOT infer latches:
-
-always_ff @(posedge clk, posedge rst)
-    if (rst)
-        cop2 <= 'd0;
-    else
-        cop2 <= nxt_cop;
+- Synthesis is DUMB DUMB DUMB DUMB. And (System)Verilog is DUMB DUMB DUMB.
+  If you go back past commit bead0e745d2dc24d9375e5658d40f8097c91b0f4 and
+  look at dma.sv, the bit will not get set in DICR even though both
+  conditions are met.
+  Things Anita changed in an attempt to fix it (and they work too): 
+    - Changed always to always_ff
+    - Changed else with and if inside to else if
+    - Changed reg to logic (but that didn't do anything on it's own)
+  Things that don't work for no clear reason:
+    - The bit in DICR got synthesized out in an assign, but not in
+      always_comb. NO CLEAR REASON WHY!
