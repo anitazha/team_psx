@@ -1,0 +1,254 @@
+
+State Machine - |system_top|gpu:gp|wb_state
+Name wb_state.HOLDTX_WB wb_state.GETTX_WB wb_state.GETMEM_WB wb_state.WAIT_WB wb_state.TOMEM_WB 
+wb_state.WAIT_WB 0 0 0 0 0 
+wb_state.GETMEM_WB 0 0 1 1 0 
+wb_state.GETTX_WB 0 1 0 1 0 
+wb_state.HOLDTX_WB 1 0 0 1 0 
+wb_state.TOMEM_WB 0 0 0 1 1 
+
+State Machine - |system_top|gpu:gp|v2c_state
+Name v2c_state.WAIT_V2C v2c_state.GETMEM2_V2C v2c_state.GETMEM1_V2C 
+v2c_state.WAIT_V2C 0 0 0 
+v2c_state.GETMEM1_V2C 1 0 1 
+v2c_state.GETMEM2_V2C 1 1 0 
+
+State Machine - |system_top|gpu:gp|c2v_state
+Name c2v_state.WAIT_C2V c2v_state.TOMEM_C2V c2v_state.GETMEM_C2V 
+c2v_state.WAIT_C2V 0 0 0 
+c2v_state.GETMEM_C2V 1 0 1 
+c2v_state.TOMEM_C2V 1 1 0 
+
+State Machine - |system_top|gpu:gp|v2v_state
+Name v2v_state.TOMEM_V2V v2v_state.GETMEM2_V2V v2v_state.GETMEM1_V2V v2v_state.WAIT_V2V 
+v2v_state.WAIT_V2V 0 0 0 0 
+v2v_state.GETMEM1_V2V 0 0 1 1 
+v2v_state.GETMEM2_V2V 0 1 0 1 
+v2v_state.TOMEM_V2V 1 0 0 1 
+
+State Machine - |system_top|gpu:gp|fill_state
+Name fill_state.TOMEM_FILL 
+fill_state.WAIT_FILL 0 
+fill_state.TOMEM_FILL 1 
+
+State Machine - |system_top|gpu:gp|clut_state
+Name clut_state.GETMEM_CLUT 
+clut_state.WAIT_CLUT 0 
+clut_state.GETMEM_CLUT 1 
+
+State Machine - |system_top|gpu:gp|xy_gen_state
+Name xy_gen_state.SIT_AROUND xy_gen_state.COMPLETE xy_gen_state.CHURN_BUTTER 
+xy_gen_state.SIT_AROUND 0 0 0 
+xy_gen_state.CHURN_BUTTER 1 0 1 
+xy_gen_state.COMPLETE 1 1 0 
+
+State Machine - |system_top|gpu:gp|decode_state
+Name decode_state.GO_CLUT decode_state.GO_MEM decode_state.DRAWING decode_state.WAIT_MEM decode_state.GET_CLUT decode_state.GET_CL2 decode_state.GET_CL1 decode_state.GET_TX2 decode_state.GET_TX1 decode_state.GET_TX0 decode_state.GET_XY2 decode_state.GET_XY1 decode_state.GET_XY0 decode_state.WAIT 
+decode_state.WAIT 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+decode_state.GET_XY0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 
+decode_state.GET_XY1 0 0 0 0 0 0 0 0 0 0 0 1 0 1 
+decode_state.GET_XY2 0 0 0 0 0 0 0 0 0 0 1 0 0 1 
+decode_state.GET_TX0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 
+decode_state.GET_TX1 0 0 0 0 0 0 0 0 1 0 0 0 0 1 
+decode_state.GET_TX2 0 0 0 0 0 0 0 1 0 0 0 0 0 1 
+decode_state.GET_CL1 0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+decode_state.GET_CL2 0 0 0 0 0 1 0 0 0 0 0 0 0 1 
+decode_state.GET_CLUT 0 0 0 0 1 0 0 0 0 0 0 0 0 1 
+decode_state.WAIT_MEM 0 0 0 1 0 0 0 0 0 0 0 0 0 1 
+decode_state.DRAWING 0 0 1 0 0 0 0 0 0 0 0 0 0 1 
+decode_state.GO_MEM 0 1 0 0 0 0 0 0 0 0 0 0 0 1 
+decode_state.GO_CLUT 1 0 0 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|curr_state
+Name curr_state.DMA curr_state.WRITE_DATA curr_state.WRITE_INIT curr_state.READ_INST curr_state.READ_DATA curr_state.READ_INST_INIT curr_state.READ_DATA_INIT curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 
+curr_state.READ_DATA_INIT 0 0 0 0 0 0 1 1 
+curr_state.READ_INST_INIT 0 0 0 0 0 1 0 1 
+curr_state.READ_DATA 0 0 0 0 1 0 0 1 
+curr_state.READ_INST 0 0 0 1 0 0 0 1 
+curr_state.WRITE_INIT 0 0 1 0 0 0 0 1 
+curr_state.WRITE_DATA 0 1 0 0 0 0 0 1 
+curr_state.DMA 1 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|addr_interpreter:addr_interp|curr_state
+Name curr_state.WAIT curr_state.WRITE_ACK curr_state.WRITE curr_state.LATCH curr_state.READ_ACK curr_state.READ curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 
+curr_state.READ 0 0 0 0 0 1 1 
+curr_state.READ_ACK 0 0 0 0 1 0 1 
+curr_state.LATCH 0 0 0 1 0 0 1 
+curr_state.WRITE 0 0 1 0 0 0 1 
+curr_state.WRITE_ACK 0 1 0 0 0 0 1 
+curr_state.WAIT 1 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|qsys_sdram_a2_sdram_0:sdram|m_next
+Name m_next.010000000 m_next.000010000 m_next.000001000 m_next.000000001 
+m_next.000000001 0 0 0 0 
+m_next.000001000 0 0 1 1 
+m_next.000010000 0 1 0 1 
+m_next.010000000 1 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|qsys_sdram_a2_sdram_0:sdram|m_state
+Name m_state.100000000 m_state.010000000 m_state.001000000 m_state.000100000 m_state.000010000 m_state.000001000 m_state.000000100 m_state.000000010 m_state.000000001 
+m_state.000000001 0 0 0 0 0 0 0 0 0 
+m_state.000000010 0 0 0 0 0 0 0 1 1 
+m_state.000000100 0 0 0 0 0 0 1 0 1 
+m_state.000001000 0 0 0 0 0 1 0 0 1 
+m_state.000010000 0 0 0 0 1 0 0 0 1 
+m_state.000100000 0 0 0 1 0 0 0 0 1 
+m_state.001000000 0 0 1 0 0 0 0 0 1 
+m_state.010000000 0 1 0 0 0 0 0 0 1 
+m_state.100000000 1 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|qsys_sdram_a2_sdram_0:sdram|i_next
+Name i_next.111 i_next.101 i_next.010 i_next.000 
+i_next.000 0 0 0 0 
+i_next.010 0 0 1 1 
+i_next.101 0 1 0 1 
+i_next.111 1 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|qsys_sdram_a2_sdram_0:sdram|i_state
+Name i_state.111 i_state.101 i_state.011 i_state.010 i_state.001 i_state.000 
+i_state.000 0 0 0 0 0 0 
+i_state.001 0 0 0 0 1 1 
+i_state.010 0 0 0 1 0 1 
+i_state.011 0 0 1 0 0 1 
+i_state.101 0 1 0 0 0 1 
+i_state.111 1 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|curr_state
+Name curr_state.WAIT curr_state.ASSIGN curr_state.IDLE 
+curr_state.IDLE 0 0 0 
+curr_state.ASSIGN 0 1 1 
+curr_state.WAIT 1 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|dma_channel:dma6|curr_state
+Name curr_state.SLEEP curr_state.CHANNEL_WR curr_state.CHANNEL_RE curr_state.WRITE_DONE curr_state.WRITE_ACK curr_state.WRITE_PREP curr_state.READ_ACK curr_state.MODE2_MADR curr_state.MODE2_INIT curr_state.MODE1_INIT curr_state.MODE0_INIT curr_state.START curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+curr_state.SLEEP 1 0 0 0 0 0 0 0 0 0 0 0 1 
+curr_state.START 0 0 0 0 0 0 0 0 0 0 0 1 1 
+curr_state.MODE0_INIT 0 0 0 0 0 0 0 0 0 0 1 0 1 
+curr_state.MODE1_INIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+curr_state.MODE2_INIT 0 0 0 0 0 0 0 0 1 0 0 0 1 
+curr_state.MODE2_MADR 0 0 0 0 0 0 0 1 0 0 0 0 1 
+curr_state.READ_ACK 0 0 0 0 0 0 1 0 0 0 0 0 1 
+curr_state.WRITE_PREP 0 0 0 0 0 1 0 0 0 0 0 0 1 
+curr_state.WRITE_ACK 0 0 0 0 1 0 0 0 0 0 0 0 1 
+curr_state.WRITE_DONE 0 0 0 1 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|dma_channel:dma5|curr_state
+Name curr_state.SLEEP curr_state.CHANNEL_WR curr_state.CHANNEL_RE curr_state.WRITE_DONE curr_state.WRITE_ACK curr_state.WRITE_PREP curr_state.READ_ACK curr_state.MODE2_MADR curr_state.MODE2_INIT curr_state.MODE1_INIT curr_state.MODE0_INIT curr_state.START curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+curr_state.SLEEP 1 0 0 0 0 0 0 0 0 0 0 0 1 
+curr_state.START 0 0 0 0 0 0 0 0 0 0 0 1 1 
+curr_state.MODE0_INIT 0 0 0 0 0 0 0 0 0 0 1 0 1 
+curr_state.MODE1_INIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+curr_state.MODE2_INIT 0 0 0 0 0 0 0 0 1 0 0 0 1 
+curr_state.MODE2_MADR 0 0 0 0 0 0 0 1 0 0 0 0 1 
+curr_state.READ_ACK 0 0 0 0 0 0 1 0 0 0 0 0 1 
+curr_state.WRITE_PREP 0 0 0 0 0 1 0 0 0 0 0 0 1 
+curr_state.WRITE_ACK 0 0 0 0 1 0 0 0 0 0 0 0 1 
+curr_state.WRITE_DONE 0 0 0 1 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|dma_channel:dma4|curr_state
+Name curr_state.SLEEP curr_state.CHANNEL_WR curr_state.CHANNEL_RE curr_state.WRITE_DONE curr_state.WRITE_ACK curr_state.WRITE_PREP curr_state.READ_ACK curr_state.MODE2_MADR curr_state.MODE2_INIT curr_state.MODE1_INIT curr_state.MODE0_INIT curr_state.START curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+curr_state.SLEEP 1 0 0 0 0 0 0 0 0 0 0 0 1 
+curr_state.START 0 0 0 0 0 0 0 0 0 0 0 1 1 
+curr_state.MODE0_INIT 0 0 0 0 0 0 0 0 0 0 1 0 1 
+curr_state.MODE1_INIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+curr_state.MODE2_INIT 0 0 0 0 0 0 0 0 1 0 0 0 1 
+curr_state.MODE2_MADR 0 0 0 0 0 0 0 1 0 0 0 0 1 
+curr_state.READ_ACK 0 0 0 0 0 0 1 0 0 0 0 0 1 
+curr_state.WRITE_PREP 0 0 0 0 0 1 0 0 0 0 0 0 1 
+curr_state.WRITE_ACK 0 0 0 0 1 0 0 0 0 0 0 0 1 
+curr_state.WRITE_DONE 0 0 0 1 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|dma_channel:dma3|curr_state
+Name curr_state.SLEEP curr_state.CHANNEL_WR curr_state.CHANNEL_RE curr_state.WRITE_DONE curr_state.WRITE_ACK curr_state.WRITE_PREP curr_state.READ_ACK curr_state.MODE2_MADR curr_state.MODE2_INIT curr_state.MODE1_INIT curr_state.MODE0_INIT curr_state.START curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+curr_state.SLEEP 1 0 0 0 0 0 0 0 0 0 0 0 1 
+curr_state.START 0 0 0 0 0 0 0 0 0 0 0 1 1 
+curr_state.MODE0_INIT 0 0 0 0 0 0 0 0 0 0 1 0 1 
+curr_state.MODE1_INIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+curr_state.MODE2_INIT 0 0 0 0 0 0 0 0 1 0 0 0 1 
+curr_state.MODE2_MADR 0 0 0 0 0 0 0 1 0 0 0 0 1 
+curr_state.READ_ACK 0 0 0 0 0 0 1 0 0 0 0 0 1 
+curr_state.WRITE_PREP 0 0 0 0 0 1 0 0 0 0 0 0 1 
+curr_state.WRITE_ACK 0 0 0 0 1 0 0 0 0 0 0 0 1 
+curr_state.WRITE_DONE 0 0 0 1 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|dma_channel:dma2|curr_state
+Name curr_state.SLEEP curr_state.CHANNEL_WR curr_state.CHANNEL_RE curr_state.WRITE_DONE curr_state.WRITE_ACK curr_state.WRITE_PREP curr_state.READ_ACK curr_state.MODE2_MADR curr_state.MODE2_INIT curr_state.MODE1_INIT curr_state.MODE0_INIT curr_state.START curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+curr_state.SLEEP 1 0 0 0 0 0 0 0 0 0 0 0 1 
+curr_state.START 0 0 0 0 0 0 0 0 0 0 0 1 1 
+curr_state.MODE0_INIT 0 0 0 0 0 0 0 0 0 0 1 0 1 
+curr_state.MODE1_INIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+curr_state.MODE2_INIT 0 0 0 0 0 0 0 0 1 0 0 0 1 
+curr_state.MODE2_MADR 0 0 0 0 0 0 0 1 0 0 0 0 1 
+curr_state.READ_ACK 0 0 0 0 0 0 1 0 0 0 0 0 1 
+curr_state.WRITE_PREP 0 0 0 0 0 1 0 0 0 0 0 0 1 
+curr_state.WRITE_ACK 0 0 0 0 1 0 0 0 0 0 0 0 1 
+curr_state.WRITE_DONE 0 0 0 1 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|dma_channel:dma1|curr_state
+Name curr_state.SLEEP curr_state.CHANNEL_WR curr_state.CHANNEL_RE curr_state.WRITE_DONE curr_state.WRITE_ACK curr_state.WRITE_PREP curr_state.READ_ACK curr_state.MODE2_MADR curr_state.MODE2_INIT curr_state.MODE1_INIT curr_state.MODE0_INIT curr_state.START curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+curr_state.SLEEP 1 0 0 0 0 0 0 0 0 0 0 0 1 
+curr_state.START 0 0 0 0 0 0 0 0 0 0 0 1 1 
+curr_state.MODE0_INIT 0 0 0 0 0 0 0 0 0 0 1 0 1 
+curr_state.MODE1_INIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+curr_state.MODE2_INIT 0 0 0 0 0 0 0 0 1 0 0 0 1 
+curr_state.MODE2_MADR 0 0 0 0 0 0 0 1 0 0 0 0 1 
+curr_state.READ_ACK 0 0 0 0 0 0 1 0 0 0 0 0 1 
+curr_state.WRITE_PREP 0 0 0 0 0 1 0 0 0 0 0 0 1 
+curr_state.WRITE_ACK 0 0 0 0 1 0 0 0 0 0 0 0 1 
+curr_state.WRITE_DONE 0 0 0 1 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|dma_controller:dma_c|dma_channel:dma0|curr_state
+Name curr_state.SLEEP curr_state.CHANNEL_WR curr_state.CHANNEL_RE curr_state.WRITE_DONE curr_state.WRITE_ACK curr_state.WRITE_PREP curr_state.READ_ACK curr_state.MODE2_MADR curr_state.MODE2_INIT curr_state.MODE1_INIT curr_state.MODE0_INIT curr_state.START curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 
+curr_state.SLEEP 1 0 0 0 0 0 0 0 0 0 0 0 1 
+curr_state.START 0 0 0 0 0 0 0 0 0 0 0 1 1 
+curr_state.MODE0_INIT 0 0 0 0 0 0 0 0 0 0 1 0 1 
+curr_state.MODE1_INIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+curr_state.MODE2_INIT 0 0 0 0 0 0 0 0 1 0 0 0 1 
+curr_state.MODE2_MADR 0 0 0 0 0 0 0 1 0 0 0 0 1 
+curr_state.READ_ACK 0 0 0 0 0 0 1 0 0 0 0 0 1 
+curr_state.WRITE_PREP 0 0 0 0 0 1 0 0 0 0 0 0 1 
+curr_state.WRITE_ACK 0 0 0 0 1 0 0 0 0 0 0 0 1 
+curr_state.WRITE_DONE 0 0 0 1 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1 
+curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|io_controller:io|curr_state
+Name curr_state.WAIT curr_state.WRITE curr_state.LATCH curr_state.READ curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 
+curr_state.READ 0 0 0 1 1 
+curr_state.LATCH 0 0 1 0 1 
+curr_state.WRITE 0 1 0 0 1 
+curr_state.WAIT 1 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|io_controller:io|joy_controller:j_cont|curr_state
+Name curr_state.TX_END curr_state.CLK_RISE curr_state.CLK_FALL curr_state.READ_BIT curr_state.LOAD_BIT curr_state.START_DELAY2 curr_state.START_DELAY1 curr_state.START_DELAY0 curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 0 
+curr_state.START_DELAY0 0 0 0 0 0 0 0 1 1 
+curr_state.START_DELAY1 0 0 0 0 0 0 1 0 1 
+curr_state.START_DELAY2 0 0 0 0 0 1 0 0 1 
+curr_state.LOAD_BIT 0 0 0 0 1 0 0 0 1 
+curr_state.READ_BIT 0 0 0 1 0 0 0 0 1 
+curr_state.CLK_FALL 0 0 1 0 0 0 0 0 1 
+curr_state.CLK_RISE 0 1 0 0 0 0 0 0 1 
+curr_state.TX_END 1 0 0 0 0 0 0 0 1 
