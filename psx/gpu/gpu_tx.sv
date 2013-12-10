@@ -1959,13 +1959,12 @@ module gpu(
 		 c2v_vram_data = c2v_hold;
 		 
 		 if (c2v_low_read) begin
-		 c2v_low_read_next = 1'b0;
+		    c2v_low_read_next = 1'b0;
 		 end
 		 else begin
-		 c2v_fifo_re = 1'b1;
+		    c2v_fifo_re = 1'b1;
 		    c2v_low_read_next = 1'b1;
-			 end
-			 
+		 end
 	      end
 	      else begin
 		 if (c2v_low_read) begin
@@ -2034,7 +2033,6 @@ module gpu(
       case (v2c_state)
 	WAIT_V2C: begin
 	   if (v2c_on) begin
-	      main_bus_rdy = 1'b0;
 	      v2c_rdy_next = 1'b0;
 	      v2c_x_next = cmd.x0;
 	      v2c_y_next = cmd.y0;
@@ -2350,8 +2348,19 @@ module gpu(
 				 v_trans_y * color_stage.y[text_i] + v_trans_c);
 	       end
 	       else begin
-		  f_u[text_i] = {(cmd.u0 + color_stage.x[text_i] - cmd.x0), 8'b0};
-		  f_v[text_i] = {(cmd.v0 + color_stage.y[text_i] - cmd.y0), 8'b0};
+		  if (xy_flip_reg[0]) begin
+		     f_u[text_i] = {(cmd.u0 + cmd.x1 - color_stage.x[text_i]), 8'b0};
+		  end
+		  else begin
+		     f_u[text_i] = {(cmd.u0 + color_stage.x[text_i] - cmd.x0), 8'b0};
+		  end
+
+		  if (xy_flip_reg[1]) begin
+		     f_v[text_i] = {(cmd.v0 + cmd.x1 - color_stage.y[text_i]), 8'b0};
+		  end
+		  else begin
+		     f_v[text_i] = {(cmd.v0 + color_stage.y[text_i] - cmd.y0), 8'b0};
+		  end
 	       end // else: !if(cmd.shape == POLY)
 	       
 	       /* Saturate the result (if its out of bounds) */
