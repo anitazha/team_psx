@@ -21,6 +21,7 @@ module top(
 	   output logic        VGA_BLANK_N, VGA_SYNC_N, VGA_CLK,
 	   output logic [7:0]  VGA_R, VGA_G, VGA_B,
 	   output logic [17:0] LEDR,
+		output logic [8:0] LEDG,
 	   output logic        SRAM_CE_N, SRAM_OE_N, SRAM_WE_N, SRAM_LB_N, SRAM_UB_N,
 	   output logic [19:0] SRAM_ADDR);
 `endif // !`ifdef sim
@@ -36,7 +37,7 @@ module top(
    logic [9:0] 		       w_x, w_y, w_x_n, w_y_n;
    logic 		       locked, c0, c1;
    
-   logic 		       VGA_re;
+   logic 		       VGA_re, VGA_we;
    logic [8:0] 		       VGA_y;
    logic [9:0] 		       VGA_x;
    logic [23:0] 	       VGA_data;
@@ -56,14 +57,14 @@ module top(
    
    logic [31:0] 	       main_bus;
    logic 		       main_bus_rdy, main_bus_re, to_gp0, to_gp1;
-   logic 		       fifo_full;
+   logic 		       fifo_full, fifo_empty;
    logic [31:0] 	       gpu_read, gpu_stat;
    
    logic [19:0] 	       inst_addr, inst_addr_n;
    logic [19:0] 	       inst_count, inst_count_n;
    
    logic [11:0] 	       inst_type, inst_type_n;
-   enum 		       logic [1:0] {FETCH, LOAD} inst_state, inst_state_n;
+   enum 		       logic [1:0] {FETCH, LOAD, WAIT} inst_state, inst_state_n;
    
    assign rst = ~KEY[0];
    
@@ -71,21 +72,23 @@ module top(
    assign sram_dq_in = SRAM_DQ;
    
    /* VRAM Controller */
-   vram_control vc(.x_tl(dis_x),
+   vram_control vc(.clk(clk_33MHz),
+		.x_tl(dis_x),
 		   .dis_w(dis_w),
 		   .*);
 
    /* Display Controller */
    display_out dc(.clk_50MHz(clk_50MHz),
-		  .enable(enable),
-		  .clk_33MHz(clk_33MHz),
-		  .vram_we(VGA_we),
-		  .vram_data(VGA_data),
-		  .y_tl(dis_y),
-		  .dis_h(dis_h),
-		  .vram_y(VGA_y),
-		  .vram_re(VGA_re),
-		  .*);
+					.clk_33MHz(clk_33MHz),
+				  .enable(enable),
+				  .vram_out(VGA_data),
+				  .vram_we(VGA_we),
+				  .vram_re(VGA_re),
+				  .vram_y(VGA_y),
+				  .vram_x(VGA_x),
+				  .y_tl(dis_y),
+				  .dis_h(dis_h),
+				  .*);
    
    /* GPU */
    gpu gp(.clk(clk_33MHz),
@@ -143,7 +146,7 @@ module top(
    
 `endif // !`ifdef sim
    
-   //assign LEDR[15:0] = GPU_data_out;
+	assign LEDR[17:16] = inst_state;
 
    /* Instruction ROM */
    inst_rom ir(.clock(clk_33MHz), .q(main_bus), .address(inst_addr));
@@ -152,11 +155,12 @@ module top(
    always_ff @(posedge clk_33MHz, posedge rst) begin
       if (rst) begin
 	 inst_addr <= 10'd0;
-	 inst_type <= 12'h1E8;
-	 inst_state <= FETCH;
+	 inst_type <= 12'h5e0;
+	 inst_state <= WAIT;
 	 inst_count <= 20'd3000;
       end
       else begin
+		inst_count <= inst_count_n;
 	 inst_addr <= inst_addr_n;
 	 inst_type <= inst_type_n;
 	 inst_state <= inst_state_n;
@@ -176,19 +180,23 @@ module top(
       to_gp1 = 1'b0;
       
       case (inst_state)
+		WAIT: begin
+		if (~KEY[2]) begin
+		inst_state_n = FETCH;
+		end
+		end
 	FETCH: begin
 	   if (inst_count != 20'd0) begin
-	      inst_addr_n = inst_addr + 10'd1;
-	      inst_type_n = inst_type >> 1;
-	      inst_count_n = inst_count - 20'd1;
 	      if (~fifo_full) begin
 		 inst_state_n = LOAD;
+		 inst_addr_n = inst_addr + 10'd1;
+	      inst_count_n = inst_count - 20'd1;
 	      end
 	   end
 	end
 	LOAD: begin
-	   inst_state_n = FETCH;
-	   
+	inst_state_n = FETCH;
+	   inst_type_n = inst_type >> 1;
 	   if (inst_type[0]) begin
 	      to_gp1 = 1'b1;
 	   end
@@ -196,6 +204,7 @@ module top(
 	      to_gp0 = 1'b1;
 	   end
 	end
+
       endcase
    end
 

@@ -1,3 +1,0 @@
-v1
-PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,display_out:dc|lpm_mult:Mult0|mult_oct:auto_generated|mac_mult1,
-PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,display_out:dc|lpm_mult:Mult1|mult_obt:auto_generated|mac_mult1,

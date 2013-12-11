@@ -1,8 +1,0 @@
-Warning (10268): Verilog HDL information at joy_controller.sv(198): always construct contains both blocking and non-blocking assignments
-Warning (10268): Verilog HDL information at joy_controller.sv(253): always construct contains both blocking and non-blocking assignments
-Info (10281): Verilog HDL Declaration information at gte_defines.sv(140): object "RGB" differs only in case from object "rgb" in the same scope
-Warning (10268): Verilog HDL information at gte.sv(410): always construct contains both blocking and non-blocking assignments
-Warning (10273): Verilog HDL warning at system_top.sv(76): extended using "x" or "z"
-Warning (10268): Verilog HDL information at io_controller.sv(745): always construct contains both blocking and non-blocking assignments
-Info (10281): Verilog HDL Declaration information at io_controller.sv(27): object "joy_data" differs only in case from object "JOY_DATA" in the same scope
-Warning (10273): Verilog HDL warning at ALU.v(120): extended using "x" or "z"

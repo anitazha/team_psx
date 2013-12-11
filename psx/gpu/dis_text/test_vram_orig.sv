@@ -135,6 +135,9 @@ module top(
    
    //blocky bb(.address(b_addr), .clock(clk_33MHz), .q(b_data_n));
    
+	assign GPU_addr = (GPU_we) ? {w_y[8:0], w_x} : {1'b0, SW[17:0]};
+	assign GPU_re = ~KEY[2] & ~GPU_we;
+	
    always_comb begin
       /* Defaults */
       dis_x = 10'd3;
@@ -144,14 +147,8 @@ module top(
 	  
       color_mode = 1'b0;
 
-      GPU_addr = {w_y[8:0], w_x};
       GPU_we = 1'b0;
-		if (GPU_en) begin
-	  GPU_re = 1'b1;
-	  end
-	  else begin
-	  GPU_re = 1'b0;
-	  end
+
       GPU_data_v = 16'd0;
       
       w_x_n = w_x;
@@ -187,7 +184,6 @@ end */
 		 end
 		 
 		 GPU_we = 1'b1;
-		 GPU_re = 1'b0;
 		 
 		 if (w_x < 10'd160) begin
 			GPU_data_v = {color[0][23:19], color[0][15:11], color[0][7:3]};

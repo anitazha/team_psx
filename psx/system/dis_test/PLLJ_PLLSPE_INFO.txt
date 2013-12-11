@@ -1,5 +1,0 @@
-PLL_Name	pll_psx:pl|altpll:altpll_component|pll_psx_altpll:auto_generated|pll1
-PLLJITTER	30
-PLLSPEmax	84
-PLLSPEmin	-53
-

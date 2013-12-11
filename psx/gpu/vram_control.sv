@@ -27,6 +27,7 @@ module vram_control(
    logic [18:0] 			VGA_addr;
    logic [19:0] VGA_mult_x, VGA_mult_x_next;
 	logic [9:0] VGA_int_x, VGA_int_x_next;
+	logic [8:0] VGA_y_hold, VGA_y_hold_next;
 	
    /* Enable and set SRAM up correctly */
    assign SRAM_CE_N = 1'b0;
@@ -43,12 +44,14 @@ module vram_control(
 	 VGA_x <= 10'd0;
 	 VGA_mult_x <= 20'd0;
 	 VGA_int_x <= 10'd0;
+	 VGA_y_hold <= 9'd0;
       end
       else begin
 	 vram_state <= vram_state_next;
 	 VGA_x <= VGA_x_next;
 	 VGA_mult_x <= VGA_mult_x_next;
 	 VGA_int_x <= VGA_int_x_next;
+	 VGA_y_hold <= VGA_y_hold_next;
       end
    end
    
@@ -67,6 +70,7 @@ module vram_control(
       VGA_addr = 19'd0;
 		VGA_mult_x_next = VGA_mult_x;
 		VGA_int_x_next = VGA_int_x;
+		VGA_y_hold_next = VGA_y_hold;
 
       vram_state_next = vram_state;
       
@@ -76,6 +80,7 @@ module vram_control(
 	   if (VGA_re) begin
 	      VGA_x_next = 10'b0;
 	      vram_state_next = VGA_SERVICE;
+			VGA_y_hold_next = VGA_y;
 	   end
 		
 	   if (GPU_re) begin
@@ -97,7 +102,7 @@ module vram_control(
 	      VGA_x_next = VGA_x + 10'd1;
 	      VGA_we = 1'b1;
 
-	      VGA_addr[18:10] = VGA_y;
+	      VGA_addr[18:10] = VGA_y_hold;
 	      VGA_addr[9:0] = VGA_int_x;
 			VGA_mult_x_next = ({10'd0, VGA_x} * {10'd0, dis_w});
 			VGA_int_x_next = (VGA_mult_x / `SCREEN_W) + x_tl;

@@ -2033,6 +2033,7 @@ module gpu(
       case (v2c_state)
 	WAIT_V2C: begin
 	   if (v2c_on) begin
+	      main_bus_rdy = 1'b0;
 	      v2c_rdy_next = 1'b0;
 	      v2c_x_next = cmd.x0;
 	      v2c_y_next = cmd.y0;
