@@ -71,14 +71,15 @@ curr_state.WRITE_DATA 0 1 0 0 0 0 0 1
 curr_state.DMA 1 0 0 0 0 0 0 1 
 
 State Machine - |system_top|mem_controller:memory|addr_interpreter:addr_interp|curr_state
-Name curr_state.WAIT curr_state.WRITE_ACK curr_state.WRITE curr_state.LATCH curr_state.READ_ACK curr_state.READ curr_state.IDLE 
-curr_state.IDLE 0 0 0 0 0 0 0 
-curr_state.READ 0 0 0 0 0 1 1 
-curr_state.READ_ACK 0 0 0 0 1 0 1 
-curr_state.LATCH 0 0 0 1 0 0 1 
-curr_state.WRITE 0 0 1 0 0 0 1 
-curr_state.WRITE_ACK 0 1 0 0 0 0 1 
-curr_state.WAIT 1 0 0 0 0 0 1 
+Name curr_state.SD_WAIT curr_state.WAIT curr_state.WRITE_ACK curr_state.WRITE curr_state.LATCH curr_state.READ_ACK curr_state.READ curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 
+curr_state.SD_WAIT 1 0 0 0 0 0 0 1 
+curr_state.READ 0 0 0 0 0 0 1 1 
+curr_state.READ_ACK 0 0 0 0 0 1 0 1 
+curr_state.LATCH 0 0 0 0 1 0 0 1 
+curr_state.WRITE 0 0 0 1 0 0 0 1 
+curr_state.WRITE_ACK 0 0 1 0 0 0 0 1 
+curr_state.WAIT 0 1 0 0 0 0 0 1 
 
 State Machine - |system_top|mem_controller:memory|qsys_sdram_a2_sdram_0:sdram|m_next
 Name m_next.010000000 m_next.000010000 m_next.000001000 m_next.000000001 
@@ -234,12 +235,20 @@ curr_state.CHANNEL_RE 0 0 1 0 0 0 0 0 0 0 0 0 1
 curr_state.CHANNEL_WR 0 1 0 0 0 0 0 0 0 0 0 0 1 
 
 State Machine - |system_top|mem_controller:memory|io_controller:io|curr_state
-Name curr_state.WAIT curr_state.WRITE curr_state.LATCH curr_state.READ curr_state.IDLE 
-curr_state.IDLE 0 0 0 0 0 
-curr_state.READ 0 0 0 1 1 
-curr_state.LATCH 0 0 1 0 1 
-curr_state.WRITE 0 1 0 0 1 
-curr_state.WAIT 1 0 0 0 1 
+Name curr_state.INIT curr_state.WAIT curr_state.WRITE curr_state.LATCH curr_state.READ curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 
+curr_state.INIT 1 0 0 0 0 1 
+curr_state.READ 0 0 0 0 1 1 
+curr_state.LATCH 0 0 0 1 0 1 
+curr_state.WRITE 0 0 1 0 0 1 
+curr_state.WAIT 0 1 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|io_controller:io|curr_pong
+Name curr_pong.000 curr_pong.WAIT1 curr_pong.START curr_pong.COUNT 
+curr_pong.000 0 0 0 0 
+curr_pong.COUNT 1 0 0 1 
+curr_pong.START 1 0 1 0 
+curr_pong.WAIT1 1 1 0 0 
 
 State Machine - |system_top|mem_controller:memory|io_controller:io|joy_controller:j_cont|curr_state
 Name curr_state.TX_END curr_state.CLK_RISE curr_state.CLK_FALL curr_state.READ_BIT curr_state.LOAD_BIT curr_state.START_DELAY2 curr_state.START_DELAY1 curr_state.START_DELAY0 curr_state.IDLE 
@@ -252,3 +261,22 @@ curr_state.READ_BIT 0 0 0 1 0 0 0 0 1
 curr_state.CLK_FALL 0 0 1 0 0 0 0 0 1 
 curr_state.CLK_RISE 0 1 0 0 0 0 0 0 1 
 curr_state.TX_END 1 0 0 0 0 0 0 0 1 
+
+State Machine - |system_top|mem_controller:memory|io_controller:io|controller_io:joypad|c_type
+Name c_type.0000 c_type.TYPE_AG c_type.TYPE_AR c_type.TYPE_DI c_type.TYPE_XX 
+c_type.0000 0 0 0 0 0 
+c_type.TYPE_XX 1 0 0 0 1 
+c_type.TYPE_DI 1 0 0 1 0 
+c_type.TYPE_AR 1 0 1 0 0 
+c_type.TYPE_AG 1 1 0 0 0 
+
+State Machine - |system_top|mem_controller:memory|io_controller:io|controller_io:joypad|curr_state
+Name curr_state.ERROR curr_state.ACK_RISE curr_state.ACK_FALL curr_state.LOAD_RX curr_state.CLK_RISE curr_state.LOAD_TX curr_state.CLK_FALL curr_state.IDLE 
+curr_state.IDLE 0 0 0 0 0 0 0 0 
+curr_state.CLK_FALL 0 0 0 0 0 0 1 1 
+curr_state.LOAD_TX 0 0 0 0 0 1 0 1 
+curr_state.CLK_RISE 0 0 0 0 1 0 0 1 
+curr_state.LOAD_RX 0 0 0 1 0 0 0 1 
+curr_state.ACK_FALL 0 0 1 0 0 0 0 1 
+curr_state.ACK_RISE 0 1 0 0 0 0 0 1 
+curr_state.ERROR 1 0 0 0 0 0 0 1 

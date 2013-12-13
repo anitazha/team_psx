@@ -1,5 +1,5 @@
 EDA Netlist Writer report for system_top
-Wed Dec  4 08:57:04 2013
+Fri Dec  6 13:39:02 2013
 Quartus II 32-bit Version 12.1 Build 177 11/07/2012 SJ Full Version
 
 
@@ -36,7 +36,7 @@ applicable agreement for further details.
 +-------------------------------------------------------------------+
 ; EDA Netlist Writer Summary                                        ;
 +---------------------------+---------------------------------------+
-; EDA Netlist Writer Status ; Successful - Wed Dec  4 08:57:04 2013 ;
+; EDA Netlist Writer Status ; Successful - Fri Dec  6 13:39:02 2013 ;
 ; Revision Name             ; system_top                            ;
 ; Top-level Entity Name     ; system_top                            ;
 ; Family                    ; Cyclone IV E                          ;
@@ -66,20 +66,20 @@ applicable agreement for further details.
 +---------------------------------------------------------------------------------------------------+------------------------+
 
 
-+----------------------------------------------------------------------------+
-; Simulation Generated Files                                                 ;
-+----------------------------------------------------------------------------+
-; Generated Files                                                            ;
-+----------------------------------------------------------------------------+
-; /work/system_top/simulation/modelsim/system_top_7_1200mv_85c_slow.vho      ;
-; /work/system_top/simulation/modelsim/system_top_7_1200mv_0c_slow.vho       ;
-; /work/system_top/simulation/modelsim/system_top_min_1200mv_0c_fast.vho     ;
-; /work/system_top/simulation/modelsim/system_top.vho                        ;
-; /work/system_top/simulation/modelsim/system_top_7_1200mv_85c_vhd_slow.sdo  ;
-; /work/system_top/simulation/modelsim/system_top_7_1200mv_0c_vhd_slow.sdo   ;
-; /work/system_top/simulation/modelsim/system_top_min_1200mv_0c_vhd_fast.sdo ;
-; /work/system_top/simulation/modelsim/system_top_vhd.sdo                    ;
-+----------------------------------------------------------------------------+
++------------------------------------------------------------------------+
+; Simulation Generated Files                                             ;
++------------------------------------------------------------------------+
+; Generated Files                                                        ;
++------------------------------------------------------------------------+
+; /work/system/simulation/modelsim/system_top_7_1200mv_85c_slow.vho      ;
+; /work/system/simulation/modelsim/system_top_7_1200mv_0c_slow.vho       ;
+; /work/system/simulation/modelsim/system_top_min_1200mv_0c_fast.vho     ;
+; /work/system/simulation/modelsim/system_top.vho                        ;
+; /work/system/simulation/modelsim/system_top_7_1200mv_85c_vhd_slow.sdo  ;
+; /work/system/simulation/modelsim/system_top_7_1200mv_0c_vhd_slow.sdo   ;
+; /work/system/simulation/modelsim/system_top_min_1200mv_0c_vhd_fast.sdo ;
+; /work/system/simulation/modelsim/system_top_vhd.sdo                    ;
++------------------------------------------------------------------------+
 
 
 +-----------------------------+
@@ -88,20 +88,20 @@ applicable agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus II 32-bit EDA Netlist Writer
     Info: Version 12.1 Build 177 11/07/2012 SJ Full Version
-    Info: Processing started: Wed Dec  4 08:55:56 2013
+    Info: Processing started: Fri Dec  6 13:37:50 2013
 Info: Command: quartus_eda --read_settings_files=off --write_settings_files=off system_top -c system_top
-Info (204019): Generated file system_top_7_1200mv_85c_slow.vho in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file system_top_7_1200mv_0c_slow.vho in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file system_top_min_1200mv_0c_fast.vho in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file system_top.vho in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file system_top_7_1200mv_85c_vhd_slow.sdo in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file system_top_7_1200mv_0c_vhd_slow.sdo in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file system_top_min_1200mv_0c_vhd_fast.sdo in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
-Info (204019): Generated file system_top_vhd.sdo in folder "/work/system_top/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top_7_1200mv_85c_slow.vho in folder "/work/system/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top_7_1200mv_0c_slow.vho in folder "/work/system/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top_min_1200mv_0c_fast.vho in folder "/work/system/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top.vho in folder "/work/system/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top_7_1200mv_85c_vhd_slow.sdo in folder "/work/system/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top_7_1200mv_0c_vhd_slow.sdo in folder "/work/system/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top_min_1200mv_0c_vhd_fast.sdo in folder "/work/system/simulation/modelsim/" for EDA simulation tool
+Info (204019): Generated file system_top_vhd.sdo in folder "/work/system/simulation/modelsim/" for EDA simulation tool
 Info: Quartus II 32-bit EDA Netlist Writer was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 709 megabytes
-    Info: Processing ended: Wed Dec  4 08:57:05 2013
-    Info: Elapsed time: 00:01:09
-    Info: Total CPU time (on all processors): 00:01:06
+    Info: Peak virtual memory: 737 megabytes
+    Info: Processing ended: Fri Dec  6 13:39:03 2013
+    Info: Elapsed time: 00:01:13
+    Info: Total CPU time (on all processors): 00:01:11
 
 

@@ -1,6 +1,6 @@
 module vga
   (input  logic CLOCK_50, reset,
-   output logic HS, VS, v_blank, h_blank, col_porch,
+   output logic HS, VS, v_blank, h_blank,
    output logic [9:0] row,
    output logic [9:0] col);
 
@@ -35,7 +35,6 @@ module vga
                                    .reset(reset));
   assign col = col_count[10:1];
   assign col_clear = (col_count >= 11'd1599);
-  assign col_porch = (col_count >= 11'd1595);
   assign col_enable = 1'b1;
   assign HS = (col_count < 11'd1312) | (col_count > 11'd1503);
   assign h_blank = col_count > 11'd1279;

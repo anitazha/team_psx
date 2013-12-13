@@ -444,7 +444,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : M_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 'd1;
+                //Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : M_RestartPC;
                 BadVAddr <= BadAddr_M;
             end
@@ -453,7 +453,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : EX_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 'd1;
+                //Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : EX_RestartPC;
                 BadVAddr <= BadVAddr;
             end
@@ -462,7 +462,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : ID_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 'd1;
+                //Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : ID_RestartPC;
                 BadVAddr <= BadVAddr;
             end
@@ -471,7 +471,7 @@ module CPZero(
                 Cause_BD <= (Status_EXL) ? Cause_BD : IF_IsBD;
                 Cause_CE <= (COP3) ? 2'b11 : ((COP1) ? 2'b01 : 2'b00);
                 Cause_ExcCode30 <= Cause_ExcCode_bits;
-                Status_EXL <= 'd1;
+                //Status_EXL <= 'd1;
                 EPC <= (Status_EXL) ? EPC : BadAddr_IF;
                 BadVAddr <= BadAddr_IF;
             end

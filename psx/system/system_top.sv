@@ -4,6 +4,7 @@ module system_top(
     input  logic [3:0]  KEY,
     input logic  [17:0] SW,
     output logic [17:0] LEDR,
+	 inout logic   [35:0] GPIO,
 
     /* SDRAM CHIP INTERFACE */
     output logic [12:0] DRAM_ADDR,
@@ -57,7 +58,7 @@ module system_top(
     wire  [15:0]      sram_dq_out, sram_dq_in;
     logic [15:0]      GPU_data_v;
     logic             color_mode;
-    logic             blk;
+    logic             v_blk, h_blk;
     logic             GPU_en;
     logic             enable;
     logic [31:0]      gpu_main_bus;
@@ -69,6 +70,12 @@ module system_top(
     logic [19:0]      inst_count, inst_count_n;
     logic [4095:0]    inst_type, inst_type_n;
 
+   logic 	      h_blk_o, v_blk_o;
+   
+   logic [7:0] 	      mem_controller_state;
+   logic [6:0] 	      addr_interp_state;
+   logic [4:0] 	      io_controller_state;
+   
     // Output assignments signals
     assign rst          = ~KEY[0];
     assign DRAM_DQ      = dram_oe_out ? dram_dq_in : {32{1'bz}};
@@ -90,14 +97,22 @@ module system_top(
     assign clk_33MHz = c0 & locked;
     assign clk_100MHz = c1 & locked;
    
-    always_ff@(posedge clk, posedge rst) begin
-        if (rst)
-            LEDR[15:0] <= 16'h0;
-        else if({pc, 2'b0} == 32'h80057AA4)
-            LEDR[15:0] <= 16'hFF;
-    end
-
-    // MIPS core
+//    always_ff@(posedge clk, posedge rst) begin
+//        if (rst)
+//            LEDR[15:0] <= 16'h0;
+//        else begin
+//	   if (SW[0] == 1'b1)
+//	     LEDR[15:0] <= {10'd0, mem_controller_state};
+//	   else if (SW[1] == 1'b1)
+//	     LEDR[15:0] <= {11'd0, addr_interp_state};
+//	   else if (SW[2] == 1'b1)
+//	     LEDR[15:0] <= {13'd0, io_controller_state};
+//	   else if({pc, 2'b0} == 32'h80057AA4)
+//             LEDR[15:0] <= 16'hFF;
+//	end
+//    end
+    
+   // MIPS core
     Processor core (
             .clock(clk), .reset(rst),
 
@@ -156,22 +171,27 @@ module system_top(
             .gpu_stat       (gpu_stat), 
             .gpu_read       (gpu_read),
             .gp0            (gp0),
-            .gp1            (gp1),
+			   .gp1            (gp1),
 				
-				/* controller */
-				.joy_ack       (),
-				.joy_data      (),
-				.joy_att       (),
-				.joy_cmd       (),
-				.joy_clk       (),
+				/* GPIO */
+				.gpio_o				(GPIO),
+				.ledr_o				(LEDR),
+				
+			  /* controller */
+			  .joy_ack       (),
+			  .joy_data      (),
+			  .joy_att       (),
+			  .joy_cmd       (),
+			  .joy_clk       (),
 
             /* HW REGISTER CONNECTIONS */
-            .hblank         (VGA_HS),
-            .vblank         (VGA_VS),
+            .hblank         (h_blk),
+            .vblank         (v_blk),
             .dotclock       (VGA_CLK),
 
             /* INTERRUPTS */
-            .interrupts     (psx_int)
+            .interrupts     (psx_int),
+	    .*
             );
 
     /* VRAM Controller */
@@ -181,18 +201,20 @@ module system_top(
             .*);
 
     /* Display Controller */
-    display_out dc(
-            .clk_50MHz(clk_50MHz),
-					.clk_33MHz(clk_33MHz),
-				  .enable(enable),
-				  .vram_out(VGA_data),
-				  .vram_we(VGA_we),
-				  .vram_re(VGA_re),
-				  .vram_y(VGA_y),
-				  .vram_x(VGA_x),
-				  .y_tl(dis_y),
-				  .dis_h(dis_h),
-            .*);
+    display_out dc
+      (.clk_50MHz(clk_50MHz),
+       .clk_33MHz(clk_33MHz),
+       .enable(enable),
+       .vram_out(VGA_data),
+       .vram_we(VGA_we),
+       .vram_re(VGA_re),
+       .vram_y(VGA_y),
+       .vram_x(VGA_x),
+       .y_tl(dis_y),
+       .dis_h(dis_h),
+       .v_blk(v_blk),
+       .h_blk(h_blk),
+       .*);
 			  
     /* GPU */
     gpu gp(

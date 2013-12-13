@@ -10,7 +10,7 @@ module display_out(
 		   input logic [9:0]  dis_h,
 		   output logic [8:0] vram_y, 
 		   output logic       vram_re,
-		   output logic       blk,
+		   output logic       h_blk, v_blk,
 		   output logic [7:0] VGA_R, VGA_G, VGA_B,
 		   output logic       VGA_HS, VGA_VS,
 		   output logic       VGA_CLK, VGA_BLANK_N, VGA_SYNC_N);
@@ -29,7 +29,7 @@ module display_out(
 
    logic [23:0] 		       stored_color;
    
-   logic 			       v_blk, h_blk;
+   logic 			       v_blk_o, h_blk_o, blk;
    
    /* VGA module; from Prof Bill Nace */
    vga v(.HS(hs),
@@ -42,7 +42,9 @@ module display_out(
 	 .col(x));
    
    assign blk = v_blk | h_blk;
-   
+   assign v_blk_o = v_blk;
+	assign h_blk_o = h_blk;
+	
    /* Row Store memory */
    row_hold rh(.rdclock(clk_50MHz),
 	       .wrclock(clk_33MHz),
@@ -92,7 +94,7 @@ module display_out(
 		vram_y = int_y[8:0];
 
       /* If were done with this row, assert a read to get the next one (if y changes) */
-      if ((x == 10'd0) & ~v_blk & (int_y != int_y_old)) begin
+      if ((x == `SCREEN_W + 10'd1) & ~v_blk & (int_y != int_y_old)) begin
 	 vram_re = 1'b1;
 	 int_y_old_new = int_y;
       end

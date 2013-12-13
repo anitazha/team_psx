@@ -1,6 +1,8 @@
 
 
 module addr_interpreter(input  logic clk, clk_50, rst,
+			output logic [ 6:0] addr_interp_state,
+			
                         input  logic [31:0] addr,
                         input  logic [31:0] data_i,
                         input  logic        ren, wen,
@@ -43,6 +45,7 @@ module addr_interpreter(input  logic clk, clk_50, rst,
    localparam WRITE     = 7'b0010000;
    localparam WRITE_ACK = 7'b0100000;
    localparam WAIT      = 7'b1000000;
+   localparam SD_WAIT   = 7'b0000000;
    
    /* PARAMETERS - constants */
    localparam BIOS_TAG_1 = 32'h1FC0_0000;   // start addresses for BIOS
@@ -121,6 +124,8 @@ module addr_interpreter(input  logic clk, clk_50, rst,
    assign sd_ren = sd_ren_out;
    assign hw_wen = hw_wen_out;
    assign hw_ren = hw_ren_out;
+
+   assign addr_interp_state = curr_state;
    
    /* timeout counter for sd_valid (resend command if timeout)*/
    always @ (posedge clk, posedge rst) begin
@@ -128,11 +133,11 @@ module addr_interpreter(input  logic clk, clk_50, rst,
          timeout_counter <= 6'd0;
       end
       else begin
-         if (curr_state != LATCH || curr_state != WRITE_ACK) begin
-            timeout_counter <= 6'd0;
+         if (curr_state == READ_ACK || curr_state == WRITE_ACK) begin
+            timeout_counter <= timeout_counter + 6'd1;
          end
          else begin
-            timeout_counter <= timeout_counter + 6'd1;
+            timeout_counter <= 6'd0;
          end
       end
    end
@@ -224,8 +229,11 @@ module addr_interpreter(input  logic clk, clk_50, rst,
                  sd_ren_out = 1'b0;
                  next_state = READ;
               end
-              else begin     
-                 next_state = READ_ACK;
+              else if (~sd_valid_i) begin
+                 next_state = SD_WAIT;
+              end
+              else begin
+                 next_state = READ;
               end
            end
            else if (in_HWREG) begin
@@ -236,6 +244,14 @@ module addr_interpreter(input  logic clk, clk_50, rst,
               next_state = LATCH;
            end
         end
+	SD_WAIT: begin
+	   if (~sd_valid_i) begin
+	      next_state = READ_ACK;
+	   end
+	   else begin
+	      next_state = SD_WAIT;
+	   end
+	end
         READ_ACK: begin
            if (in_MAIN) begin
               if (sd_valid_i) begin

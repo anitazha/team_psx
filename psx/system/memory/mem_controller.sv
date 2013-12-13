@@ -20,7 +20,10 @@
  * Top Level interface to Main Memory and Memory Mapped I/O
  */
 module mem_controller(input  logic  clk, clk_50, rst,
-                      
+		      output logic [ 7:0] mem_controller_state,
+		      output logic [ 6:0] addr_interp_state,
+                      output logic [ 4:0] io_controller_state,
+				    
                       /* SDRAM CHIP INTERFACE */
                       output logic [12:0] dram_addr,
                       output logic [ 1:0] dram_bank,
@@ -34,6 +37,8 @@ module mem_controller(input  logic  clk, clk_50, rst,
                       output logic [31:0] dram_dq_in,
                       input  logic [31:0] dram_dq_out,
                       output logic        dram_oe_out,
+							 output logic [35:0] gpio_o,
+							 output logic [17:0] ledr_o,
                       
                       /* CPU DATA */
                       input  logic [31:0] data_addr,
@@ -73,14 +78,14 @@ module mem_controller(input  logic  clk, clk_50, rst,
                       );
 
    /* PARAMETERS - state declarations */
-   localparam IDLE             = 4'b0011;
-   localparam READ_DATA_INIT   = 4'b0100;
-   localparam READ_INST_INIT   = 4'b0101;
-   localparam READ_DATA        = 4'b0110;
-   localparam READ_INST        = 4'b0111;
-   localparam WRITE_INIT       = 4'b1000;
-   localparam WRITE_DATA       = 4'b1001;
-   localparam DMA              = 4'b1010;   
+   localparam IDLE             = 8'b00000001;
+   localparam READ_DATA_INIT   = 8'b00000010;
+   localparam READ_INST_INIT   = 8'b00000100;
+   localparam READ_DATA        = 8'b00001000;
+   localparam READ_INST        = 8'b00010000;
+   localparam WRITE_INIT       = 8'b00100000;
+   localparam WRITE_DATA       = 8'b01000000;
+   localparam DMA              = 8'b10000000;   
    
    /* INTERNAL LINES */
    // - memory module interconnects 
@@ -132,7 +137,7 @@ module mem_controller(input  logic  clk, clk_50, rst,
    reg         service_DMA;
    
    // - state variables 
-   reg [3:0]   curr_state, next_state;
+   reg [7:0]   curr_state, next_state;
    reg [31:0]  curr_addr, next_addr;
    reg [31:0]  curr_data_i, next_data_i;
    reg         curr_ren, next_ren;
@@ -167,6 +172,8 @@ module mem_controller(input  logic  clk, clk_50, rst,
    assign inst_data_o = inst_latch;
 
    assign dram_clk = altpll_0_c0_clk;
+
+   assign mem_controller_state = curr_state;
    
    /* BLOCKRAM CONTROLLER */
    blockram BIOS
@@ -236,7 +243,8 @@ module mem_controller(input  logic  clk, clk_50, rst,
       .hblank        (hblank),
       .vblank        (vblank),
       .dotclock      (dotclock),
-      .interrupts    (interrupts));
+      .interrupts    (interrupts),
+		.*);
 
    /* DMA CONTROLLER */
    dma_controller dma_c
@@ -458,8 +466,8 @@ module mem_controller(input  logic  clk, clk_50, rst,
         IDLE: begin
            /* memory access from data bus */
            if (pll_locked) begin
-              if (dma_req && ~curr_dma_skip) begin
-                 next_dma_skip = 1'b1;
+              if (dma_req/* && ~curr_dma_skip*/) begin
+                 /*next_dma_skip = 1'b1;*/
                  service_DMA = 1'b1;
                  next_state = DMA;
               end
@@ -510,9 +518,9 @@ module mem_controller(input  logic  clk, clk_50, rst,
            if (dma_done) begin
               next_state = IDLE;
            end
-	   else if (~dma_req) begin
-	      next_state = IDLE;
-	   end
+			  else if (~dma_req) begin
+			  	  next_state = IDLE;
+		     end
            else begin
               next_state = DMA;
            end

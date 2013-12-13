@@ -2007,3 +2007,17 @@ module gte_decode(
     end
 endmodule: gte_decode
 
+module up_counter
+ #(parameter WIDTH = 8)
+  (input  logic             clk, en, clr, rst,
+   output logic [WIDTH-1:0] Q);
+
+  always_ff @(posedge clk, posedge rst)
+    if (rst)
+      Q <= 0;
+    else if (clr)
+      Q <= 0;
+    else if (en)
+      Q <= Q + 1'b1;
+
+endmodule : up_counter

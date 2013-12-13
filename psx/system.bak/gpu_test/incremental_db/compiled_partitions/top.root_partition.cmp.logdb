@@ -1,0 +1,12 @@
+v1
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_u|lpm_mult:Mult16|mult_lbt:auto_generated|mac_mult3,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_u|lpm_mult:Mult16|mult_lbt:auto_generated|mac_mult1,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_v|lpm_mult:Mult16|mult_lbt:auto_generated|mac_mult3,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_v|lpm_mult:Mult16|mult_lbt:auto_generated|mac_mult1,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_g|lpm_mult:Mult15|mult_lbt:auto_generated|mac_mult3,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_g|lpm_mult:Mult15|mult_lbt:auto_generated|mac_mult1,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_b|lpm_mult:Mult15|mult_lbt:auto_generated|mac_mult3,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_b|lpm_mult:Mult15|mult_lbt:auto_generated|mac_mult1,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_r|lpm_mult:Mult15|mult_lbt:auto_generated|mac_mult3,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,gpu:gp|interp:in_r|lpm_mult:Mult15|mult_lbt:auto_generated|mac_mult1,
+PORT_SWAPPING,PORT_SWAP_TYPE_DSPMULT,display_out:dc|lpm_mult:Mult0|mult_oct:auto_generated|mac_mult1,

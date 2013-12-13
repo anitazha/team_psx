@@ -161,12 +161,12 @@
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult26" CBX_FILE_NAME="mult_qbt.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult62" CBX_FILE_NAME="mult_qbt.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult8" CBX_FILE_NAME="mult_adt.tdf"/>
-		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|altsyncram:\stp_non_zero_ram_gen:stp_buffer_ram" CBX_FILE_NAME="altsyncram_5224.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|altsyncram:\stp_non_zero_ram_gen:stp_buffer_ram" CBX_FILE_NAME="altsyncram_k224.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult126" CBX_FILE_NAME="mult_adt.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult27" CBX_FILE_NAME="mult_adt.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult63" CBX_FILE_NAME="mult_adt.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult9" CBX_FILE_NAME="mult_adt.tdf"/>
-		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|sld_offload_buffer_mgr:\stp_non_zero_depth_offload_gen:stp_offload_buff_mgr_inst|LPM_COUNTER:\adv_point_3_and_more:advance_pointer_counter" CBX_FILE_NAME="cntr_jii.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|sld_signaltap:auto_signaltap_0|sld_signaltap_impl:sld_signaltap_body|sld_signaltap_implb:sld_signaltap_body|sld_offload_buffer_mgr:\stp_non_zero_depth_offload_gen:stp_offload_buff_mgr_inst|LPM_COUNTER:\adv_point_3_and_more:advance_pointer_counter" CBX_FILE_NAME="cntr_uii.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult127" CBX_FILE_NAME="mult_adt.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult28" CBX_FILE_NAME="mult_adt.tdf"/>
 		<CBX_INST_ENTRY INSTANCE_NAME="|system_top|Processor:core|gte:CP2|lpm_mult:Mult64" CBX_FILE_NAME="mult_adt.tdf"/>

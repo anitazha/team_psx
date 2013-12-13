@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP4CE115F29) Path("/afs/ece.cmu.edu/usr/anitazha/private/team_psx/psx/system/output_files/") File("system_top.sof") MfrSpec(OpMask(1));
+		Device PartName(EP4CE115F29) Path("/work/system/output_files/") File("system_top.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 
