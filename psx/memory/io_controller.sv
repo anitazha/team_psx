@@ -56,7 +56,9 @@ module io_controller(input  logic clk, rst,
                      input logic         hblank, vblank,
                      input logic         dotclock,
 
-                     output logic [10:0] interrupts
+                     output logic [10:0] interrupts,
+		     output logic [35:0] gpio_o,
+		     output logic [17:0] ledr_o
                      );
 
    /* PARAMETERS */         // 15'h   1    F    8    0  ~
@@ -108,6 +110,108 @@ module io_controller(input  logic clk, rst,
 
    localparam CACHE_CTRL_ADDR = 32'hFFFE_0130;
 
+   /* PONG Controller States */
+   localparam INIT  = 3'b000;
+   localparam COUNT = 3'b001;
+   localparam START = 3'b010;
+   localparam WAIT1  = 3'b100;
+
+   /* PONG */
+   reg [2:0]   curr_pong, next_pong;
+   reg [7:0]   control_state, rx_data_o, tx_data_o;
+   reg [4:0]   byte_no_o;
+   reg [3:0]   c_type_o;
+      
+   reg       start, next_start, err;
+   reg       DATA, ACK, COMMAND, ATT;
+   reg       c_clk;
+   reg       SLCT, STRT, UP, DOWN, RGHT, LEFT;
+   reg       L1, L2, R1, R2, TRI, SQU, XXX, CIR;
+   reg [7:0] RJOY_X, RJOY_Y, LJOY_X, LJOY_Y;
+   reg 	     RJOY, LJOY;
+
+   reg [15:0] counter;
+
+   assign DATA = gpio_o[27];
+   assign ACK  = gpio_o[25];
+   assign gpio_o[29] = ATT;
+   assign gpio_o[26] = c_clk;
+   assign gpio_o[28] = COMMAND;
+
+   controller_io joypad(.*);
+   wire [7:0] out1, out2, out3, out4, out5, out6, out7, out8, out9, out0;
+   assign out1 = {SLCT, STRT, LJOY, RJOY, SQU, TRI, CIR, XXX};
+   assign out2 = {L1, L2, R1, R2, UP, DOWN, LEFT, ,RGHT};
+
+   //assign clk = CLOCK_50;
+   //assign rst = ~KEY[0];
+
+   assign ledr_o[15:0] = {out1, out2};
+
+   /* counter for delay */
+   always @ (posedge clk, posedge rst) begin
+      if (rst) begin
+	 counter <= 'd0;
+      end
+      else if (curr_state == INIT) begin
+	 counter <= 'd0;
+      end
+      else begin
+	 counter <= counter + 'd1;
+      end
+   end
+   
+   /* FSM next state logic */
+   always @ (posedge clk, posedge rst) begin
+      if (rst) begin
+	 curr_pong <= INIT;
+	 start <= 1'b0;
+      end
+      else begin
+	 curr_pong <= next_pong;
+	 start <= next_start;
+      end
+   end
+   
+   
+   /* controller FSM */
+   always_comb begin
+      /* DEFAULTS */
+      next_pong = curr_pong;
+      next_start = 1'b0;
+
+      case (curr_pong)
+	INIT: begin
+	   next_pong = COUNT;
+	end
+	
+	COUNT: begin
+	   if (counter > 512) begin
+	      next_pong = START;
+	      next_pong = 1'b1;
+	   end
+	   else begin
+	      next_pong = COUNT;
+	   end
+	end
+
+	START: begin
+	   next_pong = WAIT1;
+	   next_pong = 1'b0;
+	end
+
+	WAIT1: begin
+	   if (ATT) begin
+	      next_pong = INIT;
+	   end
+	   else begin
+	      next_pong = WAIT1;
+	   end
+	end
+      endcase // case (curr_state)
+   end // always_comb
+
+   
    /* PSX I/O REGISTERS */
    // - Memory Control 1
    reg [31:0]  MEM_CTRL_1 [0:8];    // 0x1F801000 - 0x1F801023
@@ -639,6 +743,9 @@ module io_controller(input  logic clk, rst,
          end
       end
       else begin
+	 next_MEM_CTRL_1[0] = {4'd0, L1, L2, R1, R2, UP, DOWN, RGHT, LEFT,
+			       XXX, SQU, TRI, CIR};
+	 
          /* DMA MADR registers */
          if (DMA_MADR_new[0]) next_DMA0[0] = DMA0_MADR;
          else begin

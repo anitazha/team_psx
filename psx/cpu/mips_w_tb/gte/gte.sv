@@ -15,7 +15,7 @@ module gte_fsm(
 
     always_comb begin
         /* Defaults */
-		next_state = curr_state;
+		  next_state = curr_state;
         en_cyc   = 1'b0;
         ld_inst  = 1'b0;
         clr_inst = 1'b0;
@@ -192,11 +192,11 @@ module gte(
         end
         else if (ctc2_en) begin
             // writeback cop2c registers
-            cop2c <= nxt_cop2c;
+				cop2c <= nxt_cop2c;
         end
         else if (mtc2_en) begin
-            // writeback cop2d registers
-            cop2d <= nxt_cop2d;
+				// writeback cop2d registers
+				cop2d <= nxt_cop2d;
         end
         else begin
             // writeback cop2c registers
@@ -2007,3 +2007,17 @@ module gte_decode(
     end
 endmodule: gte_decode
 
+module up_counter
+ #(parameter WIDTH = 8)
+  (input  logic             clk, en, clr, rst,
+   output logic [WIDTH-1:0] Q);
+
+  always_ff @(posedge clk, posedge rst)
+    if (rst)
+      Q <= 0;
+    else if (clr)
+      Q <= 0;
+    else if (en)
+      Q <= Q + 1'b1;
+
+endmodule : up_counter

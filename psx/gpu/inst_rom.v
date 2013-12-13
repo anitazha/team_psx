@@ -4,7 +4,7 @@
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: blockram_16k_6.v
+// File Name: inst_rom.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -34,9 +34,9 @@
 
 
 // synopsys translate_off
-//`timescale 1 ps / 1 ps
+`timescale 1 ps / 1 ps
 // synopsys translate_on
-module blockram_16k_6 (
+module inst_rom (
 	address,
 	clock,
 	q);
@@ -83,14 +83,20 @@ module blockram_16k_6 (
 		altsyncram_component.address_aclr_a = "NONE",
 		altsyncram_component.clock_enable_input_a = "BYPASS",
 		altsyncram_component.clock_enable_output_a = "BYPASS",
-		altsyncram_component.init_file = "../mif_files/bios_16k_6.mif",
+`ifdef NO_PLI
+		altsyncram_component.init_file = "prgm.rif"
+`else
+		altsyncram_component.init_file = "prgm.hex"
+`endif
+,
 		altsyncram_component.intended_device_family = "Cyclone IV E",
 		altsyncram_component.lpm_hint = "ENABLE_RUNTIME_MOD=NO",
 		altsyncram_component.lpm_type = "altsyncram",
 		altsyncram_component.numwords_a = 4096,
 		altsyncram_component.operation_mode = "ROM",
 		altsyncram_component.outdata_aclr_a = "NONE",
-		altsyncram_component.outdata_reg_a = "UNREGISTERED",
+		altsyncram_component.outdata_reg_a = "CLOCK0",
+		altsyncram_component.ram_block_type = "M9K",
 		altsyncram_component.widthad_a = 12,
 		altsyncram_component.width_a = 32,
 		altsyncram_component.width_byteena_a = 1;
@@ -118,11 +124,11 @@ endmodule
 // Retrieval info: PRIVATE: JTAG_ENABLED NUMERIC "0"
 // Retrieval info: PRIVATE: JTAG_ID STRING "NONE"
 // Retrieval info: PRIVATE: MAXIMUM_DEPTH NUMERIC "0"
-// Retrieval info: PRIVATE: MIFfilename STRING "../mif_files/bios_16k_6.mif"
+// Retrieval info: PRIVATE: MIFfilename STRING "prgm.hex"
 // Retrieval info: PRIVATE: NUMWORDS_A NUMERIC "4096"
-// Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "0"
+// Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "2"
 // Retrieval info: PRIVATE: RegAddr NUMERIC "1"
-// Retrieval info: PRIVATE: RegOutput NUMERIC "0"
+// Retrieval info: PRIVATE: RegOutput NUMERIC "1"
 // Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
 // Retrieval info: PRIVATE: SingleClock NUMERIC "1"
 // Retrieval info: PRIVATE: UseDQRAM NUMERIC "0"
@@ -133,14 +139,15 @@ endmodule
 // Retrieval info: CONSTANT: ADDRESS_ACLR_A STRING "NONE"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_INPUT_A STRING "BYPASS"
 // Retrieval info: CONSTANT: CLOCK_ENABLE_OUTPUT_A STRING "BYPASS"
-// Retrieval info: CONSTANT: INIT_FILE STRING "../mif_files/bios_16k_6.mif"
+// Retrieval info: CONSTANT: INIT_FILE STRING "prgm.hex"
 // Retrieval info: CONSTANT: INTENDED_DEVICE_FAMILY STRING "Cyclone IV E"
 // Retrieval info: CONSTANT: LPM_HINT STRING "ENABLE_RUNTIME_MOD=NO"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "altsyncram"
 // Retrieval info: CONSTANT: NUMWORDS_A NUMERIC "4096"
 // Retrieval info: CONSTANT: OPERATION_MODE STRING "ROM"
 // Retrieval info: CONSTANT: OUTDATA_ACLR_A STRING "NONE"
-// Retrieval info: CONSTANT: OUTDATA_REG_A STRING "UNREGISTERED"
+// Retrieval info: CONSTANT: OUTDATA_REG_A STRING "CLOCK0"
+// Retrieval info: CONSTANT: RAM_BLOCK_TYPE STRING "M9K"
 // Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "12"
 // Retrieval info: CONSTANT: WIDTH_A NUMERIC "32"
 // Retrieval info: CONSTANT: WIDTH_BYTEENA_A NUMERIC "1"
@@ -150,10 +157,10 @@ endmodule
 // Retrieval info: CONNECT: @address_a 0 0 12 0 address 0 0 12 0
 // Retrieval info: CONNECT: @clock0 0 0 0 0 clock 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 32 0 @q_a 0 0 32 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL blockram_16k_6.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL blockram_16k_6.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL blockram_16k_6.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL blockram_16k_6.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL blockram_16k_6_inst.v FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL blockram_16k_6_bb.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL inst_rom.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL inst_rom.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL inst_rom.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL inst_rom.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL inst_rom_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL inst_rom_bb.v FALSE
 // Retrieval info: LIB_FILE: altera_mf
