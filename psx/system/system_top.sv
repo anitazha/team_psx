@@ -63,7 +63,8 @@ module system_top(
     logic             enable;
     logic [31:0]      gpu_main_bus;
     logic             gpu_main_bus_rdy, gpu_main_bus_re;
-    logic             to_gp0, to_gp1, gp0, gp1;
+    logic             to_gp0, to_gp1;
+    logic [31:0]      gp0, gp1;
     logic             gpu_fifo_full;
     logic [31:0]      gpu_read, gpu_stat;
     logic [19:0]      inst_addr, inst_addr_n;
