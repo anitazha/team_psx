@@ -1,0 +1,95 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 1991-2015 Altera Corporation. All rights reserved.
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, the Altera Quartus Prime License Agreement,
+# the Altera MegaCore Function License Agreement, or other 
+# applicable license agreement, including, without limitation, 
+# that your use is for the sole purpose of programming logic 
+# devices manufactured by Altera and sold by Altera or its 
+# authorized distributors.  Please refer to the applicable 
+# agreement for further details.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus Prime
+# Version 15.1.0 Build 185 10/21/2015 SJ Lite Edition
+# Date created = 20:23:57  April 09, 2018
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		psx_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus Prime software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "Cyclone V"
+set_global_assignment -name DEVICE 5CEFA9F23C8
+set_global_assignment -name TOP_LEVEL_ENTITY psx
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 15.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "20:23:57  APRIL 09, 2018"
+set_global_assignment -name LAST_QUARTUS_VERSION 15.1.0
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/vram_control.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/vga.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/triangle.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/line.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/interp.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/gpu_tx.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/fifo.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/gpu/display_out.sv
+set_global_assignment -name VERILOG_INCLUDE_FILE ../../src/cdrom/cdrom.vh
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/cdrom/cdrom.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/cdrom/cd_fifo.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/cpu/mips_w_tb/gte/components.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/cpu/mips_w_tb/gte/gte_defines.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/cpu/mips_w_tb/gte/gte.sv
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/TrapDetect.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/RegisterFile.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Register.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Processor.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Mux4.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Mux2.v
+set_global_assignment -name VERILOG_INCLUDE_FILE ../../src/cpu/mips_w_tb/src/MIPS_Parameters.vh
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/MEMWB_Stage.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/MemControl.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/IFID_Stage.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/IDEX_Stage.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Hazard_Detection.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/EXMEM_Stage.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Divide.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/CPZero.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Control.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Compare.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/ALU.v
+set_global_assignment -name VERILOG_FILE ../../src/cpu/mips_w_tb/src/Add.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/controller/controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/hw_reg_modules/timers.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/hw_reg_modules/joy_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/hw_reg_modules/interrupts.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/hw_reg_modules/dma.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/test_mem_top.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/mem_controller_sim.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/mem_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/io_controller.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/addr_interp_sim.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../src/memory/addr_interp.sv
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (SystemVerilog)"
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_id eda_simulation
